@@ -1,75 +1,68 @@
 #!/usr/bin/python
 
-import pandas as pd
-import numpy as np
+import logging
+import math
 import os
-import openpyxl
 import json
 import re
-import math
+import sys
 
+import pandas as pd
+import numpy as np
+import openpyxl
 
-class database:
-    def __init__(self, data_file, output_dir):
-        self.path = os.getcwd() + "/Daten/" + data_file
-        self.output_dir = os.getcwd() + "/" + output_dir
+class Database:
+
+    def __init__(self, data_file, output_dir, logger=None):
+        if logger == None:
+            self.log = logging.getLogger(__file__)
+        else:
+            self.log = logger
+        self.path = data_file
+        self.log.info('DATA FILE {}'.format(self.path))
+        self.output_dir = output_dir
+        self.log.info('OUTPUT DIR {}'.format(self.output_dir))
         self.sheets = self.get_sheets()
-        self.systems = {}
+        self.systems = self.get_systems()
 
     def get_systems(self):
-
         systems = {}
-
         file = pd.read_excel(self.path, sheet_name="ReadMe")
+        data = file.values
+        # Identify BAC Colums
+        bac = {}
+        for row in range(len(data)):
+            line = data[row]
+            for col in range(len(line)):
+                column = line[col]
+                # Check if value is numeric
+                if isinstance(column, (int, float, complex)) and math.isnan(column):
+                    continue
+                m = re.match(r'BAC=(\d+)\s+\((\d+)\s+binary\s+systems\)', column)
+                if not m:
+                    continue
+                bac[int(m.group(1))] = { 'num': int(m.group(2)), 'row':row, 'col':col }
+        #self.log.debug(bac)
+        for n, val in bac.items():
+            for i in range(val['row'] + 2, val['row'] + 2 + val['num']):
+                comp1 = data[i][val['col']]
+                comp2 = data[i][val['col']+1]
+                sheet = data[i][val['col']+2]
+                systems[comp1+"_"+comp2] = { "sheet": sheet, "BAC": n }
+        return systems
 
+    def parse_sheets(self):
+        for sys, val in self.systems.items():
+            self.parse_sheet(sys)
+        return
+
+    def parse_sheet(self, sheet_name):
+        system = self.systems[sheet_name]["sheet"]
+        file = pd.read_excel(self.path, sheet_name=system)
         data = file.values
 
-        # Identify BAC Colums
-        for line in data:
-            for column in line:
-                
-                # Check if value is numeric
-                if isinstance(column, (int, float, complex)):
-                    
-                    # Check if value is empty cell
-                    if math.isnan(column):
-                        continue
-                
-                test = re.match('BAC',column)
-                
-                if test is not None:
-                    row = int(np.where(data == line)[0][0])
-                    # row = data.index(line)
-                    col = int(np.where(line == column)[0][0])
-                    # col = line.index(column)
-                    name_start = test.regs[0][0]
-                    name_end = test.regs[0][1]
-                    bac = int(column[name_end+1])
-                    name = column[name_start:name_end] + column[name_end+1]
+        return
 
-                    stop = False
-                    counter = row + 1
-                    row_limit = len(data)
-
-                    while stop == False:
-                        
-                        counter += 1
-
-                        if counter + 1 == row_limit:
-                            stop = True
-                            continue
-
-                        component1 = data[counter][col]
-                        component2 = data[counter][col+1]
-                        sheet = data[counter][col+2]
-                        
-                        if isinstance(component1, (int, float, complex)):
-                            if math.isnan(component1):
-                                stop = True
-                                continue
-
-                        self.systems[component1+"_"+component2] = {"sheet": sheet, "BAC": bac}
-                        
     def get_system_data(self, system):
 
         def check_for_dict(dic):
@@ -417,11 +410,3 @@ class database:
 
         with open(path, 'w') as outfile:
             json.dump(self.systems[system], outfile, ensure_ascii=False, indent=4)
-        
-
-
-dat = database("ie0c01734_si_001.xlsx","Datenbank")
-dat.get_systems()
-dat.get_all_data()
-# dat.get_system_data('ARGON_METHANE')
-asdasd
