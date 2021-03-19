@@ -1,0 +1,51 @@
+\documentclass[12pt,a4paper,oneside]{article}
+\usepackage{chemfig}
+\usepackage[version=4]{mhchem}
+\begin{document}
+\begin{figure}
+\centering
+\setchemfig{atom sep=9mm}
+\schemestart
+\chemfig{H-[:0]C(-[:90]H)(-[:0]H)(-[:-90]H)}
+\arrow{0}[0,1]
+\chemfig{H-[:0]C(-[:90]H)(-[:-90]H)(-[:0]C(-[:0]H)(-[:90]H)(-[:-90]H))}
+\schemestop
+\end{figure}
+\begin{figure}
+\centering
+\setchemfig{atom sep=9mm}
+\schemestart
+%\chemfig{\charge{135=\|,-135=\|}{O}=C=@{ac1}\charge{45=\|,-45=\|}{O}}
+\chemfig{\charge{45:7pt=$\delta^-$,135=\|,-135=\|}{O}=C=@{ac1}\charge{45:7pt=$\delta^-$,45=\|,-45=\|}{O}}
+\arrow{0}[0,1]
+\chemfig{@{dn1}\charge{140:5pt=$\delta^+$}{H}-[::30]\lewis{13,O}-[::-60]H}
+\schemestop
+\chemmove{
+	\draw[shorten <=2pt,shorten >=4pt,red,dotted](dn1.120).. controls+(-0.7cm,0.9cm)..(ac1.45);}
+\end{figure}
+%
+%\begin{figure}
+%\centering
+%\setchemfig{atom sep=9mm}
+%\schemestart
+%\chemfig{@{ac2}\charge{45:7pt=$\delta^+$}{H}-[:-180]\charge{45:7pt=$\delta^+$}{C}(-[:180]\charge{45:7pt=$\delta^-$}{F})(-[:90]\charge{45:7pt=$\delta^-$}{F})(-[:-90]\charge{45:7pt=$\delta^-$}{F})}
+%\arrow{0}[0,1]
+%\chemfig{\charge{135:5pt=$\delta^+$}{H}-[::30]@{dn2}\charge{45:8pt=$\delta^-$}{\lewis{13,O}}-[::-60]{\charge{45:7pt=$\delta^+$}{H}}}
+%\schemestop
+%\chemmove{
+%	\draw[shorten <=5pt,shorten >=4pt,red,dotted](dn2.130).. controls+(-0.7cm,0.9cm)and+(north:1.5cm)..(ac2.90);}
+%\end{figure}
+%
+%
+%\begin{figure}
+%\centering
+%\setchemfig{atom sep=9mm}
+%\schemestart
+%\chemfig{\charge{135:5pt=$\delta^+$}{H}-[::30]\charge{45:8pt=$\delta^-$}{\lewis{13,O}}-[::-60]@{ac3}{\charge{45:7pt=$\delta^+$}{H}}}
+%\arrow{0}[0,1]
+%\chemfig{\charge{135:5pt=$\delta^+$}{H}-[::30]@{dn3}\charge{45:8pt=$\delta^-$}{\lewis{13,O}}-[::-60]{\charge{45:7pt=$\delta^+$}{H}}}
+%\schemestop
+%\chemmove{
+%	\draw[shorten <=5pt,shorten >=4pt,red,dotted](dn3.130).. controls+(-0.7cm,0.9cm)and+(north:1.5cm)..(ac3.90);}
+%\end{figure}
+\end{document}

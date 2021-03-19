@@ -1,0 +1,177 @@
+\documentclass[../thesis.tex]{subfiles}
+
+
+
+\begin{document}
+	
+% set hydrogen bonding charakteristics %from https://tex.stackexchange.com/questions/577565/how-to-draw-a-dotted-hydrogen-bond-with-chemfig
+\makeatletter % from: https://tex.stackexchange.com/a/101263/134144
+\tikzset{
+	dot diameter/.store in=\dot@diameter,
+	dot diameter=1pt,
+	dot spacing/.store in=\dot@spacing,
+	dot spacing=3.0pt,
+	dots/.style={
+		line width=\dot@diameter,
+		line cap=round,
+		dash pattern=on 0pt off \dot@spacing
+	}
+}
+\makeatother
+
+\chapter{Theoretische Grundlagen}
+\label{chp: grundlagen}
+
+\section{Thermodynamisches Modell}
+
+Thermodynamische Modelle dienen dazu den Zustand eines Systems mit Hilfe von mathematischen Gleichungen zu beschreiben \cite{atkins2006atkins}. Diese so gennanten Zustandsgleichungen stellen einen Zusammenhang zwischen den Zustandsgrößen, welche den Zustand eines Systems eindeutig beschreiben, her. Die Größen sind meistens der Druck $p$, die Temperatur $T$ und das molare Volumen $v$. Falls zwei dieser drei Größen gegeben sind kann die unbekannte berechnet werden. Zustandsgleichungen haben meistens folgende Form:
+\begin{equation}
+	p = f(T,v)
+\end{equation}
+
+\section{Bewertung thermodynamischer Modelle}
+
+Um thermodynamische Modelle bewerten zu können werden das anhand von experimentell ermittelten Daten getestet und validiert. Schwierigkeiten dabei sind die Erhebung von Daten über einen großen Temperatur- und Druckbereich sowie das Durchführen von Experimentellen für möglichst viele verschiedene Stoffgemische. Um eine möglichst objektive Bewertung möglich zu machen müssen die Stoffe und Gemische zunächst klassifiziert und dann für alle Klassen experimentelle Daten ausgewählt werden. Hierbei ist zu beachten, dass alle Klassen gleichmäßig in den Daten vertreten sein sollten um eine gleichmäßig gewichtete Bewertung vornehmen zu können.
+Die Bewertung des thermodynamischen Modells geschieht anhand der Abweichung der experimentellen von den errechneten Daten des Modells.
+In den folgenden Abschnitten wird die genannten Schritte zur Bewertung eines Modells näher erläutert.
+
+\subsection{Stoffklassifikation}
+
+Die vorgenommene Stoffklassifikation unterteilt die Stoffe anhand ihres Assoziationscharakters. Diese Eigenschaft beschreibt die Fähigkeit der Wasserstoffbrückenbildung. Es wurden vier verschiedene Kategorien erstellt, welche nun genauer beschrieben werden.
+
+\subsubsection{Nicht assoziative Stoffe}
+
+Nicht assoziative Stoffe besitzen keine Fähigkeit Wasserstoffbrückenbindungen zu bilden. Sie besitzen weder das dafür nötige freie Elektronenpaar, noch das ebenfalls notwendige zugängliche Wasserstoff Atom. Beispiele für einen solche nicht assoziativen Stoffe sind in \autoref{fig: NA-bsp} dargestellt.
+
+\begin{figure}[htbp]
+	\centering
+	\setchemfig{atom sep=9mm}
+	\schemestart
+		\chemfig{H-[:0]C(-[:90]H)(-[:0]H)(-[:-90]H)}
+		\arrow{0}[0,1]
+		\chemfig{H-[:0]C(-[:90]H)(-[:-90]H)(-[:0]C(-[:0]H)(-[:90]H)(-[:-90]H))}
+	\schemestop
+	\caption{Ethan und Methan als Beispiele nicht assoziativer Stoffe}
+	\label{fig: NA-bsp}
+\end{figure}
+
+\subsubsection{Wasserstoff akzeptierende Stoffe}
+
+Wasserstoff akzeptierende Stoffe weisen im Gegensatz zu den nicht assoziativen Stoffen eine freies Elektronenpaar auf. Mit dieses freie Elektronenpaar kann ein Wasserstoffatom eine Wasserstoffbrückenbindung eingehen. Als Beispiel für einen solchen Stoff ist in \autoref{fig: HA-bsp} $\mathrm{CO_2}$ dargestellt.
+
+\begin{figure}[htbp]
+	\centering
+	\setchemfig{atom sep=9mm}
+	\schemestart
+	\chemfig{
+		\charge{135=\|,-135=\|}{O}=C=\charge{45=\|,-45=\|}{O}-[:0,,,,,dots,red]H-[:45]\charge{45=\|,135=\|}{O}-[:-45]H}
+	\schemestop
+	\caption{$\mathrm{CO_2}$  als Beispiel für einen Wasserstoff akzeptierenden Stoff}
+	\label{fig: HA-bsp}
+\end{figure}
+
+\subsubsection{Wasserstoff bereitstellende Stoffe}
+
+Wasserstoff bereitstellende Stoffe haben mindestens ein partiell positiv geladenes Wasserstoffatom mit dem eine Wasserstoffbrückenbindung eingegangen werden kann. Als Beispiel für einen Stoff dieser Kategorie ist in \autoref{fig: HD-bsp} das Molekül Trifluormethan dargestellt.
+
+\begin{figure}
+	\centering
+	\setchemfig{atom sep=9mm}
+	\schemestart
+	\chemfig{C(-[:-180]F)(-[:90]F)(-[:-90]F)(-H-[:0,,,,,dots,red]{\charge{135=\|,-135=\|}{O}}(-[:45]H)(-[:-45]H))}
+	\schemestop
+	\caption{Trifluormethan als Beispiel für einen Wasserstoff bereitstellenden Stoff}
+	\label{fig: HD-bsp}
+\end{figure}
+
+\subsubsection{Selbst assoziative Stoffe}
+
+Stoffe die mit sich selbst eine Wasserstoffbrückenbindung eingehen können werden selbst assoziativ genannt. Sie weisen sowohl ein freies Elektronenpaar als auch ein partiell positiv geladenes Wasserstoffatom auf. Als Beispiel ist in \autoref{fig: SA-bsp} das Molekül Wasser dargestellt.
+
+\begin{figure}
+	\centering
+	\setchemfig{atom sep=9mm}
+	\schemestart
+	\chemfig{H-[:45]{\charge{45=\|,135=\|}{O}}-[:-45]H-[:0,,,,,dots,red]{\charge{135=\|,-135=\|}{O}}(-[:45]H)(-[:-45]H)}
+	\schemestop
+	\caption{Wasser als Beispiel für einen selbst assoziierenden Stoff}
+	\label{fig: SA-bsp}
+\end{figure}
+
+\subsubsection{Gemischklassifikation}
+
+Mit Klassifikation der Stoffe nach ihrer Assoziativität gegenüber Wasserstoff können Gemische aus 2 Stoffen in 9 verschiedene Gruppen unterteilt werden. Eine Darstellung der Zuordnungen für ein binäres Gemisch ist in \autoref{tab: bin-bac} dargestellt.
+
+\begin{table} [htb]
+	\centering
+	\caption{binäre Gemischkombinationen von Assoziativitäten}
+	\begin{tabular}{ cccc }
+		\hline 
+		BAC & Stoff 1 & Stoffe 2 & Klasse\\
+		\hline % \\ [\dimexpr-\normalbaselineskip+2pt]
+		1  & nicht assoziativ & nicht assoziativ & 1 \\
+		2  & nicht assoziativ & Wasserstoff akzeptierend & 1 \\
+		3  & nicht assoziativ & Wasserstoff bereitstellend & 1 \\
+		4  & Wasserstoff bereitstellend & Wasserstoff bereitstellend & 1 \\
+		4  & Wasserstoff akzeptierend & Wasserstoff akzeptierend & 1 \\
+		5  & nicht assoziativ & selbst assoziativ & 2 \\
+		6  & Wasserstoff bereitstellend & Wasserstoff akzeptierend & 3 \\
+		7  & Wasserstoff bereitstellend & selbst assoziativ & 4 \\
+		8  & Wasserstoff akzeptierend & selbst assoziativ & 4 \\
+		9  & selbst assoziativ & selbst assoziativ & 4 \\
+%		[\dimexpr-\normalbaselineskip+23pt]
+		\hline
+		\label{tab: bin-bac}
+	\end{tabular}
+\end{table}
+
+Der BAC auch \textbf{B}inary \textbf{A}ssociation \textbf{C}ode genannt dient der Unterscheidung der Kombinationen. Diese Kombinationen können weiter zusammengefasst werden, sodass 4 Klassen entstehen.
+
+In der ersten Klasse befinden sich Gemische die keine Assoziation aufweisen. Sie haben entweder mindestens einen nicht assoziativen Stoff oder bestehen nur aus Stoffen mit Wasserstoff bereitstellendem oder akzeptierenden Charakter. Die Komplexität der Wechselwirkungen zwischen den Molekülen in dieser Klasse ist gering und steigt kann durch den BAC Wert abgeschätzt werden. Je höher dieser ist desto komplexer das Modell.
+
+In der zweiten Klasse befinden sich Gemische, welche aus einem nicht assoziativen Stoff und einem selbst assoziativen Stoff bestehen. In diesen Gemischen tritt Selbstassoziation auf. Der nicht assoziative Stoff stört die Wasserstoffbrückenbindungen und löst bestehende Bindungen teilweise wieder auf. Als Resultat dieses Phänomens sind oft partielle Mischungslücken zu beobachten \cite{jaubert2020benchmark}. Gemische aus Wasser und Alkanen oder Alkohol und Alkanen sind Beispiele für Gemische dieser Klasse.
+
+In der dritten Klasse befinden sich Gemische, die eine Wasserstoffbrückenbildung zwischen den beteiligten Komponenten ermöglichen. Dieses auch ''cross association'' genannte Phänomen tritt ein, wenn ein Stoff mit einem partiell positiv geladenen Wasserstoff Atom mit einem anderen Stoff, welcher ein freies Elektronenpaar hat gemischt wird. Durch die auftretende Wechselwirkung bei der Mischung weisen diese Gemische eine negative Abweichung vom Idealverhalten auf. Das ideale Verhalten beschreibt die Reinstoffe. STIMMT DAS?
+
+In der vierten Klasse befinden sich Gemische, in denen sowohl selbst Assoziation als auch ''cross assoziation'' auftreten können. Das Verhalten dieser Stoffe ist schwer vorherzusagen, da sowohl eine Verstärkung als auch eine Abschwächung des Wasserstoffbrückennetzwerks erfolgen können \cite{jaubert2020benchmark}.
+
+\subsection{Stoffauswahl}
+
+Bei der Auswahl der Stoffe dient die Bewertung der Abweichung vom idealen Verhalten als Kriterium. Es ist sowohl eine quantitative als auch eine qualitative Bewertung vorgenommen worden.
+
+Für die qualitative Bewertung der Abweichung vom idealen Verhalten wurden folgende Kriterien verwendet:
+\begin{itemize}
+	\item Molekülgröße
+	\item Molekülform
+	\item energetische Interaktion (unabhängig von Temperatur, Druck und Zusammensetzung)
+\end{itemize}
+Ein Gemisch gilt qualitativ als ideal, wenn die Molekülgröße, -form und energetische Interaktion für beide der beteiligten Stoffe ähnliche Werte aufweisen.
+Um eine möglichst gleichmäßige Verteilung der Kriterien in den Daten zu gewährleisten beinhaltet jede BAC Gruppe etwa 20 binäre Systeme.
+
+
+
+
+\subsubsection{Bewertung des Idealverhalten}
+\label{sec: bew-ideal}
+
+Zur Bewertung des Idealverhaltens 
+
+\subsection{Bewertungskriterien und Bewertungsgrößen}
+
+Zur Bewertung eines thermodynamischen Modells werden folgende Größen verwendet:
+\begin{itemize}
+	\item kritischer Druck
+	\item kritische Zusammensetzung
+	\item azeotroper Druck
+	\item azeotrope Zusammensetzung
+	\item Zusammensetzung Flüssigphase
+	\item Zusammensetzung Dampfphase (oder zweite Flüssigphase)
+	\item 3 Phasen Druck
+	\item 3 Phasen Zusammensetzung
+	\item Mischungsenthalpie
+	\item Mischungswärmekapazität
+\end{itemize}
+
+Diese Größen werden für jedes Stoffgemisch falls möglich berechnet und mit den experimentellen Daten verglichen.
+
+\end{document}
