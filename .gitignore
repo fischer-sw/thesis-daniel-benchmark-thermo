@@ -1,0 +1,16 @@
+
+*.out
+*.aux
+*.log
+*.blg
+*.bbl
+*.gz
+*.toc
+*.pdf
+!figs/*.pdf
+*.ps
+*dvi
+*.out.ps
+*.lof
+*.lot
+*.json
