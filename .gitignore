@@ -8,7 +8,6 @@
 *.toc
 *.pdf
 !figs/*.pdf
-!Literatur/*.pdf
 *.ps
 *dvi
 *.out.ps

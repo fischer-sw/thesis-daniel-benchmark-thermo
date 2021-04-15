@@ -145,16 +145,78 @@ Für die qualitative Bewertung der Abweichung vom idealen Verhalten wurden folge
 	\item Molekülform
 	\item energetische Interaktion (unabhängig von Temperatur, Druck und Zusammensetzung)
 \end{itemize}
-Ein Gemisch gilt qualitativ als ideal, wenn die Molekülgröße, -form und energetische Interaktion für beide der beteiligten Stoffe ähnliche Werte aufweisen.
-Um eine möglichst gleichmäßige Verteilung der Kriterien in den Daten zu gewährleisten beinhaltet jede BAC Gruppe etwa 20 binäre Systeme.
+Ein Gemisch gilt qualitativ als ideal, wenn die Molekülgröße, -form und energetische Interaktion für beide der beteiligten Stoffe ähnliche Werte, unabhängig von Temperatur, Druck oder Zusammensetzung, aufweisen.
+Um eine möglichst gleichmäßige Verteilung zwischen sich ideal verhaltenden und vom Idealverhalten abweichende Stoffe in den Daten zu gewährleisten, beinhaltet jede BAC Gruppe etwa 20 binäre Systeme.
+Die Abweichung kann durch alle drei genannten Kriterien hervorgerufen werden. Ist die Abweichung vom Idealverhalten nur durch eine Differenz in der Molekülgröße hervorgerufen, ist die Exzess-Enthalpie $h^{\mathrm{E}}$ vernachlässigbar und das Gemisch wird als \textit{athermal} bezeichnet. Aus der Tatsache, dass die Exzess-Enthalpie vernachlässigbar ist resultiert, dass die Gibbs-Energie $g^{\mathrm{E}}$ proportional zur Exzess-Enthalpie des Gemisches ist.
+\begin{equation}
+	g^E \approx T \cdot s^{\mathrm{E}}
+\end{equation}   
+Die Abweichung ist somit durch entropische Effekte zu erklären.
 
+Ist die Abweichung nur durch eine Differenz in der energetischen Interaktion der beteiligten Komponenten hervorgerufen, ist die Exzess-Entropie $s^{\mathrm{E}}$ vernachlässigbar und das Gemisch wird als \textit{regular} klassifiziert. Durch die Vernachlässigung der Exzess-Entropie entsteht ein proportionaler Zusammenhang zwischen der Gibbs-Exzess Energie und der Exzess-Entalpie.
+\begin{equation}
+	g^{\mathrm{E}} \approx h^{\mathrm{E}}
+\end{equation}
+In diesem Fall sind enthalpische Effekte der Ursprung der Abweichung.
 
+Sowohl entropische, als auch enthalpische Effekte können in nichtidealen Gemischen der Ursprung für auftretende Abweichungen sein. Die Datenbank enthält sowohl Gemische mit rein entropisch bedingter, als auch Gemische mit rein enthalpisch bedingter, sowie Gemische mit entropisch und enthalpisch bedingter Abweichung.
 
+Für die Bestimmung der quantitativen Abweichung vom idealen Verhalten werden folgende Berechnungsgrößen verwendet:
+\begin{itemize}
+	\item Gibbs-Energie $g^{\mathrm{E}}$
+	\item Enthalpie $h^{\mathrm{E}}$
+	\item Entropie $s^{\mathrm{E}}$
+\end{itemize}
 
-\subsubsection{Bewertung des Idealverhalten}
-\label{sec: bew-ideal}
+Um die benötigten Größen berechnen zu können werden die Aktivitätskoeffizienten aus experimentell erhobenen Dampf-Flüssigkeits-Gleichgewichts Daten berechnet. Dazu wird der $\gamma$-$\varphi$ Ansatz verwendet. Um diesen Ansatz herzuleiten wird das Raoult-sche Gesetz als Basis verwendet.
+\begin{equation}
+	\label{eq: raoult_base}
+	y_i \cdot P = P_{i}^{\mathrm{sat}} \cdot x_i
+\end{equation}
 
-Zur Bewertung des Idealverhaltens 
+In dem hier gewählten Ansatz wird die Dampfphase als ideal angenommen, sodass die linke Seite von \autoref{eq: raoult_base} bestehen bleibt. Die Flüssigphase wird als nicht-ideal angenommen und es wird der Korrekturfaktor $\gamma_i$ eingeführt.
+\begin{equation}
+	\label{eq: raoult_mod}
+	y_i \cdot P = P_{i}^{\mathrm{sat}} \cdot x_i \cdot \gamma_i
+\end{equation}
+
+Der Faktor $\gamma_i$ beschreibt die Abweichung vom Idealverhalten. Im Falle eines sich ideal verhaltenden Stoffgemisches gilt $\gamma_i = 1$.
+\begin{equation}
+	\gamma_i \left(T,x \right) = \dfrac{P_{\mathrm{exp}} \cdot y_{i,\mathrm{exp}}}{P_{i}^{\mathrm{sat}}(T_{\mathrm{exp}}) \cdot x_{i,\mathrm{exp}}}
+\end{equation}
+Die notwendigen temperaturabhängigen Dampfdrücke $P_{i}^{\mathrm{sat}}(T)$ sind der DIPPR Datenbank entnommen.
+Um die Gibbs-Energie $g^{\mathrm{E}}$ berechnen zu können wird ein Ansatz des Margules Gibbs-Exzess-Energie Models verwendet. Der Ansatz fittet 4 Parameter anhand von isobaren Dampf-Flüssigkeit Phasengleichgewichtsdaten und ermöglicht so eine temperaturabhängige Berechnung der Gibbs-Energie. Der nötige Ansatz zum fitten ist in \autoref{eq: fit_par} beschrieben. Es gilt:
+\begin{equation}
+	\label{eq: fit_par}
+	ln(\gamma_i) = A(T)
+\end{equation}
+\begin{equation}
+	A(T) = p_1 - p_2 \cdot T-p_3 \cdot \ln(T)+p_4 \cdot \exp{ \left( \dfrac{1}{T} \right)}
+\end{equation}
+\begin{equation}
+	\dfrac{g^{\mathrm{E}}(T,x)}{RT} = x_1 \cdot x_2 \cdot A(T) 
+\end{equation}
+
+Für das fitten der Parameter wird die gemittelte durchschnittliche Abweichung minimiert. Sobald ein Ansatz für die Gibbs-Exzess-Energie vorliegt lässt sich damit mit \autoref{eq: he_ge} die Enthalpie $h^{\mathrm{E}}$ berechnen.
+\begin{equation}
+	\label{eq: he_ge}
+	h^{\mathrm{E}} = g^{\mathrm{E}} - T \cdot \left( \dfrac{\partial g^{\mathrm{E}}}{\partial T} \right)_x
+\end{equation}
+
+Mit Hilfe der Enthalpie $h^{\mathrm{E}}$ lässt sich mit dem in \autoref{eq: se} beschriebenen Ansatz die Entropie $s^{\mathrm{E}}$ berechnen.
+\begin{equation}
+	\label{eq: se}
+	s^{\mathrm{E}} = \dfrac{h^{\mathrm{E}}}{T}
+\end{equation}
+
+Mit Hilfe der Berechneten Größen kann ein Gemisch klassifiziert und falls es sich nicht ideal verhält der Ursprung der Abweichung bestimmt werden. Dazu werden die Berechnungsgrößen bei einer Zusammensetzung von $x=0.5$ berechnet und anhand der resultierenden Werte die Einteilung vorgenommen. Wie die Einteilung genau erfolgt ist in \autoref{fig: klassifikation} dargestellt.
+
+\begin{figure}[htbp]
+	\centering
+	\includegraphics[scale=0.65]{Idealverhalten.pdf}
+	\caption{Routine zur Bestimmung des Verhalten eines Gemischs und falls notwendig Bestimmung des Ursprungs der Abweichung}
+	\label{fig: klassifikation}
+\end{figure}
 
 \subsection{Bewertungskriterien und Bewertungsgrößen}
 
