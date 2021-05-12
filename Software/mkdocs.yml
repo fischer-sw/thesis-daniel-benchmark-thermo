@@ -4,7 +4,9 @@ theme:
 
 nav:
   - Klassen:
-      - Database: database.md
+    - Database: 
+      - Allgemeines: database.md
+      - Methoden: database_methods.md
 
 plugins:
   - search

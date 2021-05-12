@@ -1,7 +1,5 @@
-# Database class
+# Documentation of Database Class
 
-::: dev.database.database
+## Uasage
 
-# Test class
-
-::: dev.bla.MyClass
+Here is shown how to use the database class

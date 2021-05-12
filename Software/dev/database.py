@@ -19,7 +19,7 @@ class database:
         Arguments:
             data_file (str): Path to data_file relative from folder position
             output_dir (str): Path to folder to put data for each system
-            logger (str): logging object
+            logger (object): logging object
 
         """
         if logger == None:
