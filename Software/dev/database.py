@@ -11,9 +11,17 @@ import pandas as pd
 import numpy as np
 import openpyxl
 
-class Database:
-
+class database:
+    
     def __init__(self, data_file, output_dir, logger=None):
+        """ Constructor of database class
+
+        Arguments:
+            data_file (str): Path to data_file relative from folder position
+            output_dir (str): Path to folder to put data for each system
+            logger (str): logging object
+
+        """
         if logger == None:
             self.log = logging.getLogger(__file__)
         else:
@@ -26,6 +34,12 @@ class Database:
         self.systems = self.get_systems()
 
     def get_systems(self):
+        """ Method to get all systems available including their BAC value and sheet_name
+
+        Returns:
+            dict: dictionary with key for each system containing BAC value and sheet_name
+
+        """
         systems = {}
         file = pd.read_excel(self.path, sheet_name="ReadMe")
         data = file.values
@@ -52,18 +66,41 @@ class Database:
         return systems
 
     def parse_sheets(self):
+        """ Method to parse all sheets from available systems
+
+        """
         for sys, val in self.systems.items():
             self.parse_sheet(sys)
         return
 
     def parse_sheet(self, sheet_name):
+        """ Parse a single system's data
+
+        Arguments:
+
+            sheet_name (str) : spreadsheet to parse
+
+        """
+
         system = self.systems[sheet_name]["sheet"]
         file = pd.read_excel(self.path, sheet_name=system)
         data = file.values
 
         return
+    
 
     def get_system_data(self, system):
+        """ Method to return all data available for a specific system
+
+        Arguments:
+
+            system (str): system to get all data from
+
+        Returns:
+
+            dict: returns dict with all data that was on spreadsheet
+
+        """
 
         def check_for_dict(dic):
             if dic not in self.systems[system]:
@@ -383,6 +420,14 @@ class Database:
 
 
     def get_sheets(self):
+        """ Method to get all sheets from excel file
+
+        Returns:
+
+            list: list with all spreadsheet names
+
+        """
+
         data = pd.read_excel(self.path, sheet_name=None)
         
         sheets = []
@@ -391,6 +436,11 @@ class Database:
         return sheets
 
     def get_all_data(self):
+        """ Method to check if system is parsed and if so continue with next. Also prints progress to console to see what is going on.
+
+        """
+
+
         for key, value in self.systems.items():
             # check for existing file
             name = key + ".json"
@@ -405,6 +455,13 @@ class Database:
 
 
     def write_data(self,system):
+        """ Method to write data to json file
+
+        Arguments:
+
+            system (str): system to write data to file in output folder
+
+        """
         name = system
         path = self.output_dir + "/" + name + ".json"
 

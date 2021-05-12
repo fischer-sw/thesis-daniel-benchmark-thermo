@@ -9,6 +9,8 @@
 *.pdf
 !figs/*.pdf
 !Literatur/*.pdf
+Software/dev/__pycache__/*
+Software/site/*
 *.ps
 *dvi
 *.out.ps

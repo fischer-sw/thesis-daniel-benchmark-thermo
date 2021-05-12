@@ -1,0 +1,13 @@
+site_name: Benchmark Docs
+theme:
+  name: "material"
+
+nav:
+  - Klassen:
+      - Database: database.md
+
+plugins:
+  - search
+  - mkdocstrings:
+      watch:
+        - src/dev
