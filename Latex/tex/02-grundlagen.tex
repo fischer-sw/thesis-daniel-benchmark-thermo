@@ -36,6 +36,7 @@ Die Bewertung des thermodynamischen Modells geschieht anhand der Abweichung der 
 In den folgenden Abschnitten wird die genannten Schritte zur Bewertung eines Modells näher erläutert.
 
 \subsection{Stoffklassifikation}
+\label{sec: klassifikation}
 
 Die vorgenommene Stoffklassifikation unterteilt die Stoffe anhand ihres Assoziationscharakters. Diese Eigenschaft beschreibt die Fähigkeit der Wasserstoffbrückenbildung. Es wurden vier verschiedene Kategorien erstellt, welche nun genauer beschrieben werden.
 
@@ -203,13 +204,17 @@ Für das fitten der Parameter wird die gemittelte durchschnittliche Abweichung m
 	h^{\mathrm{E}} = g^{\mathrm{E}} - T \cdot \left( \dfrac{\partial g^{\mathrm{E}}}{\partial T} \right)_x
 \end{equation}
 
-Mit Hilfe der Enthalpie $h^{\mathrm{E}}$ lässt sich mit dem in \autoref{eq: se} beschriebenen Ansatz die Entropie $s^{\mathrm{E}}$ berechnen.
+Mit Hilfe der Enthalpie $h^{\mathrm{E}}$ lässt sich mit dem in \autoref{eq: se_ansatz} beschriebenen Ansatz die Entropie $s^{\mathrm{E}}$ in \autoref{eq: se} berechnen.
+\begin{equation}
+	\label{eq: se_ansatz}
+	g^{\mathrm{E}} = h^{\mathrm{E}} - T \cdot s^{\mathrm{E}}
+\end{equation}
 \begin{equation}
 	\label{eq: se}
-	s^{\mathrm{E}} = \dfrac{h^{\mathrm{E}}}{T}
+	s^{\mathrm{E}} = - \left( \dfrac{\partial g^{\mathrm{E}}}{\partial T} \right)_x
 \end{equation}
 
-Mit Hilfe der Berechneten Größen kann ein Gemisch klassifiziert und falls es sich nicht ideal verhält der Ursprung der Abweichung bestimmt werden. Dazu werden die Berechnungsgrößen bei einer Zusammensetzung von $x=0.5$ berechnet und anhand der resultierenden Werte die Einteilung vorgenommen. Wie die Einteilung genau erfolgt ist in \autoref{fig: klassifikation} dargestellt.
+Mit Hilfe der berechneten Größen kann ein Gemisch klassifiziert und falls es sich nicht ideal verhält der Ursprung der Abweichung bestimmt werden. Dazu werden die Berechnungsgrößen bei einer Zusammensetzung von $x=\text{0.5}$ berechnet und anhand der resultierenden Werte die Einteilung vorgenommen. Wie die Einteilung genau erfolgt ist in \autoref{fig: klassifikation} dargestellt.
 
 \begin{figure}[htbp]
 	\centering
@@ -220,7 +225,9 @@ Mit Hilfe der Berechneten Größen kann ein Gemisch klassifiziert und falls es s
 
 \subsection{Bewertungskriterien und Bewertungsgrößen}
 
-Zur Bewertung eines thermodynamischen Modells werden folgende Größen verwendet:
+Um zwei thermodynamische Modelle miteinander zu vergleichen werden beide mit experimentellen Daten verglichen und die Abweichung als Bewertungskriterium benutzt. Der Vergleich mit experimentellen Daten wird im folgenden Abschnitt erläutert.
+
+Zum Vergleich eines thermodynamischen Modells mit experimentellen Daten werden folgende Größen verwendet:
 \begin{itemize}
 	\item kritischer Druck
 	\item kritische Zusammensetzung
@@ -234,6 +241,211 @@ Zur Bewertung eines thermodynamischen Modells werden folgende Größen verwendet
 	\item Mischungswärmekapazität
 \end{itemize}
 
-Diese Größen werden für jedes Stoffgemisch falls möglich berechnet und mit den experimentellen Daten verglichen.
+Aufgrund der Gibbs'schen Phasenregel ergibt sich für alle Größen ein Freiheitsgrad > 0 sodass hierfür mindestens eine Größe festgelegt werden muss um die unbekannten berechnen zu können. Beispielhaft ist die Berechnung der Freiheitsgrade für den kritischen Punkt eines binären Gemischs in \autoref{eq: gibb p_krit} beschrieben.
+Der kritische Punkt wird durch drei Größen eindeutig definiert:
+\begin{itemize}
+	\item Druck $p$
+	\item Temperatur $T$
+	\item Zusammensetzung $x_1$
+\end{itemize}
+
+Mit der Gibb'schen Phasenregel lässt sich der Freiheitsgrad für ein Gemisch aus zwei Fluiden wie folgt berechnen.
+
+\begin{equation}
+	\label{eq: gibb p_krit}
+	f = K - P + 2 = 2 - 3 + 2 = 1
+\end{equation}
+
+Das Gemisch liegt am kritischen Punkt als Flüssigkeit, Dampf sowie im überkritischen Zustand vor.
+
+In \autoref{tab: DoF} sind die festgelegten und berechneten Größen analog zu Tabelle 13 \cite{jaubert2020benchmark} aufgeführt.
+
+\begin{table} [htb]
+	\centering
+	\caption{Festgelegte und Berechnete Größen für ein binäres System}
+	\begin{tabular}{ cccc }
+		\hline 
+		Größe & Freiheitsgrad & festgelegte Größen & berechnete Größen\\
+		\hline  \\ 
+		[\dimexpr-\normalbaselineskip+2pt]
+		kritischer Druck  & 1 &$T_{\mathrm{c}}$ & $p_{\mathrm{c}},x_{\mathrm{c}}$  \\
+		kritische Zusammensetzung  & 1 &$T_{\mathrm{c}}$ & $p_{\mathrm{c}},x_{\mathrm{c}}$  \\
+		azeotroper Druck  & 1 &$T$ & $p,x_1$  \\
+		azeotrope Zusammensetzung  & 1 &$T$ & $p,x_1$  \\
+		Zusammensetzung Flüssigphase & 2 & $T,p$ & $x_1,y_1$ \\
+		Zusammensetzung Dampfphase & 2 & $T,p$ & $x_1,y_1$ \\
+		3-Phasen-Druck & 1 & $T$ & $x_1^{\alpha},x_1^{\beta},y_1$ \\
+		3-Phasen-Zusammensetzung & 1 & $T$ & $x_1^{\alpha},x_1^{\beta},y_1$ \\
+		Mischungsenthalpie & - & $T,p,z_1$ & $h^{\mathrm{M}}$ \\
+		Mischungswärmekapazität & - & $T,p,z_1$ & $c_{\mathrm{p}}^{\mathrm{M}}$ \\
+		[\dimexpr-\normalbaselineskip+18pt]
+		\hline
+		\label{tab: DoF}
+	\end{tabular}
+\end{table}
+
+Diese Größen werden für jedes Stoffgemisch falls möglich berechnet und mit den experimentellen Daten, falls sie erhoben worden sind, verglichen. Aus den Abweichung der Werte werden für jede BAC Gruppe Noten berechnet und schließlich die Gesamtnote aus den Teilnoten ermittelt.
+
+\section{Notenberechnung}
+
+In diesem Kapitel wird die Berechnung der Gesamtnote eines thermodynamischen Modells und auf die Berechnung einzelnen, dafür notwendigen, Teilnoten eingegangen.
+
+\subsection{Berechnung der Gesamtnote}
+Die maximale Punktzahl die ein Modell ereichen kann ist auf 20 festgelegt. Die Gesamtnote wird aus vier einzelnen Teilnoten berechnet. Diese vier Teilnoten werden für jede Art der auftretenden Interaktion wie in \autoref{sec: klassifikation} beschrieben.
+
+\begin{equation}
+	\mathrm{mark}_{\mathrm{final}} = \dfrac{1}{4} \cdot \left( 
+		\mathrm{mark}_{\mathrm{NA}} + \mathrm{mark}_{\mathrm{SA}} + \mathrm{mark}_{\mathrm{CA}} + \mathrm{mark}_{\mathrm{CA + SA}} 
+	 \right)
+\end{equation}
+
+Die einzelnen Teilnoten wie z.B. $mark_{\mathrm{NA}}$ entsprechen den Noten der in \autoref{tab: bin-bac} aufgeführten Klassen. Die Noten der einzelnen Klassen berechnen sich aus den Mittelwerten der Noten der BAC Gruppen. Die Note für nicht-assoziative Gemsiche lässt sich beispielsweise wie folgt berechnen:
+
+\begin{equation}
+	\mathrm{mark}_{\mathrm{NA}} = \dfrac{1}{4} \cdot \left(
+		\mathrm{mark}_{\mathrm{BAC_1}} + \mathrm{mark}_{\mathrm{BAC_2}} + \mathrm{mark}_{\mathrm{BAC_3}} + \mathrm{mark}_{\mathrm{BAC_4}}
+	\right)
+\end{equation}
+
+Die Berechnung der Noten der drei weiteren Klassen erfolgt analog mit der in \autoref{tab: bin-bac} dargestellten Einteilung.
+
+\subsection{Berechnung des Gemittelten durchschnittlichen Fehlers}
+In diesem Abschnitt wird die Berechnung des gemittelten durchschnittlichen Fehlers gezeigt, welcher auch als \textbf{M}ean \textbf{A}verage \textbf{P}ercantage \textbf{E}rror oder kurz MAPE bezeichnet wird.
+
+Die Berechnung dieser Größe wird am Beispiel der Größe XYZ für das Gemisch ABC gezeigt.
+
+\subsection{Berechnung der Noten für die Bewertungsgrößen}
+Die einzelnen Teilnoten werden aus den Noten der jeweiligen Bewertungsgrößen bestimmt.
+\\
+
+Die Note für den kritischen Druck errechnet sich mit folgendem Zusammenhang.
+\begin{equation}
+	\mathrm{Mark}_{p_{\mathrm{c}}} = 20 - 0,75 \cdot \mathrm{MAPE}_{p_\mathrm{c}}(\%)
+\end{equation}
+
+$ p_\mathrm{c} $ ist der Druck am kritischen Punkt.
+\\
+Die Note für die kritische Zusammensetzung wird nach \autoref{eq: mark_x_c} berechnet.
+\begin{equation}
+\label{eq: mark_x_c}
+\mathrm{Mark}_{\mathrm{x_\mathrm{c},y_\mathrm{c}}} = 20 - 0,5 \cdot \left[
+	\dfrac{\mathrm{MAPE_{x_{1,\mathrm{c}},y_{1,\mathrm{c}}}}(\%) + \mathrm{MAPE_{x_{2,\mathrm{c}},y_{2,\mathrm{c}}}}(\%)}{2}
+\right]
+\end{equation}
+
+Die Größen $ x_{1,\mathrm{c}} $ und $ y_{1,\mathrm{c}} $ beschreiben die Molenbrüche für die erste Komponente in der Flüssig- und der Gasphase am kritischen Punkt. Die Größen mit dem Index 2 beziehen sich auf die anaolg auf die zweite Komponente.
+\\
+
+Für den azeotropen Druck kann die Note wie folgt berechnet werden.
+\begin{equation}
+	\mathrm{Mark}_{p_{\mathrm{az}}} = 20 - 0,5 \cdot \mathrm{MAPE}_{p_\mathrm{az}}(\%)
+\end{equation}
+
+$ p_\mathrm{az} $ bezeichnet den Druck am azeotropen Punkt.
+\\
+
+Für die azeotrope Zusammensetzung gilt folgender Zusammenhang.
+\begin{equation}
+\mathrm{Mark}_{\mathrm{x_\mathrm{az},y_\mathrm{az}}} = 20 - 0,5 \cdot \left[
+	\dfrac{\mathrm{MAPE_{x_{1,\mathrm{az}},y_{1,\mathrm{az}}}(\%)} + \mathrm{MAPE_{x_{2,\mathrm{az}},y_{2,\mathrm{az}}}}(\%)}{2}
+\right]
+\end{equation}
+
+Die Größen $ x_{1,\mathrm{az}} $ und $ y_{1,\mathrm{az}} $ beschreiben die Molenbrüche der ersten Komponente in der Flüssig- und der Gasphase am azeotropen Punkt.
+\\
+
+Die Noten für die Phasengleichgewichtsgrößen werden mit folgender Gleichung bestimmt.
+\begin{equation}
+	\mathrm{Mark}_{\mathrm{x,y}} = 20 - 0,5 \cdot \left[
+		\dfrac{\mathrm{MAPE_{x_1,y_1}(\%)} + \mathrm{MAPE_{x_2,y_2}}(\%)}{2}
+	\right]
+\end{equation}
+
+$x_1$ ist die Zusammensetzung der ersten und $x_2$ die des zweiten Stoffs in der Flüssigphase. Die Größen $ y $ beschreiben die Zusammensetzung in der Gasphase.
+
+Die Note für die Mischungsenthalpie $ h^{\mathrm{M}} $ wird aus den Abweichungen der einzelnen Datenpunkte nach \autoref{} errechnet.
+\begin{equation}
+\mathrm{Mark}_{h^{\mathrm{M}}} = 20 - 0,25 \cdot \dfrac{1}{n_{h^{\mathrm{M}}}} \sum_{i=1}^{n_{h^{\mathrm{M}}}}
+	\dfrac{1}{2} \cdot \left[
+		100 \cdot \biggl|
+			\dfrac{h_i^{\mathrm{M,EXP}}-h_i^{\mathrm{M,MODEL}}}{h_i^{\mathrm{M,EXP}}} 
+			\biggl| 
+			+ 100 \cdot \biggl| \dfrac{h_i^{\mathrm{M,EXP}}-h_i^{\mathrm{M,MODEL}}}{h_i^{\mathrm{M,MODEL}}}
+		\biggl|
+	\right]
+\end{equation}
+
+Um Noten die kleiner als null werden auszuschließen wird für Abweichungen aus dem Term
+\begin{equation}
+	\label{eq: h_m MAPEs}
+	\dfrac{1}{2} \cdot \left[
+	100 \cdot \biggl|
+	\dfrac{h_i^{\mathrm{M,EXP}}-h_i^{\mathrm{M,MODEL}}}{h_i^{\mathrm{M,EXP}}} 
+	\biggl| 
+	+ 100 \cdot \biggl| \dfrac{h_i^{\mathrm{M,EXP}}-h_i^{\mathrm{M,MODEL}}}{h_i^{\mathrm{M,MODEL}}}
+	\biggl| \right] > 80
+\end{equation}
+die Abweichung auf 80 \% festgesetzt. Dies führt zu einer Note von 0/20 für Punkte, welche die Bedingung erfüllen. Eine weitere zu berücksichtigende Schwierigkeit ist, dass große Abweichungen des Modelwerts vom experimentell ermittelten Wert abhängig davon ob sie nach oben oder unten abweichen, zu unterschiedlichen prozentualen Abweichungen führen.
+Als Beispiel sind zwei verschieden Fälle zu betrachten
+\begin{enumerate}
+	\item $ h_i^{\mathrm{M,EXP}} = 10 \mathrm{\frac{J}{mol}} $ und $ h_i^{\mathrm{M,MODEL}} = 1000 \mathrm{\frac{J}{mol}} $
+	\item $ h_i^{\mathrm{M,EXP}} = 1000 \mathrm{\frac{J}{mol}} $ und $ h_i^{\mathrm{M,MODEL}} = 10 \mathrm{\frac{J}{mol}} $
+\end{enumerate}
+Die Ergebnisse der Berechnung des MPAE sind \autoref{MPAE Glg} folgend wie folgt:
+\begin{eqnarray}
+MPAE_1 = 99 \rightarrow 9900 \% \\
+MPAE_2 = 0.99 \rightarrow 99 \%
+\end{eqnarray}
+
+Um dieses Problem zu beheben wird der Mittelwert aus zwei MAPE wie in \autoref{eq: h_m MAPEs} gezeigt berechnet.
+
+Die Note für die spezifische isobare Wärmekapazität wird mit dem gleichen Vorgehen, wie bei der Mischungswärmekapazität berechnet.
+\begin{equation}
+\mathrm{Mark}_{c_p{\mathrm{M}}} = 20 - 0,10 \cdot \dfrac{1}{n_{c_p{\mathrm{M}}}} \sum_{i=1}^{n_{c_p{\mathrm{M}}}}
+\dfrac{1}{2} \cdot \left[
+100 \cdot \biggl|
+\dfrac{c_{p,i}^{\mathrm{M,EXP}}-c_{p,i}^{\mathrm{M,MODEL}}}{c_{p,i}^{\mathrm{M,EXP}}} 
+\biggl| 
++ 100 \cdot \biggl| \dfrac{c_{p,i}^{\mathrm{M,EXP}}-c_{p,i}^{\mathrm{M,MODEL}}}{c_{p,i}^{\mathrm{M,MODEL}}}
+\biggl|
+\right]
+\end{equation}
+Um auch hier keine Noten kleiner als null zuzulassen wird für alle Punkte, welche die Bedingung 
+\begin{equation}
+\dfrac{1}{2} \cdot \left[
+100 \cdot \biggl|
+\dfrac{c_{p,i}^{\mathrm{M,EXP}}-c_{p,i}^{\mathrm{M,MODEL}}}{c_{p,i}^{\mathrm{M,EXP}}} 
+\biggl| 
++ 100 \cdot \biggl| \dfrac{c_{p,i}^{\mathrm{M,EXP}}-c_{p,i}^{\mathrm{M,MODEL}}}{c_{p,i}^{\mathrm{M,MODEL}}}
+\biggl| \right]> 200
+\end{equation}
+erfüllen die Abweichung auf 200 \% festgesetzt.
+
+\begin{table} [htb]
+	\centering
+	\caption{Festgelegte und Berechnete Größen für ein binäres System}
+	\begin{tabular}{ cc }
+		\hline 
+		Größe & Gewicht \\
+		\hline  \\ 
+		[\dimexpr-\normalbaselineskip+2pt]
+		kritischer Druck  & 0,75   \\
+		kritische Zusammensetzung  & 0,5   \\
+		azeotroper Druck  & 0,5  \\
+		azeotrope Zusammensetzung  & 0,5  \\
+		Zusammensetzung Flüssigphase & 0,5 \\
+		Zusammensetzung Dampfphase & 0,5 \\
+		3-Phasen-Druck 0,5 &  \\
+		3-Phasen-Zusammensetzung & 0,5  \\
+		Mischungsenthalpie & 0,25 \\
+		Mischungswärmekapazität & 0,10 \\
+		[\dimexpr-\normalbaselineskip+18pt]
+		\hline
+		\label{tab: Notengewichte}
+	\end{tabular}
+\end{table}
+
+Aus \autoref{tab: Notengewichte} geht hervor, dass der kritische Druck den größten Einfluss der einzelnen Teilnoten hat, da dieser die Topologie des Gemischs bestimmt. Das geringeste Gewicht habe die Mischungswärmekapazität und die Mischungsenthalpie, da diese in der Anwendung auch bei prozentualen Abweichungen von 20 bis 50 \% nur einen geringen Einfluss auf das Berechnungsergebniss haben.
+
 
 \end{document}
