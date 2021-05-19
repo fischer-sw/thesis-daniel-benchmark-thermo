@@ -72,9 +72,18 @@ class Database:
         """ Method to parse all sheets from available systems
 
         """
+        counter = 0
+        progress_old = 0
+        max_count = len(self.systems.items())
         for sys, val in self.systems.items():
             self.log.info('parsing sheet {}'.format(sys))
             self.parse_sheet(sys)
+            self.write_sheet(sys)
+            progress = round(counter/max_count,0)
+            if progress - progress_old > 1:
+                self.log.info('progress = {} %'.format(progress))
+                progress = progress_old
+            counter += 1
         return
 
     def parse_sheet(self, sheet_name):
@@ -147,7 +156,7 @@ class Database:
         for sys, val in self.systems.items():
             self.log.info('writing sheet {}'.format(sys))
             filename = os.path.join(self.output_dir, sys[0] + '_' + sys[1] + '.json')
-            with open(path, 'w') as outfile:
+            with open(filename, 'w') as outfile:
                 json.dump(val, outfile, ensure_ascii=False, indent=2, sort_keys=True)
 
     def write_sheet(self, sheet_name):
@@ -170,36 +179,3 @@ class Database:
         for table, values in data.items():
             sheets.append(table)
         return sheets
-
-    def get_all_data(self):
-        """ Method to check if system is parsed and if so continue with next. Also prints progress to console to see what is going on.
-
-        """
-
-
-        for key, value in self.systems.items():
-            # check for existing file
-            name = key + ".json"
-            existing_files = os.listdir(self.output_dir)
-            if name in existing_files:
-                continue
-            else:
-                self.get_system_data(key)
-                self.write_data(key)
-
-                print("Fortschritt....."+str(round(len(existing_files)/len(self.sheets)*100,3))+ "%")
-
-
-    def write_data(self,system):
-        """ Method to write data to json file
-
-        Arguments:
-
-            system (str): system to write data to file in output folder
-
-        """
-        name = system
-        path = self.output_dir + "/" + name + ".json"
-
-        with open(path, 'w') as outfile:
-            json.dump(self.systems[system], outfile, ensure_ascii=False, indent=4)

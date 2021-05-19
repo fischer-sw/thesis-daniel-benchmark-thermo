@@ -50,7 +50,7 @@ class Test02(unittest.TestCase):
         self.assertTrue('BAC' in val.keys())
         self.assertTrue('sheet' in val.keys())
 
-#@unittest.skip("Skipping Test03")
+@unittest.skip("Skipping Test03")
 class Test03(unittest.TestCase):
 
     def setUp(self):
@@ -84,7 +84,7 @@ class Test03(unittest.TestCase):
         self.assertTrue('CAS' in self.db.components[comp1].keys())
         self.assertEqual(self.db.components[comp1]['CAS'], '7732-18-5')
 
-@unittest.skip("Skipping Test04")
+#@unittest.skip("Skipping Test04")
 class Test04(unittest.TestCase):
 
     def setUp(self):
