@@ -1,5 +1,5 @@
 # Documentation of Database Class
 
-## Uasage
+## Usage
 
 Here is shown how to use the database class

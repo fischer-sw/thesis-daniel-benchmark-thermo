@@ -16,4 +16,4 @@ Software/site/*
 *.out.ps
 *.lof
 *.lot
-Datenbank/*.json
+*.json

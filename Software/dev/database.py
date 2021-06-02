@@ -14,7 +14,8 @@ import openpyxl
 class Database:
 
     def __init__(self, data_file, output_dir, logger=None):
-        """ Constructor of database class
+        """ 
+        Constructor of database class
 
         Arguments:
             data_file (str): Path to data_file relative from folder position
@@ -37,7 +38,8 @@ class Database:
         self.systems = self.get_systems()
 
     def get_systems(self):
-        """ Method to get all systems available including their BAC value and sheet_name
+        """ 
+        Method to get all systems available including their BAC value and sheet_name
 
         Returns:
             dict: dictionary with key for each system containing BAC value and sheet_name
@@ -69,8 +71,8 @@ class Database:
         return systems
 
     def parse_sheets(self):
-        """ Method to parse all sheets from available systems
-
+        """ 
+        Method to parse all sheets from available systems
         """
         counter = 0
         progress_old = 0
@@ -79,15 +81,16 @@ class Database:
             self.log.info('parsing sheet {}'.format(sys))
             self.parse_sheet(sys)
             self.write_sheet(sys)
-            progress = round(counter/max_count,0)
-            if progress - progress_old > 1:
+            progress = round(counter/max_count*100,1)
+            if progress - progress_old > 5:
                 self.log.info('progress = {} %'.format(progress))
-                progress = progress_old
+                progress_old = progress
             counter += 1
         return
 
     def parse_sheet(self, sheet_name):
-        """ Parse a single system's data
+        """ 
+        Parse a single system's data
 
         Arguments:
 
@@ -119,6 +122,14 @@ class Database:
         self.parse_component_mix(sheet_name, data, marker)
 
     def parse_component_mix(self, sheet_name, data, marker):
+        """
+        Function to parse mixture data and write results to self.systems
+
+        Arguments:
+            sheet_name (str): name of sheet to process
+            data (list): sheet data to process
+            marker (list): list with all marker positions (all lines with ------)
+        """
         for i in range(0, len(marker) - 2, 2):
             pos = marker[i] + 1
             comp_mix = data[pos][0]
@@ -132,11 +143,17 @@ class Database:
                     'params': {},
                     'measurements' : []
                 }
+                azeoset = {
+                    'reference': data[pos][0],
+                    'params': {},
+                    'measurements' : []
+                }
                 pos += 1
                 if not comp_mix.lower() in self.special_props:
                     for j in range(4):
                         if '=' in data[pos+j][0]:
                             dataset['params'][data[pos+j][0].replace(' =', '')] = data[pos+j][1]
+                            azeoset['params'][data[pos+j][0].replace(' =', '')] = data[pos+j][1]
                         else:
                             break
                     pos += j
@@ -144,15 +161,42 @@ class Database:
                 while type(data[pos][n]) == type(''):
                     n += 1
                 dataset['measurements'].append(list(data[pos][:n]))
+                azeoset['measurements'].append(list(data[pos][1:n]))
                 pos += 1
                 while not type(data[pos][0]) == type('') and not math.isnan(data[pos][0]):
+                    # check for azeotropic point
+                    if comp_mix.lower() in ["isobaric phase equilibrium data", "isothermal phase equilibrium data"]:
+                        if data[pos][3] == "AZEO":
+                            azeoset['measurements'].append(list(data[pos][1:n]))
+                            for ele in ['T / K ', 'P / bar ']:
+                                if ele not in azeoset['params'].keys():
+                                    azeoset['params'][ele] = data[pos][0]
+
+                            
+                            
                     dataset['measurements'].append(list(data[pos][:n]))
                     pos += 1
                 pos += 1
                 self.log.debug('dataset {}'.format(dataset))
+
+                if not "Azeotropic point" in self.systems[sheet_name].keys():
+                    self.systems[sheet_name]["Azeotropic point"] = []
+                # check if x1 and y1 data is in azeoset
+                if len(azeoset["measurements"]) == 2:   
+                    self.systems[sheet_name]["Azeotropic point"].append(azeoset)
+                # reset azeoset
+                azeoset = {
+                    'reference': data[pos][0],
+                    'params': {},
+                    'measurements' : []
+                }
+
                 self.systems[sheet_name][comp_mix].append(dataset)
 
     def write(self):
+        """
+        Function to write all systems to .json file in output dir 
+        """
         for sys, val in self.systems.items():
             self.log.info('writing sheet {}'.format(sys))
             filename = os.path.join(self.output_dir, sys[0] + '_' + sys[1] + '.json')
@@ -160,12 +204,19 @@ class Database:
                 json.dump(val, outfile, ensure_ascii=False, indent=2, sort_keys=True)
 
     def write_sheet(self, sheet_name):
+        """
+        Function to write a specific system to .json file in output dir
+
+        Arguments:
+            sheet_name (str): Name of system to write to file
+        """
         filename = os.path.join(self.output_dir, sheet_name[0] + '_' + sheet_name[1] + '.json')
         with open(filename, 'w') as outfile:
             json.dump(self.systems[sheet_name], outfile, default=str, indent=2, sort_keys=True)
 
     def get_sheets(self):
-        """ Method to get all sheets from excel file
+        """ 
+        Method to get all sheets from excel file
 
         Returns:
 
@@ -179,3 +230,33 @@ class Database:
         for table, values in data.items():
             sheets.append(table)
         return sheets
+
+    def get_param_systems(self, param, amount=[]):
+        """
+        Method to get systems that contain specific parameter
+
+        Arguments:
+            param (str): Parameter to search for
+            amount (list): systems to get e.g [0, 10] gets first ten systems
+        """
+        files = os.listdir(self.output_dir)
+        counter = 0
+        res = []
+        for element in files:
+            path = os.path.join(self.output_dir, element)
+            with open(path , 'r') as f:
+                data = json.loads(f.read())
+                test = param in data.keys()
+            if test == True:
+                if counter in amount or amount == []:
+                    system = element.split('.json')[0]
+                    res.append(system)
+                    counter += 1
+            if amount != [] and counter == amount[-1]:
+                break
+            
+
+
+        self.log.info('systems with {} = {}'.format(param,res))
+
+        return res

@@ -7,6 +7,8 @@ nav:
     - Database: 
       - Allgemeines: database.md
       - Methoden: database_methods.md
+    - Comparison:
+      - Methoden: compare_methods.md
 
 plugins:
   - search
