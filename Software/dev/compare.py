@@ -226,7 +226,7 @@ class Comparison:
                 res[BAC]['sys_res'][sys]["mark_cp_mix"] = mark_cp_mix
 
             else:
-                self.log.info("Key {} wird bisher nicht verwendet".format(key))
+                self.log.info("{}, Key '{}' wird bisher nicht verwendet".format(sys,key))
         
         self.log.info("{},{}".format(sys,res[BAC]['sys_res'][sys]))
         return res

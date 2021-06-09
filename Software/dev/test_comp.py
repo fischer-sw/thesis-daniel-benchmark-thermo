@@ -60,7 +60,7 @@ class Test01(unittest.TestCase):
         self.assertIsNotNone(erg)
         erg = self.comp.calc_sys_result('METHANE_N-HEXANE')
         self.assertIsNotNone(erg)
-        erg = self.comp.calc_sys_result('N-HEPTANE_MONOCHLOROBENZENE')
+        erg = self.comp.calc_sys_result('ETHANOL_BENZENE')
         self.assertIsNotNone(erg)
 
 if __name__ == '__main__':

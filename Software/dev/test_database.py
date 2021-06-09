@@ -94,7 +94,7 @@ class Test03(unittest.TestCase):
         self.assertTrue('CAS' in self.db.components[comp1].keys())
         self.assertEqual(self.db.components[comp1]['CAS'], '64-17-5')
 
-@unittest.skip("Skipping Test04")
+#@unittest.skip("Skipping Test04")
 class Test04(unittest.TestCase):
 
     def setUp(self):
@@ -104,7 +104,7 @@ class Test04(unittest.TestCase):
     def test_sheets(self):
         self.db.parse_sheets()
 
-#@unittest.skip("Skipping Test05")
+@unittest.skip("Skipping Test05")
 class Test05(unittest.TestCase):
 
     def setUp(self):
@@ -112,7 +112,7 @@ class Test05(unittest.TestCase):
         self.db = db
 
     def test_sheets(self):
-        self.assertIsNotNone(self.db.get_param_systems('Azeotropic point',list(range(10))))
+        self.assertIsNotNone(self.db.get_param_systems('Azeotropic point',list(range(5))))
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)

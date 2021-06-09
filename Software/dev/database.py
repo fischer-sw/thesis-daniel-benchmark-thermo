@@ -152,8 +152,12 @@ class Database:
                 if not comp_mix.lower() in self.special_props:
                     for j in range(4):
                         if '=' in data[pos+j][0]:
-                            dataset['params'][data[pos+j][0].replace(' =', '')] = data[pos+j][1]
-                            azeoset['params'][data[pos+j][0].replace(' =', '')] = data[pos+j][1]
+                            if type(data[pos+j][1]) == type(""):
+                                value = float(re.findall(r"\((.*?)\)", data[pos+j][1])[0])
+                            else:
+                                value = data[pos+j][1]
+                            dataset['params'][data[pos+j][0].replace(' =', '')] = value
+                            azeoset['params'][data[pos+j][0].replace(' =', '')] = value
                         else:
                             break
                     pos += j
