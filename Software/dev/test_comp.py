@@ -57,11 +57,16 @@ class Test01(unittest.TestCase):
 
     def test_sys_results(self):
         erg = self.comp.calc_sys_result('ETHANE_N-HEPTANE')
+        self.comp.write_results_file(erg)
         self.assertIsNotNone(erg)
         erg = self.comp.calc_sys_result('METHANE_N-HEXANE')
+        self.comp.write_results_file(erg)
         self.assertIsNotNone(erg)
         erg = self.comp.calc_sys_result('ETHANOL_BENZENE')
+        self.comp.write_results_file(erg)
         self.assertIsNotNone(erg)
+
+
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)

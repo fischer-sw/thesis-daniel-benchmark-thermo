@@ -1,6 +1,7 @@
 #!/usr/bin/python
 import os
 import json
+#from typing_extensions import ParamSpec
 import numpy as np
 import logging
 
@@ -116,12 +117,42 @@ class Comparison:
                 res[BAC]['sys_res'][sys]["mark_pc"] = mark_pc
                 res[BAC]['sys_res'][sys]["mark_xc"] = mark_xc
 
+            elif key == "Azeotropic point":
+                vals = [["x1"],["x2"]]
+                mod_res, exp_res = self.get_param_data(mod_sets, exp_sets, 'Azeotropic point', vals)
+                
+                # add P mod_res
+                mod_res["P"] = []
+                for i in range(len(mod_res["x1"])):
+                    mod_res["P"].append(mod_sets[i]["params"]["P / bar "])
+
+                # add P exp_res
+                exp_res["P"] = []
+                for i in range(len(exp_res["x1"])):
+                    exp_res["P"].append(exp_sets[i]["params"]["P / bar "])
+
+                MPAE_p_az = self.MAPE(mod_res["P"], exp_res["P"])
+                MPAE_x1_az = self.MAPE(mod_res["x1"], exp_res["x1"])
+                MPAE_x2_az = self.MAPE(mod_res["x2"], exp_res["x2"])
+                
+                mark_paz = 20 - 0.75 * MPAE_p_az
+
+                mark_xaz = 20 - 0.5 * (MPAE_x1_az + MPAE_x2_az)/2  
+                
+                # write results
+                res[BAC]['sys_res'][sys]["mark_paz"] = mark_paz
+                res[BAC]['sys_res'][sys]["mark_xaz"] = mark_xaz
 
             elif key == "Isobaric phase equilibrium data" or key == "Isothermal phase equilibrium data":
                 vals = [["x1", "y1"],["x2", "y2"]]
-                mod_res, exp_res = self.get_param_data(mod_sets, exp_sets, 'Critical point', vals)
+                mod_res, exp_res = self.get_param_data(mod_sets, exp_sets, 'phase equilibrium data', vals)
                 
+                # check if enough data is available
+                if mod_res["x1"] == [] or mod_res["x2"] == [] or mod_res["y1"] == [] or mod_res["y2"] == []:
+                    continue
 
+                if exp_res["x1"] == [] or exp_res["x2"] == [] or exp_res["y1"] == [] or exp_res["y2"] == []:
+                    continue
                 
                 for i in range(len(mod_res)):
 
@@ -231,6 +262,83 @@ class Comparison:
         self.log.info("{},{}".format(sys,res[BAC]['sys_res'][sys]))
         return res
 
+    def fix_systems(self):
+        path = os.path.join(self.data_dir, "Experimente")
+        files = os.listdir(path)
+        check_keys = ["Isobaric phase equilibrium data", "Isothermal phase equilibrium data"]
+        
+        for file in files:
+            with open(os.path.join(path,file)) as f:
+                data = json.loads(f.read())
+
+
+                # check for elements that can be merged
+                for key in check_keys:
+                    
+                    double = []
+                    pars = []
+
+                    if key not in data.keys():
+                        continue
+                    
+                    dataset = data[key]
+
+                    for n in range(len(dataset)):
+                        mes = dataset[n]
+                        # find sets with only one variable
+                        header = mes["measurements"][0]
+                        if len(header) < 3:
+                            pars.append([(mes["params"],mes["reference"]),n])
+                    
+                    if pars != []:
+                        ref = list(list(zip(*pars))[0])
+                    else:
+                        continue
+
+                    for m in range(len(dataset)):
+                        mes = dataset[m]
+                        header = mes["measurements"][0]
+                        for dbl in pars:
+                            # check if doubled element
+                            if (mes["params"],mes["reference"]) == dbl[0] and m != dbl[1]:
+                                
+                                # check header length
+                                if len(header) < 3:
+
+                                    # check id element already exists
+                                    if not (m, dbl[1]) in double and not (dbl[1], m) in double:
+                                        double.append((m, dbl[1]))
+                
+
+                if double != []:
+                    print(double)
+                    for element in double:
+                        # add new dataset
+
+                        new_set = dataset[element[0]]
+
+                        base = dataset[element[0]]["measurements"][:]
+                        extend = dataset[element[1]]["measurements"][:]
+                         
+                        for ext_ele in extend:
+                            if len(ext_ele) > 2:
+                                ext_prms = ext_ele[1:-2]
+                            else:
+                                ext_prms = ext_ele[-2]
+
+                            for j in range(len(base)):
+                                base_ele = base[j]
+                                if len(base_ele) > 2:
+                                    base_prms = base_ele[1:-2]
+                                else:
+                                    base_prms = base_ele[-2]
+
+                                # check for equal parameters
+                                if ext_prms == base_prms:
+                                    new_set["measurements"][j].append(ext_ele[-1])
+                    print(new_set)
+
+
     def MAPE(self, model, exp):
         """ Function to calculate Mean Average Percentage Error
 
@@ -264,50 +372,80 @@ class Comparison:
 
         exp_res = {}
         model_res = {}
-        for i in range(len(model_data)):
-            model_ele = model_data[i] 
-            exp_ele = exp_data[i]
-            for j in range(len(model_ele['measurements'])):
-                for k in values[0] + values[1]:
-                    # create lists
-                    if not k in model_res:
-                        model_res[k] = []
-                        exp_res[k] = []
+
+        # create keys
+        for k in values[0] + values[1]:
+            # create lists
+            if not k in model_res:
+                model_res[k] = []
+                exp_res[k] = []
+
+        # get header of first element (all headers are the same)
+        model_ele = model_data[0] 
+
+        header = model_ele['measurements'][0]
+        
+        # loop through needed values
+        for k in values[0]:
+        
+            # get all needed values
+            for i in range(len(model_data)):
+                mod_mes = model_data[i]
+                exp_mes = exp_data[i]
+
+                header = mod_mes["measurements"][0]
+
+                v = 'NaN'
+                # check header of model data for position
+                for value in range(len(header)):
+
+                    element = header[value]
+
+                    if k in element:
+                        v = value
                     
-                    # get index
-                    header = model_ele['measurements'][0]
-                    v = 'NaN'
-                    for value in range(len(header)):
-                        if k in header[value]:
-                            v = value
-                        
-                        # check for x_1, x_2, y_1 and y_2
-                        if ord(header[value][-1]) == 8321 and k[0] == header[value][0]:
-                            v = value
-                        
-                        # check for h_mix
-                        if param == "Enthalpy of mixing" and header[value] == "h\u1d39 / J.mol\u207b\u00b9":
-                            v = value
+                    # check for x_1, x_2, y_1 and y_2
+                    if ord(header[value][-1]) == 8321 and k[0] == header[value][0]:
+                        v = value
+                    
+                    # check for h_mix
+                    if param == "Enthalpy of mixing" and header[value] == "h\u1d39 / J.mol\u207b\u00b9":
+                        v = value
 
-                        # check for cp_mix
-                        if param == "Heat capacity of mixing" and header[value] == "c\u1d18\u1d39 / J.mol\u207b\u00b9.K\u207b\u00b9":
-                            v = value
+                    # check for cp_mix
+                    if param == "Heat capacity of mixing" and header[value] == "c\u1d18\u1d39 / J.mol\u207b\u00b9.K\u207b\u00b9":
+                        v = value
 
 
-                    if k in values[0] and v != 'NaN':
-                        ele = model_ele['measurements'][j][v]
-                        if type(ele) != type(""):
-                            model_res[k].append(ele)
-                            exp_res[k].append(exp_ele['measurements'][j][v])
-                        else:
-                            continue
+                if v == 'NaN':
+                    continue
+                # Experiment Data
+                exp_mes_data = exp_mes["measurements"]
+                if len(exp_mes_data) > 2:
+                    exp_vals = list(list(zip(*exp_mes["measurements"][1:-1]))[v])
+                else:
+                    exp_vals = [exp_mes["measurements"][-1][v]]
+                exp_res[k] += exp_vals
 
-                    elif k in values[1]:
-                        if k[-1] == '2' and model_res[k[0]+"1"] != [] :
-                            model_res[k].append(1 - model_res[k[0]+"1"][-1])
-                            exp_res[k].append(1 - exp_res[k[0]+"1"][-1])
+                # Modell Data
+                mod_mes_data = mod_mes["measurements"]
+                if len(mod_mes_data) > 2:
+                    mes_vals = list(list(zip(*mod_mes["measurements"][1:-1]))[v])
+                else:
+                    mes_vals = [mod_mes["measurements"][-1][v]]
+                model_res[k] += mes_vals
+            
+                # check if calculation is needed:
+                first_chrs = []
+                if values[1] != []:
+                    first_chrs =  list(list(zip(*values[1]))[0])
 
-                        
+                if len(k) > 1 and k[0] in first_chrs:
+                    mod_calc_vals = [1-x for x in mes_vals]
+                    exp_calc_vals = [1-x for x in exp_vals]
+
+                    model_res[k[0]+ "2"] += mod_calc_vals
+                    exp_res[k[0]+ "2"] += exp_calc_vals
 
         return model_res , exp_res 
 
