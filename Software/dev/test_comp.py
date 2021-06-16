@@ -17,7 +17,7 @@ comp = None
 
 def setUpModule():
     global comp
-    comp = Comparison(os.path.join(sys.path[0],'..', '..', 'Datenbank'), os.path.join(sys.path[0],'..', '..', 'Ergebnisse'), 'Test_Model', 'Test', logger=log)
+    comp = Comparison(os.path.join(sys.path[0],'..', '..', 'Datenbank'), os.path.join(sys.path[0],'..', '..', 'Ergebnisse'), 'Test_Modell', 'Test', logger=log)
     return
 
 def tearDownModule():
@@ -48,7 +48,7 @@ class Test01(unittest.TestCase):
         self.assertIsNotNone(erg)
         self.comp.write_results_file(erg)
 
-#@unittest.skip("Skipping Test03")
+@unittest.skip("Skipping Test03")
 class Test01(unittest.TestCase):
 
     def setUp(self):

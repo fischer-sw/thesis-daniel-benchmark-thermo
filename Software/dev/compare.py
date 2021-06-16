@@ -1,9 +1,12 @@
 #!/usr/bin/python
 import os
+import sys
 import json
+from shutil import copyfile
 #from typing_extensions import ParamSpec
 import numpy as np
 import logging
+
 
 
 class Comparison:
@@ -30,16 +33,45 @@ class Comparison:
         self.data_dir = data_dir
         self.result_dir = result_dir
         self.model = model_name
+        self.setup_test_model()
+        self.init_results()
      
 
-    def setup_test_model(self):
+    def setup_model(self, name):
         """
         Function that sets up Test Model
+
+        Arguments:
+            name (str): Model Name
         """
-        pass
+        
+        # create model folder
+        path = os.path.join(sys.path[0],'..', '..', 'Datenbank', 'Modelle', name)
+        os.makedirs(path, exist_ok=True)
 
+        # create results folcer
+        path = os.path.join(sys.path[0],'..', '..', 'Ergebnisse', name)
+        os.makedirs(path, exist_ok=True)
 
-    def create_results(self):
+    def setup_test_model(self):
+        systems = ["ETHANE_N-HEPTANE", "ETHANOL_BENZENE", "METHANE_N-HEXANE", "N-HEPTANE_MONOCHLOROBENZENE"]
+        
+        # create folder
+        name = "Test_Modell"
+        self.setup_model(name)
+
+        # copy data
+        for element in systems:
+
+            source = self.data_dir
+            dest = os.path.join(sys.path[0],'..', '..', 'Datenbank', 'Modelle', name)   
+
+            source = os.path.join(source, 'Experimente', element+".json")
+            dest = os.path.join(dest, element+".json")
+
+            copyfile(source, dest)
+
+    def init_results(self):
 
         """
         Function to initialize results file
@@ -53,7 +85,7 @@ class Comparison:
             res["BAC"+str(i)]["group_res"] = {}
             res["BAC"+str(i)]["sys_res"] = {}
 
-        return res
+        self.write_results_file(res)
 
     
     def write_results_file(self, res):
@@ -268,81 +300,81 @@ class Comparison:
         self.log.info("{},{}".format(sys,res[BAC]['sys_res'][sys]))
         return res
 
-    def fix_systems(self):
-        path = os.path.join(self.data_dir, "Experimente")
-        files = os.listdir(path)
-        check_keys = ["Isobaric phase equilibrium data", "Isothermal phase equilibrium data"]
+    # def fix_systems(self):
+    #     path = os.path.join(self.data_dir, "Experimente")
+    #     files = os.listdir(path)
+    #     check_keys = ["Isobaric phase equilibrium data", "Isothermal phase equilibrium data"]
         
-        for file in files:
-            with open(os.path.join(path,file)) as f:
-                data = json.loads(f.read())
+    #     for file in files:
+    #         with open(os.path.join(path,file)) as f:
+    #             data = json.loads(f.read())
 
 
-                # check for elements that can be merged
-                for key in check_keys:
+    #             # check for elements that can be merged
+    #             for key in check_keys:
                     
-                    double = []
-                    pars = []
+    #                 double = []
+    #                 pars = []
 
-                    if key not in data.keys():
-                        continue
+    #                 if key not in data.keys():
+    #                     continue
                     
-                    dataset = data[key]
+    #                 dataset = data[key]
 
-                    for n in range(len(dataset)):
-                        mes = dataset[n]
-                        # find sets with only one variable
-                        header = mes["measurements"][0]
-                        if len(header) < 3:
-                            pars.append([(mes["params"],mes["reference"]),n])
+    #                 for n in range(len(dataset)):
+    #                     mes = dataset[n]
+    #                     # find sets with only one variable
+    #                     header = mes["measurements"][0]
+    #                     if len(header) < 3:
+    #                         pars.append([(mes["params"],mes["reference"]),n])
                     
-                    if pars != []:
-                        ref = list(list(zip(*pars))[0])
-                    else:
-                        continue
+    #                 if pars != []:
+    #                     ref = list(list(zip(*pars))[0])
+    #                 else:
+    #                     continue
 
-                    for m in range(len(dataset)):
-                        mes = dataset[m]
-                        header = mes["measurements"][0]
-                        for dbl in pars:
-                            # check if doubled element
-                            if (mes["params"],mes["reference"]) == dbl[0] and m != dbl[1]:
+    #                 for m in range(len(dataset)):
+    #                     mes = dataset[m]
+    #                     header = mes["measurements"][0]
+    #                     for dbl in pars:
+    #                         # check if doubled element
+    #                         if (mes["params"],mes["reference"]) == dbl[0] and m != dbl[1]:
                                 
-                                # check header length
-                                if len(header) < 3:
+    #                             # check header length
+    #                             if len(header) < 3:
 
-                                    # check id element already exists
-                                    if not (m, dbl[1]) in double and not (dbl[1], m) in double:
-                                        double.append((m, dbl[1]))
+    #                                 # check id element already exists
+    #                                 if not (m, dbl[1]) in double and not (dbl[1], m) in double:
+    #                                     double.append((m, dbl[1]))
                 
 
-                if double != []:
-                    print(double)
-                    for element in double:
-                        # add new dataset
+    #             if double != []:
+    #                 print(double)
+    #                 for element in double:
+    #                     # add new dataset
 
-                        new_set = dataset[element[0]]
+    #                     new_set = dataset[element[0]]
 
-                        base = dataset[element[0]]["measurements"][:]
-                        extend = dataset[element[1]]["measurements"][:]
+    #                     base = dataset[element[0]]["measurements"][:]
+    #                     extend = dataset[element[1]]["measurements"][:]
                          
-                        for ext_ele in extend:
-                            if len(ext_ele) > 2:
-                                ext_prms = ext_ele[1:-2]
-                            else:
-                                ext_prms = ext_ele[-2]
+    #                     for ext_ele in extend:
+    #                         if len(ext_ele) > 2:
+    #                             ext_prms = ext_ele[1:-2]
+    #                         else:
+    #                             ext_prms = ext_ele[-2]
 
-                            for j in range(len(base)):
-                                base_ele = base[j]
-                                if len(base_ele) > 2:
-                                    base_prms = base_ele[1:-2]
-                                else:
-                                    base_prms = base_ele[-2]
+    #                         for j in range(len(base)):
+    #                             base_ele = base[j]
+    #                             if len(base_ele) > 2:
+    #                                 base_prms = base_ele[1:-2]
+    #                             else:
+    #                                 base_prms = base_ele[-2]
 
-                                # check for equal parameters
-                                if ext_prms == base_prms:
-                                    new_set["measurements"][j].append(ext_ele[-1])
-                    print(new_set)
+    #                             # check for equal parameters
+    #                             if ext_prms == base_prms:
+    #                                 new_set["measurements"][j].append(ext_ele[-1])
+    #                 print(new_set)
 
 
     def MAPE(self, model, exp):

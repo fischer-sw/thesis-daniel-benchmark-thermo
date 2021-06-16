@@ -196,10 +196,12 @@ class Database:
                 pos += 1
                 self.log.debug('dataset {}'.format(dataset))
 
-                if not "Azeotropic point" in self.systems[sheet_name].keys():
-                    self.systems[sheet_name]["Azeotropic point"] = []
+                
                 # check if x1 and y1 data is in azeoset
-                if len(azeoset["measurements"]) == 2:   
+                if len(azeoset["measurements"]) == 2:
+                    if not "Azeotropic point" in self.systems[sheet_name].keys():
+                        self.systems[sheet_name]["Azeotropic point"] = []
+                        
                     self.systems[sheet_name]["Azeotropic point"].append(azeoset)
                 # reset azeoset
                 azeoset = {

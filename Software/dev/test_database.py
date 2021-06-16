@@ -24,7 +24,7 @@ def tearDownModule():
     global db
     return
 
-@unittest.skip("Skipping Test01")
+#@unittest.skip("Skipping Test01")
 class Test01(unittest.TestCase):
 
     def setUp(self):
@@ -37,7 +37,7 @@ class Test01(unittest.TestCase):
         self.assertIsNotNone(self.db.sheets)
         self.assertGreater(len(self.db.sheets), 0)
 
-@unittest.skip("Skipping Test02")
+#@unittest.skip("Skipping Test02")
 class Test02(unittest.TestCase):
 
     def setUp(self):
@@ -51,7 +51,7 @@ class Test02(unittest.TestCase):
         self.assertTrue('BAC' in val.keys())
         self.assertTrue('sheet' in val.keys())
 
-@unittest.skip("Skipping Test03")
+#@unittest.skip("Skipping Test03")
 class Test03(unittest.TestCase):
 
     def setUp(self):
@@ -94,7 +94,17 @@ class Test03(unittest.TestCase):
         self.assertTrue('CAS' in self.db.components[comp1].keys())
         self.assertEqual(self.db.components[comp1]['CAS'], '64-17-5')
 
-@unittest.skip("Skipping Test04")
+    def test_sheet5(self):
+        comp1 = 'METHANE'
+        comp2 = 'N-HEXANE'
+        self.db.parse_sheet((comp1, comp2))
+        self.db.write_sheet((comp1, comp2))
+        self.assertTrue(comp1 in self.db.components.keys())
+        self.assertTrue('CAS' in self.db.components[comp1].keys())
+        self.assertEqual(self.db.components[comp1]['CAS'], '74-82-8')
+
+
+#@unittest.skip("Skipping Test04")
 class Test04(unittest.TestCase):
 
     def setUp(self):
@@ -104,7 +114,7 @@ class Test04(unittest.TestCase):
     def test_sheets(self):
         self.db.parse_sheets()
 
-@unittest.skip("Skipping Test05")
+#@unittest.skip("Skipping Test05")
 class Test05(unittest.TestCase):
 
     def setUp(self):
