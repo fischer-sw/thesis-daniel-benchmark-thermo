@@ -31,11 +31,23 @@ class Database:
         self.log.info('DATA FILE {}'.format(self.path))
         self.output_dir = output_dir
         self.log.info('OUTPUT DIR {}'.format(self.output_dir))
+        self.create_folders()
         self.components = {}
         self.component_keys = [ 'CAS', 'InChiKey', 'Critical temperature / K', 'Critical pressure / bar', 'Acentric factor' ]
         self.special_props = [ 'critical point', 'three-phase line']
         self.sheets = self.get_sheets()
         self.systems = self.get_systems()
+        
+
+    def create_folders(self):
+        """
+        Function that creates Database Folder
+        """
+        # create Datenbank folder
+        path = os.path.join(sys.path[0],'..', '..', 'Datenbank', 'Experimente')
+        os.makedirs(path, exist_ok=True)
+        path = os.path.join(sys.path[0],'..', '..', 'Datenbank', 'Modelle')
+        os.makedirs(path, exist_ok=True)
 
     def get_systems(self):
         """ 
@@ -164,6 +176,7 @@ class Database:
                 n = 1
                 while type(data[pos][n]) == type(''):
                     n += 1
+
                 dataset['measurements'].append(list(data[pos][:n]))
                 azeoset['measurements'].append(list(data[pos][1:n]))
                 pos += 1

@@ -30,7 +30,13 @@ class Comparison:
         self.data_dir = data_dir
         self.result_dir = result_dir
         self.model = model_name
+     
 
+    def setup_test_model(self):
+        """
+        Function that sets up Test Model
+        """
+        pass
 
 
     def create_results(self):

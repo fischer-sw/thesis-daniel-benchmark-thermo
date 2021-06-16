@@ -94,7 +94,7 @@ class Test03(unittest.TestCase):
         self.assertTrue('CAS' in self.db.components[comp1].keys())
         self.assertEqual(self.db.components[comp1]['CAS'], '64-17-5')
 
-#@unittest.skip("Skipping Test04")
+@unittest.skip("Skipping Test04")
 class Test04(unittest.TestCase):
 
     def setUp(self):
