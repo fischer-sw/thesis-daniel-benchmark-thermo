@@ -1,4 +1,4 @@
-
+*.dll
 *.out
 *.aux
 *.log
@@ -11,6 +11,7 @@
 !Literatur/*.pdf
 Software/dev/__pycache__/*
 Software/site/*
+TREND 4.0/*
 *.ps
 *dvi
 *.out.ps
