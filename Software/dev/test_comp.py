@@ -37,7 +37,7 @@ class Test01(unittest.TestCase):
         self.assertIsNotNone(self.comp.model)
 
 @unittest.skip("Skipping Test02")
-class Test01(unittest.TestCase):
+class Test02(unittest.TestCase):
 
     def setUp(self):
         global comp
@@ -49,7 +49,7 @@ class Test01(unittest.TestCase):
         self.comp.write_results_file(erg)
 
 @unittest.skip("Skipping Test03")
-class Test01(unittest.TestCase):
+class Test03(unittest.TestCase):
 
     def setUp(self):
         global comp
