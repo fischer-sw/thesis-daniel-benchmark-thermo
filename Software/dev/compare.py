@@ -101,7 +101,35 @@ class Comparison:
             json.dump(res, outfile, ensure_ascii=False, indent=2, sort_keys=True)
 
     
-    def calc_sys_result(self, sys):
+    def create_results(self):
+        """
+        Function that creates results for all systems in model directory
+
+        """
+        res_path = os.path.join(self.result_dir, self.model, self.test_name +'.json')
+        path = os.path.join(sys.path[0],'..', '..', 'Datenbank', 'Modelle', self.model)
+
+        with open(res_path, 'r') as file:
+            res = json.loads(file.read())
+
+        systems = os.listdir(path)
+
+        for element in systems:
+            sys_name = element.split('.json')[0]
+            
+            mod_path = os.path.join(path, element)
+
+            with open(mod_path, 'r') as file:
+                model_data = json.loads(file.read())
+
+            BAC = model_data
+            res = self.calc_sys_result(sys_name, res)
+        
+        return res
+
+
+
+    def calc_sys_result(self, sys, res):
         """
         Function to cacluate all grades possible for one system
 
@@ -113,12 +141,10 @@ class Comparison:
         # get model data
         
 
-        res_path = os.path.join(self.result_dir, self.model, self.test_name +'.json')
+        
         mod_path = os.path.join(self.data_dir, 'Modelle', self.model ,sys +'.json')
         exp_path = os.path.join(self.data_dir, 'Experimente' ,sys + '.json')
         
-        with open(res_path, 'r') as file:
-            res = json.loads(file.read())
 
         with open(mod_path, 'r') as file:
             model_data = json.loads(file.read())
@@ -299,82 +325,6 @@ class Comparison:
         
         self.log.info("{},{}".format(sys,res[BAC]['sys_res'][sys]))
         return res
-
-    # def fix_systems(self):
-    #     path = os.path.join(self.data_dir, "Experimente")
-    #     files = os.listdir(path)
-    #     check_keys = ["Isobaric phase equilibrium data", "Isothermal phase equilibrium data"]
-        
-    #     for file in files:
-    #         with open(os.path.join(path,file)) as f:
-    #             data = json.loads(f.read())
-
-
-    #             # check for elements that can be merged
-    #             for key in check_keys:
-                    
-    #                 double = []
-    #                 pars = []
-
-    #                 if key not in data.keys():
-    #                     continue
-                    
-    #                 dataset = data[key]
-
-    #                 for n in range(len(dataset)):
-    #                     mes = dataset[n]
-    #                     # find sets with only one variable
-    #                     header = mes["measurements"][0]
-    #                     if len(header) < 3:
-    #                         pars.append([(mes["params"],mes["reference"]),n])
-                    
-    #                 if pars != []:
-    #                     ref = list(list(zip(*pars))[0])
-    #                 else:
-    #                     continue
-
-    #                 for m in range(len(dataset)):
-    #                     mes = dataset[m]
-    #                     header = mes["measurements"][0]
-    #                     for dbl in pars:
-    #                         # check if doubled element
-    #                         if (mes["params"],mes["reference"]) == dbl[0] and m != dbl[1]:
-                                
-    #                             # check header length
-    #                             if len(header) < 3:
-
-    #                                 # check id element already exists
-    #                                 if not (m, dbl[1]) in double and not (dbl[1], m) in double:
-    #                                     double.append((m, dbl[1]))
-                
-
-    #             if double != []:
-    #                 print(double)
-    #                 for element in double:
-    #                     # add new dataset
-
-    #                     new_set = dataset[element[0]]
-
-    #                     base = dataset[element[0]]["measurements"][:]
-    #                     extend = dataset[element[1]]["measurements"][:]
-                         
-    #                     for ext_ele in extend:
-    #                         if len(ext_ele) > 2:
-    #                             ext_prms = ext_ele[1:-2]
-    #                         else:
-    #                             ext_prms = ext_ele[-2]
-
-    #                         for j in range(len(base)):
-    #                             base_ele = base[j]
-    #                             if len(base_ele) > 2:
-    #                                 base_prms = base_ele[1:-2]
-    #                             else:
-    #                                 base_prms = base_ele[-2]
-
-    #                             # check for equal parameters
-    #                             if ext_prms == base_prms:
-    #                                 new_set["measurements"][j].append(ext_ele[-1])
-    #                 print(new_set)
 
 
     def MAPE(self, model, exp):

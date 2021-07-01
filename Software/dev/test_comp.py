@@ -5,6 +5,7 @@ import os
 import re
 import sys
 import unittest
+import json
 
 from compare import Comparison
 
@@ -21,6 +22,7 @@ def setUpModule():
     return
 
 def tearDownModule():
+
     global comp
     return
 
@@ -43,10 +45,22 @@ class Test02(unittest.TestCase):
         global comp
         self.comp = comp
 
-    def test_create_results(self):
-        erg = self.comp.create_results()
-        self.assertIsNotNone(erg)
+    def test_sys_results(self):
+
+        res_path = os.path.join(self.comp.result_dir, self.comp.model, self.comp.test_name +'.json')
+        with open(res_path, 'r') as file:
+            res = json.loads(file.read())
+
+
+        erg = self.comp.calc_sys_result('ETHANE_N-HEPTANE', res)
         self.comp.write_results_file(erg)
+        self.assertIsNotNone(erg)
+        erg = self.comp.calc_sys_result('METHANE_N-HEXANE', res)
+        self.comp.write_results_file(erg)
+        self.assertIsNotNone(erg)
+        erg = self.comp.calc_sys_result('ETHANOL_BENZENE', res)
+        self.comp.write_results_file(erg)
+        self.assertIsNotNone(erg)
 
 @unittest.skip("Skipping Test03")
 class Test03(unittest.TestCase):
@@ -55,17 +69,10 @@ class Test03(unittest.TestCase):
         global comp
         self.comp = comp
 
-    def test_sys_results(self):
-        erg = self.comp.calc_sys_result('ETHANE_N-HEPTANE')
-        self.comp.write_results_file(erg)
+    def test_create_results(self):
+        erg = self.comp.create_results()
         self.assertIsNotNone(erg)
-        erg = self.comp.calc_sys_result('METHANE_N-HEXANE')
         self.comp.write_results_file(erg)
-        self.assertIsNotNone(erg)
-        erg = self.comp.calc_sys_result('ETHANOL_BENZENE')
-        self.comp.write_results_file(erg)
-        self.assertIsNotNone(erg)
-
 
 
 if __name__ == '__main__':

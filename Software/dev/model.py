@@ -91,6 +91,9 @@ class Model:
             if element not in sys_keys:
                 continue
 
+            if "BAC" not in results.keys():
+                results["BAC"] = exp_data["BAC"]
+
             if element == 'Enthalpy of mixing':
                 #add key to dict
                 if not element in results.keys():
