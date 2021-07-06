@@ -26,7 +26,7 @@ class Model:
             self.log = logging.getLogger(__file__)
         else:
             self.log = logger
-        self.data_dir = os.path.join(sys.path[0], '../..', 'Datenbank', 'Experimente')
+        self.data_dir = os.path.join(sys.path[0], '..','..', 'Datenbank', 'Experimente')
         self.systems = self.get_systems()
         self.model_name = model_name
         self.ceate_model_dir()
