@@ -69,9 +69,31 @@ class Test03(unittest.TestCase):
         global comp
         self.comp = comp
 
-    def test_create_results(self):
-        erg = self.comp.create_results()
+    def test_create_sys_results(self):
+        erg = self.comp.create_sys_results()
         self.assertIsNotNone(erg)
+        self.comp.write_results_file(erg)
+
+# @unittest.skip("Skipping Test04")
+class Test04(unittest.TestCase):
+
+    def setUp(self):
+        global comp
+        self.comp = comp
+
+    def test_create_bac_results(self):
+        erg = self.comp.calc_bac_results()
+        self.assertIsNotNone(erg["BAC1"]["group_res"]["mark_h_mix"])
+        self.comp.write_results_file(erg)
+
+    def test_create_group_results(self):
+        erg = self.comp.calc_group_results()
+        self.assertIsNotNone(erg["group_res"]["mark_NA"]["mark_h_mix"])
+        self.comp.write_results_file(erg)
+
+    def test_create_model_results(self):
+        erg = self.comp.calc_model_results()
+        self.assertIsNotNone(erg["model_res"]["mark_h_mix"])
         self.comp.write_results_file(erg)
 
 

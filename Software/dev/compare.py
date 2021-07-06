@@ -35,6 +35,9 @@ class Comparison:
         self.model = model_name
         self.setup_test_model()
         self.init_results()
+
+
+        self.res_vars = ['mark_h_mix']
      
 
     def setup_model(self, name):
@@ -84,8 +87,18 @@ class Comparison:
             res["BAC"+str(i)] = {}
             res["BAC"+str(i)]["group_res"] = {}
             res["BAC"+str(i)]["sys_res"] = {}
-
-        self.write_results_file(res)
+            res["model_res"] = {}
+            res["group_res"] = {
+                "mark_NA" : {},
+                "mark_SA" : {},
+                "mark_CA" : {},
+                "mark_CA_SA" : {}
+            }
+        
+        # check if file exisits:
+        path = os.path.join(self.result_dir, self.model, self.test_name +'.json')
+        if not os.path.isfile(path):
+            self.write_results_file(res)
 
     
     def write_results_file(self, res):
@@ -101,7 +114,7 @@ class Comparison:
             json.dump(res, outfile, ensure_ascii=False, indent=2, sort_keys=True)
 
     
-    def create_results(self):
+    def create_sys_results(self):
         """
         Function that creates results for all systems in model directory
 
@@ -127,6 +140,83 @@ class Comparison:
         
         return res
 
+
+    def calc_bac_results(self):
+        """
+        Function that calculates BAC results
+        """
+
+
+        
+
+        res_path = os.path.join(self.result_dir, self.model, self.test_name +'.json')
+        
+        with open(res_path, 'r') as file:
+            res = json.loads(file.read())
+
+        for element in self.res_vars:
+
+            mark_sum = 0
+            sys_count = 0
+
+            for key in res.keys():
+                
+                if key[0:3] != "BAC":
+                    continue
+                for system in res[key]["sys_res"].keys():
+                    
+                    if not element in res[key]["sys_res"][system].keys():
+                        continue
+
+                    mark_sum += res[key]["sys_res"][system][element]
+                    sys_count += 1
+
+                res[key]["group_res"][element] = mark_sum/sys_count
+                self.log.info("{} group results {} = {}".format(key,element, mark_sum/sys_count))
+
+        return res
+
+    def calc_group_results(self):
+        
+
+        res_path = os.path.join(self.result_dir, self.model, self.test_name +'.json')
+        
+        with open(res_path, 'r') as file:
+            res = json.loads(file.read())
+
+        for element in self.res_vars:
+
+            mark_NA = (res["BAC1"]["group_res"][element] + res["BAC2"]["group_res"][element]+ res["BAC3"]["group_res"][element]+ res["BAC4"]["group_res"][element])/4
+            
+            mark_SA = res["BAC5"]["group_res"][element]
+
+            mark_CA = res["BAC6"]["group_res"][element]
+
+            mark_CA_SA =  (res["BAC7"]["group_res"][element] + res["BAC8"]["group_res"][element]+ res["BAC9"]["group_res"][element])/3
+
+            res["group_res"]["mark_NA"][element] = mark_NA
+            res["group_res"]["mark_SA"][element] = mark_SA
+            res["group_res"]["mark_CA"][element] = mark_CA
+            res["group_res"]["mark_CA_SA"][element] = mark_CA_SA
+
+        return res
+
+    def calc_model_results(self):
+        """
+        Function that calculates model results from BAC results
+        """
+
+
+
+        res_path = os.path.join(self.result_dir, self.model, self.test_name +'.json')
+        
+        with open(res_path, 'r') as file:
+            res = json.loads(file.read())
+
+        for element in self.res_vars:
+            res["model_res"][element] = (res["group_res"]["mark_NA"][element] + res["group_res"]["mark_SA"][element] + res["group_res"]["mark_CA"][element] + res["group_res"]["mark_CA_SA"][element])/4
+
+        return res
 
 
     def calc_sys_result(self, sys, res):
