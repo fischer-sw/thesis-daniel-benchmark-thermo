@@ -57,22 +57,11 @@ class Comparison:
         os.makedirs(path, exist_ok=True)
 
     def setup_test_model(self):
-        systems = ["ETHANE_N-HEPTANE", "ETHANOL_BENZENE", "METHANE_N-HEXANE", "N-HEPTANE_MONOCHLOROBENZENE"]
         
         # create folder
         name = "Test_Modell"
         self.setup_model(name)
 
-        # copy data
-        for element in systems:
-
-            source = self.data_dir
-            dest = os.path.join(sys.path[0],'..', '..', 'Datenbank', 'Modelle', name)   
-
-            source = os.path.join(source, 'Experimente', element+".json")
-            dest = os.path.join(dest, element+".json")
-
-            copyfile(source, dest)
 
     def init_results(self):
 
@@ -161,7 +150,7 @@ class Comparison:
 
             for key in res.keys():
                 
-                if key[0:3] != "BAC":
+                if key[0:3] != "BAC" or len(res[key]["sys_res"]) == 0:
                     continue
                 for system in res[key]["sys_res"].keys():
                     
@@ -180,24 +169,66 @@ class Comparison:
         
 
         res_path = os.path.join(self.result_dir, self.model, self.test_name +'.json')
+
         
         with open(res_path, 'r') as file:
             res = json.loads(file.read())
 
         for element in self.res_vars:
 
-            mark_NA = (res["BAC1"]["group_res"][element] + res["BAC2"]["group_res"][element]+ res["BAC3"]["group_res"][element]+ res["BAC4"]["group_res"][element])/4
+            mark_NA_list = []
+
+            mark_SA_list = []
+
+            mark_CA_list = []
+
+            mark_CA_SA_list = []
+
+            for i in range(1,10):
+                bac = "BAC" + str(i)
+                
+                if i in range(1,5):
+                    
+                    if element in list(res[bac]["group_res"].keys()):
+                        mark_NA_list.append(res[bac]["group_res"][element])
+                    continue
+
+                if i == 5:
+                    
+                    if element in list(res[bac]["group_res"].keys()):
+                        mark_SA_list.append(res[bac]["group_res"][element])
+                    continue
+
+                if i == 6:
+                    
+                    if element in list(res[bac]["group_res"].keys()):
+                        mark_CA_list.append(res[bac]["group_res"][element])
+                    continue
+
+
+                if i in range(7,10):
+                    
+                    if element in list(res[bac]["group_res"].keys()):
+                        mark_CA_SA_list.append(res[bac]["group_res"][element])
+                    continue
+                
             
-            mark_SA = res["BAC5"]["group_res"][element]
+            # calc marks
+            if mark_NA_list != []:
+                mark_NA = sum(mark_NA_list)/(len(mark_NA_list))
+                res["group_res"]["mark_NA"][element] = mark_NA
 
-            mark_CA = res["BAC6"]["group_res"][element]
+            if mark_SA_list != []:
+                mark_SA = sum(mark_SA_list)/(len(mark_SA_list))
+                res["group_res"]["mark_SA"][element] = mark_SA
 
-            mark_CA_SA =  (res["BAC7"]["group_res"][element] + res["BAC8"]["group_res"][element]+ res["BAC9"]["group_res"][element])/3
+            if mark_CA_list != []:
+                mark_CA = sum(mark_CA_list)/(len(mark_CA_list))
+                res["group_res"]["mark_CA"][element] = mark_CA
 
-            res["group_res"]["mark_NA"][element] = mark_NA
-            res["group_res"]["mark_SA"][element] = mark_SA
-            res["group_res"]["mark_CA"][element] = mark_CA
-            res["group_res"]["mark_CA_SA"][element] = mark_CA_SA
+            if mark_CA_SA_list != []:
+                mark_CA_SA = sum(mark_CA_SA_list)/(len(mark_CA_SA_list))
+                res["group_res"]["mark_CA_SA"][element] = mark_CA_SA
 
         return res
 
@@ -210,12 +241,24 @@ class Comparison:
 
         res_path = os.path.join(self.result_dir, self.model, self.test_name +'.json')
         
+
+        marks = ["mark_NA", "mark_SA", "mark_CA", "mark_CA_SA"]
+
         with open(res_path, 'r') as file:
             res = json.loads(file.read())
 
         for element in self.res_vars:
-            res["model_res"][element] = (res["group_res"]["mark_NA"][element] + res["group_res"]["mark_SA"][element] + res["group_res"]["mark_CA"][element] + res["group_res"]["mark_CA_SA"][element])/4
 
+            mark_list = []
+
+            for mark in marks:
+                if element in list(res["group_res"][mark]):
+                    mark_list.append(res["group_res"][mark][element])
+            
+            if mark_list != []:
+                res["model_res"][element] = sum(mark_list)/len(mark_list)
+
+                
         return res
 
 
@@ -372,15 +415,16 @@ class Comparison:
                     exp_val = exp_res[name][i]
                     mod_val = mod_res[name][i]
 
-                    err = 0.5 * (self.MAPE([mod_val], [exp_val])+ self.MAPE([exp_val], [mod_val]))
+                    # err = 0.5 * (self.MAPE([mod_val], [exp_val])+ self.MAPE([exp_val], [mod_val]))
+
+                    err = 0.5 * (100 * abs((exp_val - mod_val)/exp_val) + 100 * abs((exp_val - mod_val)/mod_val))
 
                     if err > 80.0:
                         err = 80.0
 
                     sum += err
 
-                mark_h_mix = 20 - 0.25 * 1/len(mod_res) * sum
-                
+                mark_h_mix = 20 - 0.25 * 1/len(mod_res["h_mix"]) * sum
 
                 # write results
                 res[BAC]['sys_res'][sys]["mark_h_mix"] = mark_h_mix
