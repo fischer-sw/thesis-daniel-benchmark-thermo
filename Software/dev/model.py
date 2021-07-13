@@ -34,6 +34,8 @@ class Model:
         
         self.ceate_model_dir()
         self.reset_model()
+
+        self.bacs = list(range(1,3))
         
         self.trend_path = os.path.join(sys.path[0],'..','..','TREND 4.0')
         self.dll_path = os.path.join(sys.path[0],'TREND_FIT_DLL.dll')
@@ -93,9 +95,6 @@ class Model:
 
     def calc_model_results(self):
 
-
-        bacs = [1]
-
         for element in self.systems:
 
             sys_file_name = '_'.join(element) + '.json'
@@ -104,7 +103,7 @@ class Model:
             with open(os.path.join(self.data_dir, sys_file_name)) as file:
                 system = json.loads(file.read())
 
-            if not system["BAC"] in bacs:
+            if not system["BAC"] in self.bacs:
                 continue
 
             res = self.calc_system_results(element)

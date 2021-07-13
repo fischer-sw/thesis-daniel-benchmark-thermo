@@ -38,8 +38,8 @@ class Test01(unittest.TestCase):
         self.assertIsNotNone(self.comp)
         self.assertIsNotNone(self.comp.model)
 
-# @unittest.skip("Skipping Test03")
-class Test03(unittest.TestCase):
+# @unittest.skip("Skipping Test02")
+class Test02(unittest.TestCase):
 
     def setUp(self):
         global comp
@@ -50,8 +50,10 @@ class Test03(unittest.TestCase):
         self.assertIsNotNone(erg)
         self.comp.write_results_file(erg)
 
-# @unittest.skip("Skipping Test04")
-class Test04(unittest.TestCase):
+        
+
+# @unittest.skip("Skipping Test03")
+class Test03(unittest.TestCase):
 
     def setUp(self):
         global comp
@@ -62,10 +64,24 @@ class Test04(unittest.TestCase):
         self.assertIsNotNone(erg["BAC1"]["group_res"]["mark_h_mix"])
         self.comp.write_results_file(erg)
 
+# @unittest.skip("Skipping Test04")
+class Test04(unittest.TestCase):
+
+    def setUp(self):
+        global comp
+        self.comp = comp
+
     def test_create_group_results(self):
         erg = self.comp.calc_group_results()
         self.assertIsNotNone(erg["group_res"]["mark_NA"]["mark_h_mix"])
         self.comp.write_results_file(erg)
+
+# @unittest.skip("Skipping Test05")
+class Test05(unittest.TestCase):
+
+    def setUp(self):
+        global comp
+        self.comp = comp
 
     def test_create_model_results(self):
         erg = self.comp.calc_model_results()

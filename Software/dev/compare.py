@@ -38,6 +38,7 @@ class Comparison:
 
 
         self.res_vars = ['mark_h_mix', 'mark_cp_mix']
+        self.bacs = list(range(1,3))
      
 
     def setup_model(self, name):
@@ -62,7 +63,7 @@ class Comparison:
         name = "Test_Modell"
         self.setup_model(name)
 
-        #reset results file
+        # reset results file
         file = os.listdir(os.path.join(self.result_dir, self.model))
         for f in file:
             os.remove(os.path.join(self.result_dir, self.model, f))
@@ -130,7 +131,7 @@ class Comparison:
                 model_data = json.loads(file.read())
 
             BAC = model_data
-            res = self.calc_sys_result(sys_name, res)
+            res = self.calc_sys_results(sys_name, res)
         
         return res
 
@@ -148,12 +149,26 @@ class Comparison:
         with open(res_path, 'r') as file:
             res = json.loads(file.read())
 
+
+        # check if sys results are there
+        check = False
+        for i in self.bacs:
+            BAC = "BAC" + str(i)
+            if res[BAC]["sys_res"] == {}:
+                check = True
+
+        if check == True:
+           res = self.create_sys_results()
+
+
         for element in self.res_vars:
 
-            mark_sum = 0
-            sys_count = 0
+            
 
             for key in res.keys():
+
+                mark_sum = 0
+                sys_count = 0
                 
                 if key[0:3] != "BAC" or len(res[key]["sys_res"]) == 0:
                     continue
@@ -166,18 +181,13 @@ class Comparison:
                     sys_count += 1
 
                 res[key]["group_res"][element] = mark_sum/sys_count
-                self.log.info("{} group results {} = {}".format(key,element, mark_sum/sys_count))
+                self.log.info("{} group results {} = {}".format(key, element, mark_sum/sys_count))
 
         return res
 
     def calc_group_results(self):
         
-
-        res_path = os.path.join(self.result_dir, self.model, self.test_name +'.json')
-
-        
-        with open(res_path, 'r') as file:
-            res = json.loads(file.read())
+        res = self.calc_bac_results()
 
         for element in self.res_vars:
 
@@ -222,18 +232,22 @@ class Comparison:
             if mark_NA_list != []:
                 mark_NA = sum(mark_NA_list)/(len(mark_NA_list))
                 res["group_res"]["mark_NA"][element] = mark_NA
+                self.log.info("mark_NA {} = {}".format(element, mark_NA))
 
             if mark_SA_list != []:
                 mark_SA = sum(mark_SA_list)/(len(mark_SA_list))
                 res["group_res"]["mark_SA"][element] = mark_SA
+                self.log.info("mark_SA {} = {}".format(element, mark_SA))
 
             if mark_CA_list != []:
                 mark_CA = sum(mark_CA_list)/(len(mark_CA_list))
                 res["group_res"]["mark_CA"][element] = mark_CA
+                self.log.info("mark_CA {} = {}".format(element, mark_CA))
 
             if mark_CA_SA_list != []:
                 mark_CA_SA = sum(mark_CA_SA_list)/(len(mark_CA_SA_list))
                 res["group_res"]["mark_CA_SA"][element] = mark_CA_SA
+                self.log.info("mark_CA_SA {} = {}".format(element, mark_CA_SA))
 
         return res
 
@@ -242,15 +256,9 @@ class Comparison:
         Function that calculates model results from BAC results
         """
 
-
-
-        res_path = os.path.join(self.result_dir, self.model, self.test_name +'.json')
-        
+        res = self.calc_group_results()
 
         marks = ["mark_NA", "mark_SA", "mark_CA", "mark_CA_SA"]
-
-        with open(res_path, 'r') as file:
-            res = json.loads(file.read())
 
         for element in self.res_vars:
 
@@ -261,13 +269,15 @@ class Comparison:
                     mark_list.append(res["group_res"][mark][element])
             
             if mark_list != []:
-                res["model_res"][element] = sum(mark_list)/len(mark_list)
+                model_mark = sum(mark_list)/len(mark_list)
+                res["model_res"][element] = model_mark
+                self.log.info("model_mark {} = {}".format(element, model_mark))
 
                 
         return res
 
 
-    def calc_sys_result(self, sys, res):
+    def calc_sys_results(self, sys, res):
         """
         Function to cacluate all grades possible for one system
 
@@ -422,7 +432,10 @@ class Comparison:
 
                     # err = 0.5 * (self.MAPE([mod_val], [exp_val])+ self.MAPE([exp_val], [mod_val]))
 
-                    err = 0.5 * (100 * abs((exp_val - mod_val)/exp_val) + 100 * abs((exp_val - mod_val)/mod_val))
+                    if exp_val != 0.0 or mod_val != 0.0:
+                        err = 0.5 * (100 * abs((exp_val - mod_val)/exp_val) + 100 * abs((exp_val - mod_val)/mod_val))
+                    else:
+                        print("")
 
                     if err > 80.0:
                         err = 80.0
@@ -446,7 +459,8 @@ class Comparison:
                     exp_val = exp_res[name][i]
                     mod_val = mod_res[name][i]
 
-                    err = 0.5 * (100 * abs((exp_val - mod_val)/exp_val) + 100 * abs((exp_val - mod_val)/mod_val))
+                    if exp_val != 0.0 or mod_val != 0.0:
+                        err = 0.5 * (100 * abs((exp_val - mod_val)/exp_val) + 100 * abs((exp_val - mod_val)/mod_val))
 
                     if err > 200.0:
                         err = 200.0
