@@ -27,11 +27,19 @@ class Model:
         else:
             self.log = logger
         self.data_dir = os.path.join(sys.path[0], '..','..', 'Datenbank', 'Experimente')
+        self.model_dir = os.path.join(sys.path[0], '..','..', 'Datenbank', 'Modelle', model_name)
+
         self.systems = self.get_systems()
         self.model_name = model_name
+        
         self.ceate_model_dir()
+        self.reset_model()
+        
         self.trend_path = os.path.join(sys.path[0],'..','..','TREND 4.0')
         self.dll_path = os.path.join(sys.path[0],'TREND_FIT_DLL.dll')
+
+
+        self.calc_vars = ['Enthalpy of mixing', 'Heat capacity of mixing']
 
         self.COSMOparam = (ct.c_double * COSMO_length)()
         self.COSMOparam[0] = 6525.69 * 4184.0
@@ -55,6 +63,13 @@ class Model:
         self.COSMOparam[18] = 115.70
         self.COSMOparam[19] = 76.89
         self.COSMOparam[20] = 85.37 
+
+
+    def reset_model(self):
+        files = os.listdir(self.model_dir)
+        for file in files:
+            os.remove(os.path.join(self.model_dir, file))
+
 
     def get_systems(self):
         
@@ -113,7 +128,6 @@ class Model:
         """
         results = {}
 
-        calc_vars = ['Enthalpy of mixing']
 
         self.log.info('Calculating {} {}'.format(system[0], system[1]))
 
@@ -126,14 +140,14 @@ class Model:
 
         sys_keys = exp_data.keys()
 
-        for element in calc_vars:
+        for element in self.calc_vars:
             if element not in sys_keys:
                 continue
 
             if "BAC" not in results.keys():
                 results["BAC"] = exp_data["BAC"]
 
-            if element == 'Enthalpy of mixing':
+            if element in ['Enthalpy of mixing', 'Heat capacity of mixing']:
                 #add key to dict
                 if not element in results.keys():
                     results[element] = []
@@ -155,17 +169,27 @@ class Model:
                         
                         x = exp_data[element][i]['measurements'][k][1]
 
-                        hE , hE_error = self.calc_heat_capa(system, Temp, Press, x)
+                        if element == 'Enthalpy of mixing':
+                            hE , hE_error = self.calc_h_mix(system, Temp, Press, x)
 
-                        # if no error accured
-                        if hE_error.value != -7878:
-                            results[element][i]['measurements'].append([hE, x])
+                            # if no error accured
+                            if hE_error.value != -7878:
+                                results[element][i]['measurements'].append([hE, x])
+
+                        if element == 'Heat capacity of mixing':
+                            cp , cp_error = self.calc_heat_capa(system, Temp, Press, x)
+
+                            # if no error accured
+                            if cp_error.value != -7878:
+                                results[element][i]['measurements'].append([cp, x])
+
+
 
             if element == "blabla":
                 pass
         
         # check all keys for model values
-        for element in calc_vars:
+        for element in self.calc_vars:
             
             check = False
 
@@ -201,7 +225,7 @@ class Model:
             os.mkdir(path)
 
 
-    def calc_heat_capa(self, system, temp, press, x):
+    def calc_h_mix(self, system, temp, press, x):
         
         fldmix = None
         fld1 = None
@@ -223,20 +247,52 @@ class Model:
         fld1 = Fluid('TP','H',[fld1_name, fld2_name],[0.99999999,0.00000001],[1,1],1,self.trend_path,'molar',self.dll_path)
         fld2 = Fluid('TP','H',[fld2_name, fld1_name],[0.99999999,0.00000001],[1,1],1,self.trend_path,'molar',self.dll_path)        
         
-        # fldmix = Fluid('TP','H',['methane','ethane'],[0.6,0.4],[1,1],1,self.trend_path,'molar',self.dll_path)
-        # fld1 = Fluid('TP','H',['methane','ethane'],[0.99999999,0.00000001],[1,1],1,self.trend_path,'molar',self.dll_path)
-        # fld2 = Fluid('TP','H',['ethane','methane'],[0.99999999,0.00000001],[1,1],1,self.trend_path,'molar',self.dll_path)
-
         h_mix, errmix = fldmix.TREND_EOS_FIT(temp, press, self.COSMOparam)
         h_fld1, errmix = fld1.TREND_EOS_FIT(temp, press, self.COSMOparam)
         h_fld2, errmix = fld2.TREND_EOS_FIT(temp, press, self.COSMOparam)
         hE = h_mix - x * h_fld1 - (1-x) * h_fld2
         
         if errmix.value != -7878:
-            self.log.info("{}, x = {}, hE = {} J/(mol*K)".format(system,x,hE))
+            self.log.info("{}, x = {}, hE = {} J/mol".format(system,x,hE))
 
         else:
             self.log.info("{} hE calculation not possible".format(system))
 
 
         return hE, errmix
+
+    def calc_heat_capa(self, system, temp, press, x):
+        
+        fldmix = None
+        fld1 = None
+        fld2 = None
+        cp = None
+        cp_mix = None
+        cp_fld1 = None
+        cp_fld2 = None
+        errmix = None
+
+        fld1_name = system[0].lower()
+        fld2_name = system[1].lower()
+
+        press = press/10  # MPa
+
+        # self.fldmix1 = Fluid('TP','HE',['methane','ethane'],[0.6,0.4],[1,1],1,self.trend_path,'molar',self.dll_path)
+        fldmix = Fluid('TP','CP',[fld1_name, fld2_name],[x, 1-x],[1,1],1,self.trend_path,'molar',self.dll_path)
+        
+        fld1 = Fluid('TP','CP',[fld1_name, fld2_name],[0.99999999,0.00000001],[1,1],1,self.trend_path,'molar',self.dll_path)
+        fld2 = Fluid('TP','CP',[fld2_name, fld1_name],[0.99999999,0.00000001],[1,1],1,self.trend_path,'molar',self.dll_path)        
+
+        cp_mix, errmix = fldmix.TREND_EOS_FIT(temp, press, self.COSMOparam)
+        cp_fld1, errmix = fld1.TREND_EOS_FIT(temp, press, self.COSMOparam)
+        cp_fld2, errmix = fld2.TREND_EOS_FIT(temp, press, self.COSMOparam)
+        cp = cp_mix - x * cp_fld1 - (1-x) * cp_fld2
+        
+        if errmix.value != -7878:
+            self.log.info("{}, x = {}, cp = {} J/(mol*K)".format(system,x,cp))
+
+        else:
+            self.log.info("{} cp calculation not possible".format(system))
+
+
+        return cp, errmix

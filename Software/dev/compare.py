@@ -37,7 +37,7 @@ class Comparison:
         self.init_results()
 
 
-        self.res_vars = ['mark_h_mix']
+        self.res_vars = ['mark_h_mix', 'mark_cp_mix']
      
 
     def setup_model(self, name):
@@ -61,6 +61,11 @@ class Comparison:
         # create folder
         name = "Test_Modell"
         self.setup_model(name)
+
+        #reset results file
+        file = os.listdir(os.path.join(self.result_dir, self.model))
+        for f in file:
+            os.remove(os.path.join(self.result_dir, self.model, f))
 
 
     def init_results(self):
@@ -441,14 +446,14 @@ class Comparison:
                     exp_val = exp_res[name][i]
                     mod_val = mod_res[name][i]
 
-                    err = 0.5 * (self.MAPE([mod_val], [exp_val])+ self.MAPE([exp_val], [mod_val]))
+                    err = 0.5 * (100 * abs((exp_val - mod_val)/exp_val) + 100 * abs((exp_val - mod_val)/mod_val))
 
                     if err > 200.0:
                         err = 200.0
 
                     sum += err
 
-                mark_cp_mix = 20 - 0.1 * 1/len(mod_res) * sum
+                mark_cp_mix = 20 - 0.1 * 1/len(mod_res["cp_mix"]) * sum
                 
 
                 # write results
