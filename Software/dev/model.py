@@ -239,19 +239,21 @@ class Model:
         fld2_name = system[1].lower()
 
         press = press/10  # MPa
+        eqtype = 2 #Reinstoffgleichung: 1: Hochgenau, 2: SRK, 3: PR, 4: LKP, 6: PC-SAFT
+        mixtype = 22 #Gemischmodell: 1: Multifluid-Gemischmodell, 2: SRK a quadratisch, b linear, 21: SRK a quadratisch, b quadratisch, 22: PSRK, 3: PR a quadratisch, b linear, 31: PR a quadratisch, b quadratisch, 32: VTPR
 
         # self.fldmix1 = Fluid('TP','HE',['methane','ethane'],[0.6,0.4],[1,1],1,self.trend_path,'molar',self.dll_path)
-        fldmix = Fluid('TP','H',[fld1_name, fld2_name],[x, 1-x],[1,1],1,self.trend_path,'molar',self.dll_path)
+        fldmix = Fluid('TP','H',[fld1_name, fld2_name],[x, 1-x],[eqtype,eqtype],mixtype,self.trend_path,'molar',self.dll_path)
         
-        fld1 = Fluid('TP','H',[fld1_name, fld2_name],[0.99999999,0.00000001],[1,1],1,self.trend_path,'molar',self.dll_path)
-        fld2 = Fluid('TP','H',[fld2_name, fld1_name],[0.99999999,0.00000001],[1,1],1,self.trend_path,'molar',self.dll_path)        
+        fld1 = Fluid('TP','H',[fld1_name, fld2_name],[0.99999999,0.00000001],[eqtype,eqtype],mixtype,self.trend_path,'molar',self.dll_path)
+        fld2 = Fluid('TP','H',[fld2_name, fld1_name],[0.99999999,0.00000001],[eqtype,eqtype],mixtype,self.trend_path,'molar',self.dll_path)        
         
         h_mix, errmix = fldmix.TREND_EOS_FIT(temp, press, self.COSMOparam)
         h_fld1, errmix = fld1.TREND_EOS_FIT(temp, press, self.COSMOparam)
         h_fld2, errmix = fld2.TREND_EOS_FIT(temp, press, self.COSMOparam)
         hE = h_mix - x * h_fld1 - (1-x) * h_fld2
         
-        if errmix.value != -7878:
+        if errmix.value == 0:
             self.log.info("{}, x = {}, hE = {} J/mol".format(system,x,hE))
 
         else:
@@ -275,19 +277,21 @@ class Model:
         fld2_name = system[1].lower()
 
         press = press/10  # MPa
+        eqtype = 2 #Reinstoffgleichung: 1: Hochgenau, 2: SRK, 3: PR, 4: LKP, 6: PC-SAFT
+        mixtype = 22 #Gemischmodell: 1: Multifluid-Gemischmodell, 2: SRK a quadratisch, b linear, 21: SRK a quadratisch, b quadratisch, 22: PSRK, 3: PR a quadratisch, b linear, 31: PR a quadratisch, b quadratisch, 32: VTPR
 
         # self.fldmix1 = Fluid('TP','HE',['methane','ethane'],[0.6,0.4],[1,1],1,self.trend_path,'molar',self.dll_path)
-        fldmix = Fluid('TP','CP',[fld1_name, fld2_name],[x, 1-x],[1,1],1,self.trend_path,'molar',self.dll_path)
+        fldmix = Fluid('TP','CP',[fld1_name, fld2_name],[x, 1-x],[eqtype,eqtype],mixtype,self.trend_path,'molar',self.dll_path)
         
-        fld1 = Fluid('TP','CP',[fld1_name, fld2_name],[0.99999999,0.00000001],[1,1],1,self.trend_path,'molar',self.dll_path)
-        fld2 = Fluid('TP','CP',[fld2_name, fld1_name],[0.99999999,0.00000001],[1,1],1,self.trend_path,'molar',self.dll_path)        
+        fld1 = Fluid('TP','CP',[fld1_name, fld2_name],[0.99999999,0.00000001],[eqtype,eqtype],mixtype,self.trend_path,'molar',self.dll_path)
+        fld2 = Fluid('TP','CP',[fld2_name, fld1_name],[0.99999999,0.00000001],[eqtype,eqtype],mixtype,self.trend_path,'molar',self.dll_path)        
 
         cp_mix, errmix = fldmix.TREND_EOS_FIT(temp, press, self.COSMOparam)
         cp_fld1, errmix = fld1.TREND_EOS_FIT(temp, press, self.COSMOparam)
         cp_fld2, errmix = fld2.TREND_EOS_FIT(temp, press, self.COSMOparam)
         cp = cp_mix - x * cp_fld1 - (1-x) * cp_fld2
         
-        if errmix.value != -7878:
+        if errmix.value == 0:
             self.log.info("{}, x = {}, cp = {} J/(mol*K)".format(system,x,cp))
 
         else:
