@@ -150,6 +150,7 @@ def merge(data, fluids, mappings):
 
                     formula = d[1]
                     # print(formula)
+
                     
                     y.append(mass)
                     continue
@@ -158,6 +159,32 @@ def merge(data, fluids, mappings):
         fluids.append(y)
     fluids.append(['@END'])
     return fluids
+
+
+def masse(formula):
+    weights = {
+        'C': 12.01,
+        'O': 16,
+        'H': 1,
+        'Br': 79.9,
+        'Si': 28.08,
+        'N': 14,
+        'F': 18.99,
+        'Cl': 35.4,
+        'S': 32.06,
+        'I': 126.9
+    }
+    result = 0
+    for item in re.findall('[A-Z][a-z]*[0-9]*', formula):
+        m = re.match('([A-Z][a-z]*)(\d+)', item)
+        if m:
+            result += weights[m.group(1)] * int(m.group(2))
+        else:
+            result += 1
+    return result
+
+formula = sys.argv[1]
+print(masse(formula))
 
 
 fld_to_csv(fluids_file_name)
