@@ -5,6 +5,8 @@
 *.blg
 *.bbl
 *.gz
+*.csv
+*.fld
 *.toc
 *.pdf
 !figs/*.pdf
