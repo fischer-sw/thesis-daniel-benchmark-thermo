@@ -37,6 +37,8 @@ class Database:
         self.special_props = [ 'critical point', 'three-phase line']
         self.sheets = self.get_sheets()
         self.systems = self.get_systems()
+        self.components = self.get_components()
+        self.write_components_file("database_components")
         
 
     def create_folders(self):
@@ -48,6 +50,40 @@ class Database:
         os.makedirs(path, exist_ok=True)
         path = os.path.join(sys.path[0],'..', '..', 'Datenbank', 'Modelle')
         os.makedirs(path, exist_ok=True)
+
+
+    def get_components(self):
+        """
+        Function that returns all components in Database
+
+        Returns:
+            list: All different components in Database 
+        """
+
+        components = []
+
+        for system in self.systems.keys():
+            for i in range(2):
+                if not system[i] in components:
+                    components.append(system[i])
+
+        return components
+
+    def write_components_file(self, filename):
+
+        """
+        Function that writes components to file
+
+        Arguments:
+            filename (str) : name of output file
+
+        """
+        
+        filepath = os.path.join(os.path.dirname(self.path), filename + ".txt")
+
+        with open(filepath, "w") as f:
+            for element in self.components:
+                f.write(element + "\n")
 
     def get_systems(self):
         """ 

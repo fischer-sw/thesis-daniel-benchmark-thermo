@@ -149,10 +149,10 @@ def merge(data, fluids, mappings):
                     I_mass = 126.9
 
                     formula = d[1]
-                    # print(formula)
-
                     
-                    y.append(mass)
+                    mass = round(molar_mass(formula),2)
+                    
+                    y.append(str(mass))
                     continue
 
                 y.append('0')
@@ -160,8 +160,65 @@ def merge(data, fluids, mappings):
     fluids.append(['@END'])
     return fluids
 
+def read_systems(filename):
 
-def masse(formula):
+    path = os.path.join(sys.path[0], filename + ".txt")
+
+
+    with open(path) as f:
+        data = f.readlines()
+
+    for i in range(len(data)):
+        data[i] = data[i].split("\n")[0]
+
+    return data
+
+def check_systems(systems, data):
+
+    res = {}
+
+    found = 0
+    number = len(systems)
+
+    for ele in systems:
+        for i in range(len(data)-1):
+
+
+            res[ele] = False
+
+            test = ele
+
+            if test in data[i][0] or test in data[i][1]:
+                res[ele] = True
+                found += 1
+                break
+
+            test = ele.lower()
+            
+            if test in data[i][0].lower() or test in data[i][1].lower():
+                res[ele] = True
+                found += 1
+                break
+            
+            if len(ele.split("-")) > 1:
+                test = ele.split("-")[1]
+
+                if test in data[i][0] or test in data[i][1]:
+                    res[ele] = True
+                    found += 1
+                    break
+
+                test = ele.split("-")[1].lower()
+
+                if test in data[i][0].lower() or test in data[i][1].lower():
+                    res[ele] = True
+                    found += 1
+                    break
+
+    return (res, number, found)
+
+
+def molar_mass(formula):
     weights = {
         'C': 12.01,
         'O': 16,
@@ -176,15 +233,15 @@ def masse(formula):
     }
     result = 0
     for item in re.findall('[A-Z][a-z]*[0-9]*', formula):
-        m = re.match('([A-Z][a-z]*)(\d+)', item)
+        m = re.match('([A-Z][a-z]*)(\d+)*', item)
         if m:
-            result += weights[m.group(1)] * int(m.group(2))
-        else:
-            result += 1
-    return result
+            if m.groups()[1] != None:
+                test = m.groups()
+                result += weights[m.group(1)] * int(m.group(2))
+            else:
+                result += weights[m.group(1)]
 
-formula = sys.argv[1]
-print(masse(formula))
+    return result
 
 
 fld_to_csv(fluids_file_name)
@@ -206,4 +263,9 @@ mappings = {
 }
 merged = merge(data, fluids, mappings)
 # print(len(fluids), fluids[0])
-write_fld("test", merged)
+# write_fld("test", merged)
+systems = read_systems("database_components")
+
+res, n_sys, n_found = check_systems(systems, merged)
+
+print(str(n_found/n_sys * 100) + " % gefunden")
