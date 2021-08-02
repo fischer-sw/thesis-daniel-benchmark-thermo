@@ -270,8 +270,7 @@ class Filereader():
         
 
 if __name__ == "__main__":
-    path = os.path.join(sys.path[0], "..", "..","TREND 4.0", "srk", "fluids_srk", "srkfluids.fld")
+    path = os.path.join(sys.path[0], "..", "..","Daten", "test.fld")
     reader = Filereader(path)
     srk_data = reader.readdata()
-    hor_data = reader.read_hostmann()
-    # reader.writefile(os.path.join(sys.path[0], "test.fld"))
+    reader.writefile(os.path.join(sys.path[0], "test.fld"))

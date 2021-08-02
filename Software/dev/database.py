@@ -60,12 +60,32 @@ class Database:
             list: All different components in Database 
         """
 
-        components = []
+        components = {}
 
-        for system in self.systems.keys():
-            for i in range(2):
-                if not system[i] in components:
-                    components.append(system[i])
+        filepath = os.path.join(os.path.dirname(self.path), "database_components.json")
+        if os.path.exists(filepath) == False:
+
+            for system in self.systems.keys():
+                
+                file = None
+                data = None
+                
+                file = pd.read_excel(self.path, sheet_name=self.systems[system]["sheet"],skiprows=0 ,nrows=5)
+                data = file.values
+                for i in range(2):
+
+                    ele = file.columns[i+1]
+
+                    if ele in components.keys():
+                        continue
+                    
+                    ele_cas = data[0][i+1]
+                    components[ele] = ele_cas
+                    self.log.info("{}, CAS = {}".format(ele, ele_cas))
+            
+        else:
+            with open(filepath) as f:
+                components = json.loads(f.read())
 
         return components
 
@@ -79,11 +99,11 @@ class Database:
 
         """
         
-        filepath = os.path.join(os.path.dirname(self.path), filename + ".txt")
+        filepath = os.path.join(os.path.dirname(self.path), filename + ".json")
 
         with open(filepath, "w") as f:
-            for element in self.components:
-                f.write(element + "\n")
+            json.dump(self.components, f, ensure_ascii=False, indent=2, sort_keys=True)
+            
 
     def get_systems(self):
         """ 

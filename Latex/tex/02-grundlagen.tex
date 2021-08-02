@@ -309,10 +309,15 @@ Die einzelnen Teilnoten wie z.B. $mark_{\mathrm{NA}}$ entsprechen den Noten der 
 
 Die Berechnung der Noten der drei weiteren Klassen erfolgt analog mit der in \autoref{tab: bin-bac} dargestellten Einteilung.
 
-\subsection{Berechnung des Gemittelten durchschnittlichen Fehlers}
-In diesem Abschnitt wird die Berechnung des gemittelten durchschnittlichen Fehlers gezeigt, welcher auch als \textbf{M}ean \textbf{A}verage \textbf{P}ercantage \textbf{E}rror oder kurz MAPE bezeichnet wird.
+\subsection{Berechnung des gemittelten durchschnittlichen Fehlers}
+In diesem Abschnitt wird die Berechnung des gemittelten durchschnittlichen Fehlers gezeigt, welcher auch als \textbf{M}ean \textbf{A}verage \textbf{P}ercantage \textbf{E}rror oder kurz MAPE bezeichnet wird.Der MPAE kann mit folgender Formel berechnet werden:
 
-Die Berechnung dieser Größe wird am Beispiel der Größe XYZ für das Gemisch ABC gezeigt.
+\begin{equation}
+	MPAE_X(\%) = 100 \cdot \dfrac{1}{n} \cdot \sum_{i=1}^{n} \biggl| \dfrac{X_i^\mathrm{EXP} - X_i^\mathrm{MODEL}}{X_i^\mathrm{MODEL}} \biggr|
+	\label{MPAE Glg}
+\end{equation}
+
+Die Variable $n$ beschreibt die Anzahl der Messpunkte. $X_i^\mathrm{MODEL}$ steht für einen Messdatenpunkt des Modells und $X_i^\mathrm{EXP}$ für den zugehörigen experimentellen Messwert.
 
 \subsection{Berechnung der Noten für die Bewertungsgrößen}
 Die einzelnen Teilnoten werden aus den Noten der jeweiligen Bewertungsgrößen bestimmt.
@@ -435,7 +440,7 @@ erfüllen die Abweichung auf 200 \% festgesetzt.
 		azeotrope Zusammensetzung  & 0,5  \\
 		Zusammensetzung Flüssigphase & 0,5 \\
 		Zusammensetzung Dampfphase & 0,5 \\
-		3-Phasen-Druck 0,5 &  \\
+		3-Phasen-Druck & 0,5   \\
 		3-Phasen-Zusammensetzung & 0,5  \\
 		Mischungsenthalpie & 0,25 \\
 		Mischungswärmekapazität & 0,10 \\

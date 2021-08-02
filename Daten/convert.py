@@ -3,8 +3,9 @@ import os
 import re
 import sys
 import math
+import json
 
-data_file_name = 'srk_data'
+data_file_name = 'horstmann_data'
 fluids_file_name = 'srkfluids'
 
 def fld_to_csv(file_name):
@@ -45,6 +46,94 @@ def get_row(data, key, value):
             return x
     return None
 
+def get_tab_length(word):
+    res = 0
+
+    tabs = {
+        "a" : 0.5,
+        "b" : 0.5,
+        "c" : 0.5,
+        "d" : 0.5,
+        "e" : 0.5,
+        "f" : 0.25,
+        "g" : 0.5,
+        "h" : 0.5,
+        "i" : 0.20,
+        "j" : 0.20,
+        "k" : 0.5,
+        "l" : 0.2,
+        "m" : 0.5,
+        "n" : 0.5,
+        "o" : 0.5,
+        "p" : 0.5,
+        "q" : 0.5,
+        "r" : 0.25,
+        "s" : 0.5,
+        "t" : 0.25,
+        "u" : 0.5,
+        "v" : 0.5,
+        "w" : 0.5,
+        "x" : 0.5,
+        "y" : 0.5,
+        "z" : 0.5,
+        "A" : 0.5,
+        "B" : 0.5,
+        "C" : 0.5,
+        "D" : 0.5,
+        "E" : 0.5,
+        "F" : 0.5,
+        "G" : 0.5,
+        "H" : 0.5,
+        "I" : 0.25,
+        "J" : 0.5,
+        "K" : 0.5,
+        "L" : 0.5,
+        "M" : 0.5,
+        "N" : 0.5,
+        "O" : 0.5,
+        "P" : 0.5,
+        "Q" : 0.5,
+        "R" : 0.5,
+        "S" : 0.5,
+        "T" : 0.5,
+        "U" : 0.5,
+        "V" : 0.5,
+        "W" : 0.5,
+        "X" : 0.5,
+        "Y" : 0.5,
+        "Z" : 0.5,
+        "0" : 0.5,
+        "1" : 0.5,
+        "2" : 0.5,
+        "3" : 0.5,
+        "4" : 0.5,
+        "5" : 0.5,
+        "6" : 0.5,
+        "7" : 0.5,
+        "8" : 0.5,
+        "9" : 0.5,
+        "-" : 0.25,
+        " " : 0.5,
+        "(" : 0.25,
+        "[" : 0.25,
+        ")" : 0.25,
+        "]" : 0.25,
+        "." : 0.25,
+        "," : 0.25,
+        "/" : 0.25,
+        "_" : 0.5,
+        "+" : 0.5,
+        "'" : 0.15,
+        "<" : 0.5,
+        ">" : 0.5,
+        "@" : 0.5
+    }
+
+    for ele in word:
+        res += tabs[ele]
+    return math.floor(res)
+
+
 def write_fld(file_name, data):
     path = os.path.join(sys.path[0], file_name + ".fld")
     with open(path, "w") as f:
@@ -57,23 +146,35 @@ def write_fld(file_name, data):
 
             for ele in line:
 
-                tab_number = 15
+                tab_number = 17
 
                 ele = str(ele)
                 delta = 0
-
-                delta = math.ceil((len(ele)/4))
+                
+                # delta = get_tab_length(ele)
+                delta = math.ceil(len(ele)/4)
                 rest = len(ele)%4
 
-                if rest == 0:
-                    tab_number -= (delta + 1)
-                else:
+                if rest != 0:
+                
                     tab_number -= delta
+
+                else:
+                    tab_number -= (delta + 1)
+
                 line_str += (ele + tab_number * "\t")
             f.write(line_str + "\n")
             
 
-        
+def write_mappings(data, file_name):
+
+    path = os.path.join(sys.path[0], file_name + ".json")
+
+    if os.path.exists(path) == False:
+        with open(path, "w") as f:
+            json.dump(data, f , ensure_ascii=False, indent=2, sort_keys=True)
+    else:
+        print("File {} already there".format(file_name + ".json"))
 
 
 def merge(data, fluids, mappings):
@@ -101,7 +202,7 @@ def merge(data, fluids, mappings):
                     element = round(float(d[element_idx].split('*')[0])/1000,4)
                     element = str(element)
                 else:
-                    element = d[element_idx].split('*')[0]
+                    element = d[element_idx].split('*')[0].lower()
                 y.append(element)
             else:
                 
@@ -162,14 +263,9 @@ def merge(data, fluids, mappings):
 
 def read_systems(filename):
 
-    path = os.path.join(sys.path[0], filename + ".txt")
-
-
+    path = os.path.join(sys.path[0], filename + ".json")
     with open(path) as f:
-        data = f.readlines()
-
-    for i in range(len(data)):
-        data[i] = data[i].split("\n")[0]
+        data = json.loads(f.read())
 
     return data
 
@@ -180,40 +276,20 @@ def check_systems(systems, data):
     found = 0
     number = len(systems)
 
-    for ele in systems:
+    for ele in systems.keys():
+
+        res[ele] = False
+        ele_cas = systems[ele]
+
         for i in range(len(data)-1):
-
-
-            res[ele] = False
-
-            test = ele
-
-            if test in data[i][0] or test in data[i][1]:
-                res[ele] = True
+            data_cas = data[i][2]
+            if ele_cas == data_cas:
                 found += 1
+                data_ele = data[i][0]
+                res[ele] = data_ele
                 break
 
-            test = ele.lower()
             
-            if test in data[i][0].lower() or test in data[i][1].lower():
-                res[ele] = True
-                found += 1
-                break
-            
-            if len(ele.split("-")) > 1:
-                test = ele.split("-")[1]
-
-                if test in data[i][0] or test in data[i][1]:
-                    res[ele] = True
-                    found += 1
-                    break
-
-                test = ele.split("-")[1].lower()
-
-                if test in data[i][0].lower() or test in data[i][1].lower():
-                    res[ele] = True
-                    found += 1
-                    break
 
     return (res, number, found)
 
@@ -243,7 +319,6 @@ def molar_mass(formula):
 
     return result
 
-
 fld_to_csv(fluids_file_name)
 data = read_csv(data_file_name)
 fluids = read_csv(fluids_file_name)
@@ -263,9 +338,13 @@ mappings = {
 }
 merged = merge(data, fluids, mappings)
 # print(len(fluids), fluids[0])
-# write_fld("test", merged)
+write_fld("test", merged)
 systems = read_systems("database_components")
 
 res, n_sys, n_found = check_systems(systems, merged)
 
-print(str(n_found/n_sys * 100) + " % gefunden")
+write_mappings(res, "mappings")
+
+found_per = round(n_found/n_sys * 100, 0)
+
+print(str(found_per) + " % gefunden")
