@@ -33,6 +33,7 @@ class Database:
         self.log.info('OUTPUT DIR {}'.format(self.output_dir))
         self.create_folders()
         self.components = {}
+        self.data = self.get_data()
         self.component_keys = [ 'CAS', 'InChiKey', 'Critical temperature / K', 'Critical pressure / bar', 'Acentric factor' ]
         self.special_props = [ 'critical point', 'three-phase line']
         self.sheets = self.get_sheets()
@@ -40,6 +41,17 @@ class Database:
         self.components = self.get_components()
         self.write_components_file("database_components")
         
+        
+
+    def get_data(self):
+        """
+        Function that reades Excel File
+        """
+        
+        file = pd.read_excel(self.path, sheet_name=None)
+
+        return file
+
 
     def create_folders(self):
         """
@@ -57,7 +69,7 @@ class Database:
         Function that returns all components in Database
 
         Returns:
-            list: All different components in Database 
+            dict: dict of all different components in Database with their CAS number
         """
 
         components = {}
@@ -65,22 +77,24 @@ class Database:
         filepath = os.path.join(os.path.dirname(self.path), "database_components.json")
         if os.path.exists(filepath) == False:
 
+            file = pd.read_excel(self.path, sheet_name=None, nrows=5)
+
             for system in self.systems.keys():
                 
-                file = None
-                data = None
+                sheet = self.systems[system]["sheet"]
                 
-                file = pd.read_excel(self.path, sheet_name=self.systems[system]["sheet"],skiprows=0 ,nrows=5)
-                data = file.values
+                data = file[sheet].values
+
                 for i in range(2):
 
-                    ele = file.columns[i+1]
+                    ele = file[sheet].columns[i+1]
 
                     if ele in components.keys():
                         continue
                     
                     ele_cas = data[0][i+1]
-                    components[ele] = ele_cas
+                    components[ele] = {}
+                    components[ele]['CAS'] = ele_cas
                     self.log.info("{}, CAS = {}".format(ele, ele_cas))
             
         else:
@@ -99,11 +113,47 @@ class Database:
 
         """
         
+        def merge_dicts(d1, d2):
+        
+            res = {}
+
+            size_d1 = count_keys(d1)
+            size_d2 = count_keys(d2)
+
+
+            if size_d1 >= size_d2:
+                res = {**d2, **d1}
+
+            else:
+                res = {**d1, **d2}
+
+            return res
+
+        def count_keys(dict_, counter=0):
+            for each_key in dict_:
+                if isinstance(dict_[each_key], dict):
+                    # Recursive call
+                    counter = count_keys(dict_[each_key], counter + 1)
+                else:
+                    counter += 1
+            return counter
+
         filepath = os.path.join(os.path.dirname(self.path), filename + ".json")
 
+        if os.path.exists(filepath) == True:
+            with open(filepath) as g:
+                old_data = json.loads(g.read())
+
+
+            data = merge_dicts(old_data, self.components)
+
+        else:
+            data = self.components
+
         with open(filepath, "w") as f:
-            json.dump(self.components, f, ensure_ascii=False, indent=2, sort_keys=True)
-            
+            json.dump(data, f, ensure_ascii=False, indent=2, sort_keys=True)
+
+
 
     def get_systems(self):
         """ 
@@ -114,7 +164,7 @@ class Database:
 
         """
         systems = {}
-        file = pd.read_excel(self.path, sheet_name="ReadMe")
+        file = self.data["ReadMe"]
         data = file.values
         # Identify BAC Colums
         bac = {}
@@ -154,6 +204,9 @@ class Database:
                 self.log.info('progress = {} %'.format(progress))
                 progress_old = progress
             counter += 1
+
+        self.write_components_file("database_components")
+
         return
 
     def parse_sheet(self, sheet_name):
@@ -168,7 +221,7 @@ class Database:
 
         system = self.systems[sheet_name]["sheet"]
         self.log.debug('SHEET {}'.format(system))
-        file = pd.read_excel(self.path, sheet_name=system)
+        file = self.data[system]
         data = file.values
         if not sheet_name[0] in self.components.keys():
             self.components[sheet_name[0]] = {}
@@ -179,6 +232,7 @@ class Database:
             line = data[i]
             if not type(line[0]) == type(''):
                 continue
+
             if line[0] in self.component_keys:
                 self.components[sheet_name[0]][line[0]] = line[1]
                 self.components[sheet_name[1]][line[0]] = line[2]
@@ -299,7 +353,7 @@ class Database:
 
         """
 
-        data = pd.read_excel(self.path, sheet_name=None)
+        data = self.data
 
         sheets = []
         for table, values in data.items():
