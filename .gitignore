@@ -11,6 +11,7 @@
 *.pdf
 !figs/*.pdf
 !Literatur/*.pdf
+!Daten/mappings.json
 Daten/*.txt
 Software/dev/__pycache__/*
 Software/site/*

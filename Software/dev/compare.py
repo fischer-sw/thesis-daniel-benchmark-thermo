@@ -38,7 +38,7 @@ class Comparison:
 
 
         self.res_vars = ['mark_h_mix', 'mark_cp_mix']
-        self.bacs = list(range(1,3))
+        self.bacs = list(range(1,10))
      
 
     def setup_model(self, name):
@@ -425,6 +425,7 @@ class Comparison:
                 name = vals[0][0]
 
                 sum = 0
+                err = 0
 
                 for i in range(len(mod_res[name])):
                     exp_val = exp_res[name][i]
@@ -432,7 +433,7 @@ class Comparison:
 
                     # err = 0.5 * (self.MAPE([mod_val], [exp_val])+ self.MAPE([exp_val], [mod_val]))
 
-                    if exp_val != 0.0 or mod_val != 0.0:
+                    if exp_val != 0.0 and mod_val != 0.0:
                         err = 0.5 * (100 * abs((exp_val - mod_val)/exp_val) + 100 * abs((exp_val - mod_val)/mod_val))
                     else:
                         print("")
@@ -454,12 +455,13 @@ class Comparison:
                 name = vals[0][0]
 
                 sum = 0
+                err = 0
 
                 for i in range(len(mod_res[name])):
                     exp_val = exp_res[name][i]
                     mod_val = mod_res[name][i]
 
-                    if exp_val != 0.0 or mod_val != 0.0:
+                    if exp_val != 0.0 and mod_val != 0.0:
                         err = 0.5 * (100 * abs((exp_val - mod_val)/exp_val) + 100 * abs((exp_val - mod_val)/mod_val))
 
                     if err > 200.0:

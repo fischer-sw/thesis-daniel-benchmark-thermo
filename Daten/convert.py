@@ -4,6 +4,7 @@ import re
 import sys
 import math
 import json
+import numpy as np
 
 data_file_name = 'horstmann_data'
 fluids_file_name = 'srkfluids'
@@ -108,6 +109,10 @@ def merge(data, fluids, mappings):
         for i in range(len(fluids[0])):
 
             item = fluids[0][i]
+
+            fluid = d[0]
+
+
             if item in mappings.keys():
                 element_idx = data[0].index(mappings[item])
 
@@ -135,8 +140,12 @@ def merge(data, fluids, mappings):
                         group_list = [i.strip() for i in group_list]
 
                         for ele in group_list:
-                            amount = int(ele.split('×')[0])
-                            group = ele.split('×')[1]
+                            amount = int(ele.split('Ã—')[0])
+                            group = ele.split('Ã—')[1]
+                            # amount = int(ele.split('×')[0])
+                            # group = ele.split('×')[1]
+                            
+
 
                             groups += amount*[group]
                         y[-1] = str(len(groups))
@@ -191,8 +200,8 @@ def check_systems(systems, data):
 
     for ele in systems.keys():
 
-        res[ele] = False
-        ele_cas = systems[ele]
+        res[ele] = None
+        ele_cas = systems[ele]['CAS']
 
         for i in range(len(data)-1):
             data_cas = data[i][2]
@@ -236,6 +245,17 @@ fld_to_csv(fluids_file_name)
 data = read_csv(data_file_name)
 fluids = read_csv(fluids_file_name)
 
+test = list(list(zip(*fluids))[0])
+
+length = []
+
+for i in range(1,len(test)):
+    length.append(len(test[i]))
+
+print(str(max(length)))
+
+
+
 mappings = {
 #   996 ['english name', 'formula', 'CAS-nr.', 'Tc,i / K', 'Pc,i / kPa', 'vc,i / cm3 mol-1', 'Ï‰i', 'c1,i', 'c2,i', 'c3,i', 'Tmin / K', 'Tmax / K', 'increments [counter Ã— sub group number]']
 #   136 ['BEZEICHNUNG', 'ALTERNATIVER NAME', 'CAS-NR', 'M / (g/mol)', 'Azentr. Fak.', 'Pkrit / MPa', 'Tcrit / K', 'Ptr / Mpa', 'Ttr / K', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'c1', 'c2', 'c3', 'nr_of_groups', 'g1', 'g2', 'g3', 'g4', 'g5', 'g6', 'g7', 'g8', 'g9', 'g10', 'g11', 'g12', 'g13', 'g14', 'g15', 'g16', 'g17', 'g18', 'g19', 'g20', 'g21', 'g22', 'g23', 'g24', 'g25', 'g26', 'g27', 'g28', 'g29'] ''
@@ -244,7 +264,7 @@ mappings = {
     'CAS-NR': 'CAS-nr.',
     'Tcrit / K': 'Tc,i / K',
     'Pkrit / MPa': 'Pc,i / kPa',
-    'Azentr. Fak.': 'ωi',
+    'Azentr. Fak.': 'Ï‰i',
     'c1': 'c1,i', 
     'c2': 'c2,i', 
     'c3': 'c3,i'

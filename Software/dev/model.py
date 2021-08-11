@@ -35,13 +35,15 @@ class Model:
         self.ceate_model_dir()
         self.reset_model()
 
-        self.bacs = list(range(1,3))
+        self.bacs = list(range(1,9))
         
         self.trend_path = os.path.join(sys.path[0],'..','..','TREND 4.0')
         self.dll_path = os.path.join(sys.path[0],'TREND_FIT_DLL.dll')
 
 
         self.calc_vars = ['Enthalpy of mixing', 'Heat capacity of mixing']
+
+        
 
         self.COSMOparam = (ct.c_double * COSMO_length)()
         self.COSMOparam[0] = 6525.69 * 4184.0
@@ -235,9 +237,11 @@ class Model:
         h_fld2 = None
         errmix = None
 
-        fld1_name = system[0].lower()
-        fld2_name = system[1].lower()
 
+        fld1_name = system[0]
+        fld2_name = system[1]
+
+            
         press = press/10  # MPa
         eqtype = 2 #Reinstoffgleichung: 1: Hochgenau, 2: SRK, 3: PR, 4: LKP, 6: PC-SAFT
         mixtype = 22 #Gemischmodell: 1: Multifluid-Gemischmodell, 2: SRK a quadratisch, b linear, 21: SRK a quadratisch, b quadratisch, 22: PSRK, 3: PR a quadratisch, b linear, 31: PR a quadratisch, b quadratisch, 32: VTPR
@@ -273,8 +277,8 @@ class Model:
         cp_fld2 = None
         errmix = None
 
-        fld1_name = system[0].lower()
-        fld2_name = system[1].lower()
+        fld1_name = system[0]
+        fld2_name = system[1]
 
         press = press/10  # MPa
         eqtype = 2 #Reinstoffgleichung: 1: Hochgenau, 2: SRK, 3: PR, 4: LKP, 6: PC-SAFT

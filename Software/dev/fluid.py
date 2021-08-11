@@ -4,6 +4,7 @@ import sys
 import platform
 import os
 import time
+import json
 
 input_length = 12
 fluid_length = 30
@@ -134,7 +135,48 @@ class Fluid:
         assert(os.path.exists(self.dll_path))
         self.TrendDLL = ct.windll.LoadLibrary(self.dll_path)
 
+
+        self.fluid_mappings = self.read_mappings("mappings_fertig")
+
+    def read_mappings(self, filename):
+        
+        mappings_path = os.path.join(sys.path[0], "..", "..","Daten", filename + ".json")
+
+        with open(mappings_path) as f:
+            mappings = json.loads(f.read())
+
+        return mappings
+
     def TREND_EOS(self,pr1,pr2):
+
+        mapping = self.fluid_mappings
+
+        use_mappings = False
+
+        fld1_org_name = pr1
+        fld2_org_name = pr2
+
+        if use_mappings == True:
+
+            
+
+            if fld1_org_name in mapping.keys():
+                fld1_name = mapping[fld1_org_name]
+            else:
+                fld1_name = fld1_org_name
+
+            if fld1_name == None:
+                fld1_name = fld1_org_name
+
+            
+            if fld2_org_name in mapping.keys():
+                fld2_name = mapping[fld2_org_name]
+            else:
+                fld2_name = fld2_org_name
+                
+            if fld2_name == None:
+                fld2_name = fld2_org_name
+
         errorflag = ct.c_int(0)
         self.TrendDLL.TREND_EOS_STDCALL.restype = ct.c_double # !beware required line otherwise you get unsensible output
         return self.TrendDLL.TREND_EOS_STDCALL(self.calctype, self.input, ct.byref(ct.c_double(pr1)), ct.byref(ct.c_double(pr2)), self.fluid, self.moles, self.eos_ind, ct.byref(self.mix_ind), self.path, self.unit, ct.byref(errorflag), ct.byref(self.handle_ptr), 12, 12, 30, 255, 20),errorflag

@@ -79,8 +79,8 @@ class Filereader():
             
         len_hed = len(self.header)
         len_list = len(liste)
-        splittedpath = self.path.split('/') 
-        filename = splittedpath[1]
+        splittedpath = self.path.split('\\') 
+        filename = splittedpath[-1]
         if len_hed < len_list:
             print("Es sind Spalten für die Substanz: "+liste[0]+ " in der Datei " +filename+ " nicht beschriftet --> Leertasten durch Tabs ersetzen")
             self.append_header(len_list)
@@ -93,10 +93,11 @@ class Filereader():
         #dict[<key>] = value
         #Counter for reading through list
         i = 0
-        for element in liste:
+        for i in range(50):
+            element = liste[i]
             if element != None:
-                subs[self.header[i]] = liste[i]
-            i = i + 1
+                subs[self.header[i]] = element
+
         self.dic[liste[0]]= subs
 
     def adddata(self, data, data_header):
@@ -267,10 +268,29 @@ class Filereader():
     #                     self.dic[key][element] = str(data[key][2])
     #             else:
     #                 self.dic[key][element] = "0.000000000000000"
-        
+
+    def stripdata(self, data, length):
+
+        stripped = {}
+
+        for key in data.keys():
+            if key == "Header":
+                continue
+            if len(key) <= length:
+                stripped[key] = data[key]
+
+        return stripped
 
 if __name__ == "__main__":
-    path = os.path.join(sys.path[0], "..", "..","Daten", "test.fld")
+    path = os.path.join(sys.path[0], "..", "..","Daten", "test_fertig_lang.fld")
     reader = Filereader(path)
     srk_data = reader.readdata()
-    reader.writefile(os.path.join(sys.path[0], "test.fld"))
+
+    stripped_data = reader.stripdata(srk_data, 8)
+
+    reader.dic = stripped_data
+
+
+    output_path = os.path.join(sys.path[0], "..", "..","Daten", "test_fertig_kurz.fld")
+
+    reader.writefile(output_path)
