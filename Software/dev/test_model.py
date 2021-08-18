@@ -45,6 +45,19 @@ class Test02(unittest.TestCase):
     def test_model_results(self):
        self.model.calc_model_results()
 
+# @unittest.skip("Skipping Test03")
+class Test03(unittest.TestCase):
+    
+    def setUp(self):
+        global model
+        self.model = model
+        
+
+    def test_model_results(self):
+        res, exp_res , model_res = self.model.check_possible_calculations()
+        self.assertIsNotNone(exp_res)
+        self.assertIsNotNone(model_res)
+        self.assertIsNotNone(res)
 
 
 if __name__ == '__main__':

@@ -13,6 +13,7 @@ import numpy as np
 import openpyxl
 
 from fluid import *
+from srk_fld_file import *
 
 class Model:
 
@@ -31,17 +32,21 @@ class Model:
 
         self.systems = self.get_systems()
         self.model_name = model_name
+
+        self.model = "SRK"
         
         self.ceate_model_dir()
         self.reset_model()
 
-        self.bacs = list(range(1,9))
+        self.bacs = list(range(1,10))
         
         self.trend_path = os.path.join(sys.path[0],'..','..','TREND 4.0')
         self.dll_path = os.path.join(sys.path[0],'TREND_FIT_DLL.dll')
 
 
         self.calc_vars = ['Enthalpy of mixing', 'Heat capacity of mixing']
+
+        self.fluid_mappings = self.read_mappings("mappings_fertig")
 
         
 
@@ -67,6 +72,18 @@ class Model:
         self.COSMOparam[18] = 115.70
         self.COSMOparam[19] = 76.89
         self.COSMOparam[20] = 85.37 
+
+
+
+
+    def read_mappings(self, filename):
+        
+        mappings_path = os.path.join(sys.path[0], "..", "..","Daten", filename + ".json")
+
+        with open(mappings_path) as f:
+            mappings = json.loads(f.read())
+
+        return mappings
 
 
     def reset_model(self):
@@ -95,6 +112,136 @@ class Model:
 
         return systems
 
+
+    def get_system_data(self, system):
+        
+        path = os.path.join(self.data_dir, system[0]+"_"+system[1] + ".json")
+
+        with open(path) as f:
+            data = json.loads(f.read())
+
+        return data
+
+    def check_possible_calculations(self):
+        
+        exp_count = self.get_experimental_count()
+
+
+        model_count = {}
+
+        res = {}
+
+        # init results
+        for bac in self.bacs:
+            model_count["BAC" + str(bac)] = {}
+            res["BAC" + str(bac)] = {}
+
+        for system in self.systems:
+
+            data = self.get_system_data(system)
+
+            bac = "BAC" + str(data["BAC"])
+            
+            for var in self.calc_vars:
+                
+                if not var in data.keys():
+                    continue
+
+                test = self.check_model_components(self.model, system)
+                
+                if test == True:
+
+                    if var in model_count[bac].keys(): 
+                        model_count[bac][var] += 1
+
+                    else:
+                        model_count[bac][var] = 1
+        
+        for key in model_count.keys():
+
+            for var in self.calc_vars:
+                res[key][var] = round(model_count[key][var] / exp_count[key][var] * 100, 0)
+
+
+        return res, exp_count, model_count
+        
+
+
+    def get_experimental_count(self):
+        res = {}
+
+        exp_data_list = os.listdir(self.data_dir)
+
+        # init results
+        for bac in self.bacs:
+            res["BAC" + str(bac)] = {}
+
+         
+        for system in self.systems:
+            
+            data = self.get_system_data(system)
+
+            for key in data.keys():
+                if key in ["BAC","sheet"]:
+                    continue
+                else:
+                    bac = "BAC"+ str(data["BAC"])
+                    if key in res[bac].keys():
+                        res[bac][key] += 1
+                    else:
+                        res[bac][key] = 1
+
+        return res
+
+
+    def check_model_components(self, model, components):
+        
+        res = {}
+
+        for ele in components:
+            res[ele] = False
+        
+        if model == "SRK":
+            
+            # get srk-fld data
+
+            path = os.path.join(sys.path[0], "..", "..","Daten", "test1_fertig_lang.fld")
+            reader = Filereader(path)
+            srk_data = reader.readdata()
+
+            for ele in components:
+                model_comp_name = self.fluid_mappings[ele]
+
+                if not model_comp_name in srk_data.keys() :
+                    continue
+
+                comp = srk_data[model_comp_name]
+
+                letters = ["A", "B", "C", "D", "E", "F", "G"]
+
+                for letter in letters:
+                    if comp[letter] != '0':
+                       res[ele] = True
+
+            test_res = 0
+
+            for ele in components:
+                if res[ele] == True:
+                    test_res += 1
+            
+            if test_res == 2:
+                return True
+
+            else:
+                return False
+
+        if model == "new model":
+            # do check here
+            pass
+
+        else:
+            return False
+
     def calc_model_results(self):
 
         for element in self.systems:
@@ -109,10 +256,9 @@ class Model:
                 continue
 
             res = self.calc_system_results(element)
-            
 
             if res != {}:
-                self.write_results(sys_file_name, res)
+                self.write_results(sys_file_name, res)           
 
 
     def calc_system_results(self, system):
@@ -130,7 +276,7 @@ class Model:
         results = {}
 
 
-        self.log.info('Calculating {} {}'.format(system[0], system[1]))
+        
 
         # get experimental data
         sys_file_name = '_'.join(system) + '.json'
@@ -139,19 +285,24 @@ class Model:
             exp_data = json.loads(file.read())
 
 
-        sys_keys = exp_data.keys()
+        sys_keys = list(exp_data.keys())
 
         for element in self.calc_vars:
             if element not in sys_keys:
+                self.log.info('Skipped {} {}'.format(system[0], system[1]))
                 continue
 
             if "BAC" not in results.keys():
                 results["BAC"] = exp_data["BAC"]
 
             if element in ['Enthalpy of mixing', 'Heat capacity of mixing']:
-                #add key to dict
-                if not element in results.keys():
-                    results[element] = []
+                
+                components_test = self.check_model_components(self.model, system)
+                
+
+                if components_test == False:
+                    self.log.info("No A-G data for {} | {}".format(self.fluid_mappings[system[0]], self.fluid_mappings[system[1]]))
+                    return {}
 
                 # loop through all measurements
                 for i in range(len(exp_data[element])):
@@ -160,6 +311,11 @@ class Model:
                     
                     Press = data_set["params"]["P / bar "]
                     Temp = data_set["params"]["T / K "]
+                    
+
+                    #add key to dict
+                    if not element in results.keys():
+                        results[element] = []
                     
                     results[element].append({})  
                     results[element][i]['measurements'] = [exp_data[element][i]['measurements'][0]]
@@ -238,8 +394,8 @@ class Model:
         errmix = None
 
 
-        fld1_name = system[0]
-        fld2_name = system[1]
+        fld1_name = self.fluid_mappings[system[0]]
+        fld2_name = self.fluid_mappings[system[1]]
 
             
         press = press/10  # MPa
@@ -277,8 +433,8 @@ class Model:
         cp_fld2 = None
         errmix = None
 
-        fld1_name = system[0]
-        fld2_name = system[1]
+        fld1_name = self.fluid_mappings[system[0]]
+        fld2_name = self.fluid_mappings[system[1]]
 
         press = press/10  # MPa
         eqtype = 2 #Reinstoffgleichung: 1: Hochgenau, 2: SRK, 3: PR, 4: LKP, 6: PC-SAFT

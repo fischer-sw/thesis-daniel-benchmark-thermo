@@ -160,8 +160,8 @@ class Filereader():
     
     def writefile(self, path):
         pos = {}
-        tabs = '\t\t\t\t\t\t'
-        num_tabs = 6
+        tabs = '\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t'
+        num_tabs = 15
         counter = 0
         with open(path, 'w') as file:
             #write header:
@@ -227,47 +227,45 @@ class Filereader():
             file.write('@END')
 
 
-    # def read_LMN_xls(self,path):
+    def appendAtoG(self, data, path):
 
-    #     book = xlrd.open_workbook(path)
 
-    #     xls_data = {}
-    #     # get the first worksheet
-    #     first_sheet = book.sheet_by_index(0)
-    #     num_rows = first_sheet.nrows - 1
-        
+        new_data = []
 
-    #     for i in range(1,num_rows):
-    #         row = first_sheet.row_slice(rowx=i, start_colx=8, end_colx=15)
-    #         name = row[-1].value
-    #         data = []
-    #         columns = [0, 1, 2]
-    #         for element in columns:
-    #             cell_data = row[element].value
-    #             data.append(cell_data)
-    #         xls_data[name] = data
-        
-        
-    #     self.change_TWU_vals(xls_data)
+        with open(path) as f:
+            AtoGdata = f.readlines()
 
-    # def change_TWU_vals(self,data):
 
-    #     xls_data = data
-    #     TWU_Pars = ['L', 'M', 'N']
-        
-    #     for key, val in self.dic.items():
-    #         if key == "Header":
-    #             continue
-    #         for element in TWU_Pars:
-    #             if key in xls_data:            
-    #                 if element == 'L':
-    #                     self.dic[key][element] = str(data[key][0])
-    #                 elif element == 'M':
-    #                     self.dic[key][element] = str(data[key][1])
-    #                 elif element == 'N':
-    #                     self.dic[key][element] = str(data[key][2])
-    #             else:
-    #                 self.dic[key][element] = "0.000000000000000"
+
+        for line in AtoGdata:
+             new_data.append(line.split("\n")[0])
+
+        for i in range(1,len(new_data)):
+            
+            line = new_data[i]
+
+            line_splt = line.split(" ") 
+            
+            search_cas = line_splt[1]
+
+            for key in data.keys():
+                if key == "Header":
+                    continue
+                data_cas = data[key]["CAS-NR"]
+
+                if search_cas == data_cas:
+                    data[key]["A"] = line_splt[-7]
+                    data[key]["B"] = line_splt[-6]
+                    data[key]["C"] = line_splt[-5]
+                    data[key]["D"] = line_splt[-4]
+                    data[key]["E"] = line_splt[-3]
+                    data[key]["F"] = line_splt[-2]
+                    data[key]["G"] = line_splt[-1]
+                    break
+
+
+        return data
+
 
     def stripdata(self, data, length):
 
@@ -286,11 +284,17 @@ if __name__ == "__main__":
     reader = Filereader(path)
     srk_data = reader.readdata()
 
-    stripped_data = reader.stripdata(srk_data, 8)
+    # stripped_data = reader.stripdata(srk_data, 8)
 
-    reader.dic = stripped_data
+    # reader.dic = stripped_data
+
+    AtoGpath = os.path.join(sys.path[0], "..", "..","Daten", "A-G.txt")
 
 
-    output_path = os.path.join(sys.path[0], "..", "..","Daten", "test_fertig_kurz.fld")
+    new_data = reader.appendAtoG(reader.dic, AtoGpath)
+
+    reader.dic = new_data
+
+    output_path = os.path.join(sys.path[0], "..", "..","Daten", "test1_fertig_lang.fld")
 
     reader.writefile(output_path)
