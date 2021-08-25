@@ -269,10 +269,15 @@ mappings = {
     'c2': 'c2,i', 
     'c3': 'c3,i'
 }
+
+
 merged = merge(data, fluids, mappings)
 # print(len(fluids), fluids[0])
 write_fld("test", merged)
 systems = read_systems("database_components")
+
+
+
 
 res, n_sys, n_found = check_systems(systems, merged)
 

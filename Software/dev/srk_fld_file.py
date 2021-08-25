@@ -279,8 +279,27 @@ class Filereader():
 
         return stripped
 
+
+    def komma2dot(self, data):
+
+        for key in data:
+            if key == "Header":
+                continue
+
+            for ele in ["A", "B", "C", "D", "E", "F", "G"]:
+
+                value = data[key][ele]
+
+                if "," in value:
+
+                    new_value = value.replace(",",".")
+                    data[key][ele] = new_value
+
+        return data
+
+
 if __name__ == "__main__":
-    path = os.path.join(sys.path[0], "..", "..","Daten", "test_fertig_lang.fld")
+    path = os.path.join(sys.path[0], "..", "..","Daten", "test1_fertig_lang.fld")
     reader = Filereader(path)
     srk_data = reader.readdata()
 
@@ -288,12 +307,20 @@ if __name__ == "__main__":
 
     # reader.dic = stripped_data
 
-    AtoGpath = os.path.join(sys.path[0], "..", "..","Daten", "A-G.txt")
+    # AtoGpath = os.path.join(sys.path[0], "..", "..","Daten", "A-G.txt")
 
 
-    new_data = reader.appendAtoG(reader.dic, AtoGpath)
+    # new_data = reader.appendAtoG(reader.dic, AtoGpath)
 
-    reader.dic = new_data
+    
+    srk_data = reader.komma2dot(srk_data)
+    
+    reader.dic = srk_data
+
+
+
+
+
 
     output_path = os.path.join(sys.path[0], "..", "..","Daten", "test1_fertig_lang.fld")
 

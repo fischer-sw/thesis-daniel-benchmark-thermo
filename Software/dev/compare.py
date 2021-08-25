@@ -425,9 +425,12 @@ class Comparison:
                 name = vals[0][0]
 
                 sum = 0
-                err = 0
+                
 
                 for i in range(len(mod_res[name])):
+
+                    err = 0
+
                     exp_val = exp_res[name][i]
                     mod_val = mod_res[name][i]
 
@@ -435,8 +438,6 @@ class Comparison:
 
                     if exp_val != 0.0 and mod_val != 0.0:
                         err = 0.5 * (100 * abs((exp_val - mod_val)/exp_val) + 100 * abs((exp_val - mod_val)/mod_val))
-                    else:
-                        print("")
 
                     if err > 80.0:
                         err = 80.0
@@ -455,9 +456,11 @@ class Comparison:
                 name = vals[0][0]
 
                 sum = 0
-                err = 0
 
                 for i in range(len(mod_res[name])):
+
+                    err = 0
+
                     exp_val = exp_res[name][i]
                     mod_val = mod_res[name][i]
 

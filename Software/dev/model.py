@@ -36,7 +36,7 @@ class Model:
         self.model = "SRK"
         
         self.ceate_model_dir()
-        self.reset_model()
+        # self.reset_model()
 
         self.bacs = list(range(1,10))
         
@@ -205,7 +205,7 @@ class Model:
             
             # get srk-fld data
 
-            path = os.path.join(sys.path[0], "..", "..","Daten", "test1_fertig_lang.fld")
+            path = os.path.join(sys.path[0], "..", "..","TREND 4.0", "srk", "fluids_srk", "srkfluids.fld")
             reader = Filereader(path)
             srk_data = reader.readdata()
 
@@ -274,9 +274,7 @@ class Model:
 
         """
         results = {}
-
-
-        
+        model_data = {}
 
         # get experimental data
         sys_file_name = '_'.join(system) + '.json'
@@ -284,6 +282,13 @@ class Model:
         with open(os.path.join(self.data_dir, sys_file_name)) as file:
             exp_data = json.loads(file.read())
 
+
+        model_path = os.path.join(self.model_dir, sys_file_name) 
+
+        if os.path.exists(model_path):
+
+            with open(model_path) as file:
+                model_data = json.loads(file.read())
 
         sys_keys = list(exp_data.keys())
 
@@ -308,16 +313,27 @@ class Model:
                 for i in range(len(exp_data[element])):
                     
                     data_set = exp_data[element][i]
+
+
+                    #add key to dict
+                    if not element in results.keys():
+                        results[element] = []
+
+                    results[element].append({})
+                        
+                    
+                    # check for existing data
+                    if model_data != {}:
+                        if exp_data[element][i]["params"] == model_data[element][i]["params"]:
+                            results[element][i] = model_data[element][i]
+                            self.log.info("Already calculated {} data for {} | {}".format(element,self.fluid_mappings[system[0]], self.fluid_mappings[system[1]] ))
+                            continue
+                    
                     
                     Press = data_set["params"]["P / bar "]
                     Temp = data_set["params"]["T / K "]
                     
 
-                    #add key to dict
-                    if not element in results.keys():
-                        results[element] = []
-                    
-                    results[element].append({})  
                     results[element][i]['measurements'] = [exp_data[element][i]['measurements'][0]]
                     results[element][i]['params'] = exp_data[element][i]['params']
 
@@ -340,6 +356,45 @@ class Model:
                             if cp_error.value != -7878:
                                 results[element][i]['measurements'].append([cp, x])
 
+
+            if element in ["Isothermal phase equilibrium data", "Isobaric phase equilibrium data"]:
+                
+                # loop through all measurements
+                for i in range(len(exp_data[element])):
+                    
+                    data_set = exp_data[element][i]
+
+
+                    #add key to dict
+                    if not element in results.keys():
+                        results[element] = []
+
+                    results[element].append({})
+                        
+                    
+                    # check for existing data
+                    if model_data != {}:
+                        if exp_data[element][i]["params"] == model_data[element][i]["params"]:
+                            results[element][i] = model_data[element][i]
+                            self.log.info("Already calculated {} data for {} | {}".format(element,self.fluid_mappings[system[0]], self.fluid_mappings[system[1]] ))
+                            continue
+                    
+                    
+                    Press = data_set["params"]["P / bar "]
+                    Temp = data_set["params"]["T / K "]
+                    
+
+                    results[element][i]['measurements'] = [exp_data[element][i]['measurements'][0]]
+                    results[element][i]['params'] = exp_data[element][i]['params']
+
+
+                    # calculate results
+                    x, y, phase_error = self.calc_phase_eq(system, Temp, Press)
+
+
+                    # process model data
+                    for k in range(1,len(exp_data[element][i]['measurements'])):
+                        pass
 
 
             if element == "blabla":
@@ -417,7 +472,7 @@ class Model:
             self.log.info("{}, x = {}, hE = {} J/mol".format(system,x,hE))
 
         else:
-            self.log.info("{} hE calculation not possible".format(system))
+            self.log.info("{} hE calculation not possible. error = {}".format(system, errmix.value))
 
 
         return hE, errmix
@@ -455,7 +510,7 @@ class Model:
             self.log.info("{}, x = {}, cp = {} J/(mol*K)".format(system,x,cp))
 
         else:
-            self.log.info("{} cp calculation not possible".format(system))
+            self.log.info("{} cp calculation not possible. error = {}".format(system, errmix.value))
 
 
         return cp, errmix
