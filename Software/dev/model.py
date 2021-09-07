@@ -44,9 +44,11 @@ class Model:
         self.dll_path = os.path.join(sys.path[0],'TREND_FIT_DLL.dll')
 
 
-        self.calc_vars = ['Enthalpy of mixing', 'Heat capacity of mixing']
+        vars = ['Enthalpy of mixing', 'Heat capacity of mixing', 'Isothermal phase equilibrium data', 'Isobaric phase equilibrium data']
 
-        self.fluid_mappings = self.read_mappings("mappings_fertig")
+        self.calc_vars = vars[1:3]
+
+        self.fluid_mappings = self.read_mappings("mappings")
 
         
 
@@ -514,3 +516,30 @@ class Model:
 
 
         return cp, errmix
+
+
+
+    def calc_phase_eq(self, system, var, var_val):
+
+        fldmix = None
+
+
+        fld1_name = self.fluid_mappings[system[0]]
+        fld2_name = self.fluid_mappings[system[1]]
+        
+        eqtype = 2 #Reinstoffgleichung: 1: Hochgenau, 2: SRK, 3: PR, 4: LKP, 6: PC-SAFT
+        mixtype = 22 #Gemischmodell: 1: Multifluid-Gemischmodell, 2: SRK a quadratisch, b linear, 21: SRK a quadratisch, b quadratisch, 22: PSRK, 3: PR a quadratisch, b linear, 31: PR a quadratisch, b quadratisch, 32: VTPR
+
+        # self.fldmix1 = Fluid('TP','HE',['methane','ethane'],[0.6,0.4],[1,1],1,self.trend_path,'molar',self.dll_path)
+        fldmix = Fluid(inp_var, [fld1_name, fld2_name],[eqtype,eqtype],mixtype,self.trend_path,'molar',self.dll_path)
+
+        tmp_path = os.path.join(self.data_dir,'..', 'Daten', 'tmp_phase_eq.txt')
+
+        if os.path.exists(tmp_path):
+            os.remove(tmp_path)
+
+
+        # prop = 'Tvap' or 'pvap'
+        p_points_array, T_points_array, x_points, rhovap_points, rholiq_points, points = fldmix.PTXDIAG_FIT(prop, self.COSMOparam, tmp_path)
+
+        return p_points_array, T_points_array, x_points, rhovap_points, rholiq_points, points
