@@ -136,7 +136,7 @@ class Fluid:
         self.TrendDLL = ct.windll.LoadLibrary(self.dll_path)
 
 
-        self.fluid_mappings = self.read_mappings("mappings_fertig")
+        self.fluid_mappings = self.read_mappings("mappings")
 
     def read_mappings(self, filename):
         

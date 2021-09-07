@@ -46,7 +46,7 @@ class Model:
 
         vars = ['Enthalpy of mixing', 'Heat capacity of mixing', 'Isothermal phase equilibrium data', 'Isobaric phase equilibrium data']
 
-        self.calc_vars = vars[1:3]
+        self.calc_vars = vars[0:2]
 
         self.fluid_mappings = self.read_mappings("mappings")
 
