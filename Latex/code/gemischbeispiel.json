@@ -1,0 +1,85 @@
+{
+  "BAC": 5,
+  "Enthalpy of mixing": [
+    {
+      "measurements": [
+        [
+          "h\u1d39 / J.mol\u207b\u00b9",
+          "z\u2081"
+        ],
+        [
+          8.76,
+          0.0265
+        ],
+        [
+          "...",
+          "..."
+        ]
+        
+      ],
+      "params": {
+        "P / bar ": 75,
+        "T / K ": 298.15
+      },
+      "reference": "Sipowska, J.T - Graham, R.C - Neely, B.J - Ott, J.B - Izatt, R.M, Excess enthalpies for (ethane + methanol) at 298.15 and 348.15 K and 7.5 and 15 MPa, and at 323.15 K at 7.5, 10, and 15 MPa, The Journal of Chemical Thermodynamics. 21 (1989) 1085-1093. doi:10.1016/0021-9614(89)90095-5"
+    },
+    {
+      "measurements": [
+        [
+          "h\u1d39 / J.mol\u207b\u00b9",
+          "z\u2081"
+        ],
+        [
+          4.17,
+          0.0099
+        ],
+        [
+          "...",
+          "..."
+        ]
+        
+      ],
+      "params": {
+        "P / bar ": 69,
+        "T / K ": 298.15
+      },
+      "reference": "McFall, T.A. - Post, M.E. - Christensen, J.J. - Izatt, R.M., The excess enthalpies of eight (ethane + alcohol) mixtures at 298.15 K, The Journal of Chemical Thermodynamics. 13 (1981) 441-446. doi:10.1016/0021-9614(81)90051-3"
+    }
+  ],
+  "Isothermal phase equilibrium data": [
+    {
+      "measurements": [
+        [
+          "P / bar",
+          "x\u2081",
+          "y\u2081"
+        ],
+        [
+          1.7,
+          0.0346,
+          0.9917
+        ],
+        [
+          3.16,
+          0.0582,
+          0.9998
+        ],
+        [
+          6.26,
+          0.1348,
+          0.9999
+        ],
+        [
+          9.32,
+          0.3267,
+          0.9996
+        ]
+      ],
+      "params": {
+        "T / K ": 241.4
+      },
+      "reference": "Ruffine, L., \u00c9quilibres de phases \u00e0 basse temp\u00e9rature de syst\u00e8mes complexes CO2 - hydrocarbures l\u00e9gers - m\u00e9thanol - eau : mesures et mod\u00e9lisation (2005)"
+    }
+  ],
+  "sheet": "2_1101"
+}
