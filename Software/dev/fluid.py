@@ -224,7 +224,7 @@ class Fluid:
         fileout = str.encode(fileout)
         fileout_arg = ct.create_string_buffer(fileout.ljust(255),255)
         y = self.TrendDLL.PTXDIAG_OUT_FIT_STDCALL(self.input, ct.byref(ct.c_double(pr1)), self.fluid, self.eos_ind, ct.byref(self.mix_ind), self.path, COSMOparam, self.p_points_array, self.T_points_array, self.x_points, self.rhovap_points, self.rholiq_points, ct.byref(points), fileout_arg, ct.byref(errorflag), ct.byref(self.handle_ptr), 12, 30, 255, 255)                
-        return self.p_points_array, self.T_points_array, self.x_points, self.rhovap_points, self.rholiq_points, points          
+        return self.p_points_array, self.T_points_array, self.x_points, self.rhovap_points, self.rholiq_points, points, errorflag          
 
 
     def PTDIAG(self,env_pv,p_spec,T_spec,fileout):

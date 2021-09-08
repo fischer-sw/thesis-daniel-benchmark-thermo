@@ -46,7 +46,7 @@ class Model:
 
         vars = ['Enthalpy of mixing', 'Heat capacity of mixing', 'Isothermal phase equilibrium data', 'Isobaric phase equilibrium data']
 
-        self.calc_vars = vars[0:2]
+        self.calc_vars = vars[2:4]
 
         self.fluid_mappings = self.read_mappings("mappings")
 
@@ -381,22 +381,55 @@ class Model:
                             self.log.info("Already calculated {} data for {} | {}".format(element,self.fluid_mappings[system[0]], self.fluid_mappings[system[1]] ))
                             continue
                     
-                    
-                    Press = data_set["params"]["P / bar "]
-                    Temp = data_set["params"]["T / K "]
-                    
+                    if element == 'Isothermal phase equilibrium data':
+                        var_val = data_set["params"]["T / K "]
+                        var = 'Tvap'
 
+                    if element == 'Isobaric phase equilibrium data':
+                        var_val = data_set["params"]["P / bar "]
+                        var = 'p_vap'
+
+
+                     # create results
                     results[element][i]['measurements'] = [exp_data[element][i]['measurements'][0]]
                     results[element][i]['params'] = exp_data[element][i]['params']
 
 
                     # calculate results
-                    x, y, phase_error = self.calc_phase_eq(system, Temp, Press)
+                    values, phase_error = self.calc_phase_eq(system, var, var_val)
+
+                    if phase_error != 0:
+                        self.log.info("error in {} for {} | {}, error = {}".format(element,self.fluid_mappings[system[0]], self.fluid_mappings[system[1]], phase_error))
+                        continue
 
 
                     # process model data
-                    for k in range(1,len(exp_data[element][i]['measurements'])):
-                        pass
+                    len_data = len(exp_data[element][i]['measurements'])
+
+                    model_keys = np.array(list(values.keys()))
+
+                    for k in range(1,len_data):
+                        measure_ele = exp_data[element][i]['measurements'][k]
+                        val_dist = abs(model_keys - measure_ele[0])
+                        min_dist = min(val_dist)
+                        min_idx = np.where(val_dist == np.amin(val_dist))[0][0]
+                        
+                        # check if distance from exp value is to large
+                        if (var == 'Tvap' and min_dist > 3) or (var == 'pvap' and min_dist > 10):
+                            continue 
+                        
+                        min_x_val = values[model_keys[min_idx]]['x']
+                        min_y_val = values[model_keys[min_idx]]['y']
+
+                        positon = [min_x_val - measure_ele[1], min_y_val - measure_ele[1]]
+
+                        if positon[0] > positon[1]:
+                            tmp_set = [measure_ele[0], min_y_val, min_x_val]
+                        else:
+                            tmp_set = [measure_ele[0], min_x_val, min_y_val]
+                        
+                        results[element][i]['measurements'].append(tmp_set)
+
 
 
             if element == "blabla":
@@ -523,6 +556,7 @@ class Model:
 
         fldmix = None
 
+        values = {}
 
         fld1_name = self.fluid_mappings[system[0]]
         fld2_name = self.fluid_mappings[system[1]]
@@ -531,15 +565,27 @@ class Model:
         mixtype = 22 #Gemischmodell: 1: Multifluid-Gemischmodell, 2: SRK a quadratisch, b linear, 21: SRK a quadratisch, b quadratisch, 22: PSRK, 3: PR a quadratisch, b linear, 31: PR a quadratisch, b quadratisch, 32: VTPR
 
         # self.fldmix1 = Fluid('TP','HE',['methane','ethane'],[0.6,0.4],[1,1],1,self.trend_path,'molar',self.dll_path)
-        fldmix = Fluid(inp_var, [fld1_name, fld2_name],[eqtype,eqtype],mixtype,self.trend_path,'molar',self.dll_path)
+        fldmix = Fluid(var, 'CP', [fld1_name, fld2_name],[0.6,0.4],[eqtype,eqtype],mixtype,self.trend_path,'molar',self.dll_path)
 
-        tmp_path = os.path.join(self.data_dir,'..', 'Daten', 'tmp_phase_eq.txt')
+        tmp_path = ''
+        
+        p_points_array, T_points_array, x_points, rhovap_points, rholiq_points, points, error = fldmix.PTXDIAG_FIT(var_val, self.COSMOparam, tmp_path)
 
-        if os.path.exists(tmp_path):
-            os.remove(tmp_path)
+        if error.value != 0:
+            return values, error.value
 
+        if var == 'Tvap':
+            for i in range(points.value):
+                element = p_points_array[i]
+                values[element] = {}
+                values[element]['x'] = x_points[2][i]
+                values[element]['y'] = x_points[0][i]
 
-        # prop = 'Tvap' or 'pvap'
-        p_points_array, T_points_array, x_points, rhovap_points, rholiq_points, points = fldmix.PTXDIAG_FIT(prop, self.COSMOparam, tmp_path)
+        if var == 'pvap':
+            for i in range(points.value):
+                element = T_points_array[i]
+                values[element] = {}
+                values[element]['x'] = x_points[2][i]
+                values[element]['y'] = x_points[0][i]
 
-        return p_points_array, T_points_array, x_points, rhovap_points, rholiq_points, points
+        return values, error.value
