@@ -73,7 +73,7 @@ class Test04(unittest.TestCase):
 
     def test_create_group_results(self):
         erg = self.comp.calc_group_results()
-        self.assertIsNotNone(erg["group_res"]["mark_NA"]["mark_h_mix"])
+        self.assertIsNotNone(erg["class_res"]["mark_NA"])
         self.comp.write_results_file(erg)
 
 # @unittest.skip("Skipping Test05")
@@ -85,7 +85,7 @@ class Test05(unittest.TestCase):
 
     def test_create_model_results(self):
         erg = self.comp.calc_model_results()
-        self.assertIsNotNone(erg["model_res"]["mark_h_mix"])
+        self.assertIsNotNone(erg["model_res"])
         self.comp.write_results_file(erg)
 
 

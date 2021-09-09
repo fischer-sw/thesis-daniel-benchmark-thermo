@@ -82,12 +82,12 @@ class Comparison:
             res["BAC"+str(i)] = {}
             res["BAC"+str(i)]["group_res"] = {}
             res["BAC"+str(i)]["sys_res"] = {}
-            res["model_res"] = {}
-            res["group_res"] = {
-                "mark_NA" : {},
-                "mark_SA" : {},
-                "mark_CA" : {},
-                "mark_CA_SA" : {}
+            res["model_res"] = 0.0
+            res["class_res"] = {
+                "mark_NA" : 0.0,
+                "mark_SA" : 0.0,
+                "mark_CA" : 0.0,
+                "mark_CA_SA" : 0.0
             }
         
         # check if file exisits:
@@ -189,65 +189,72 @@ class Comparison:
         
         res = self.calc_bac_results()
 
-        for element in self.res_vars:
+        
 
-            mark_NA_list = []
+        mark_NA_list = []
 
-            mark_SA_list = []
+        mark_SA_list = []
 
-            mark_CA_list = []
+        mark_CA_list = []
 
-            mark_CA_SA_list = []
+        mark_CA_SA_list = []
 
-            for i in range(1,10):
-                bac = "BAC" + str(i)
+        for i in range(1,10):
+            bac = "BAC" + str(i)
+
+
+            #calculate bac results
+
+            tmp = []
+            for element in list(res[bac]["group_res"].keys()):
+                tmp.append(res[bac]["group_res"][element])
+
+            res[bac]["res"] = sum(tmp)/len(tmp)
+
+            # append bac results to class list
+            if i in range(1,5):
+        
+                mark_NA_list.append(res[bac]["res"])
+                continue
+
+            if i == 5:
                 
-                if i in range(1,5):
-                    
-                    if element in list(res[bac]["group_res"].keys()):
-                        mark_NA_list.append(res[bac]["group_res"][element])
-                    continue
+                mark_SA_list.append(res[bac]["res"])
+                continue
+                
 
-                if i == 5:
-                    
-                    if element in list(res[bac]["group_res"].keys()):
-                        mark_SA_list.append(res[bac]["group_res"][element])
-                    continue
-
-                if i == 6:
-                    
-                    if element in list(res[bac]["group_res"].keys()):
-                        mark_CA_list.append(res[bac]["group_res"][element])
-                    continue
+            if i == 6:
+                
+                mark_CA_list.append(res[bac]["res"])
+                continue
 
 
-                if i in range(7,10):
-                    
-                    if element in list(res[bac]["group_res"].keys()):
-                        mark_CA_SA_list.append(res[bac]["group_res"][element])
-                    continue
+            if i in range(7,10):
+                
+                mark_CA_SA_list.append(res[bac]["res"])
+                continue
                 
             
-            # calc marks
-            if mark_NA_list != []:
-                mark_NA = sum(mark_NA_list)/(len(mark_NA_list))
-                res["group_res"]["mark_NA"][element] = mark_NA
-                self.log.info("mark_NA {} = {}".format(element, mark_NA))
+        # calc class marks
+        if mark_NA_list != []:
+            mark_NA = sum(mark_NA_list)/(len(mark_NA_list))
+            res["class_res"]["mark_NA"] = mark_NA
+            self.log.info("mark_NA = {}".format(mark_NA))
 
-            if mark_SA_list != []:
-                mark_SA = sum(mark_SA_list)/(len(mark_SA_list))
-                res["group_res"]["mark_SA"][element] = mark_SA
-                self.log.info("mark_SA {} = {}".format(element, mark_SA))
+        if mark_SA_list != []:
+            mark_SA = sum(mark_SA_list)/(len(mark_SA_list))
+            res["class_res"]["mark_SA"] = mark_SA
+            self.log.info("mark_SA = {}".format(mark_SA))
 
-            if mark_CA_list != []:
-                mark_CA = sum(mark_CA_list)/(len(mark_CA_list))
-                res["group_res"]["mark_CA"][element] = mark_CA
-                self.log.info("mark_CA {} = {}".format(element, mark_CA))
+        if mark_CA_list != []:
+            mark_CA = sum(mark_CA_list)/(len(mark_CA_list))
+            res["class_res"]["mark_CA"] = mark_CA
+            self.log.info("mark_CA = {}".format(mark_CA))
 
-            if mark_CA_SA_list != []:
-                mark_CA_SA = sum(mark_CA_SA_list)/(len(mark_CA_SA_list))
-                res["group_res"]["mark_CA_SA"][element] = mark_CA_SA
-                self.log.info("mark_CA_SA {} = {}".format(element, mark_CA_SA))
+        if mark_CA_SA_list != []:
+            mark_CA_SA = sum(mark_CA_SA_list)/(len(mark_CA_SA_list))
+            res["class_res"]["mark_CA_SA"] = mark_CA_SA
+            self.log.info("mark_CA_SA = {}".format(mark_CA_SA))
 
         return res
 
@@ -260,18 +267,17 @@ class Comparison:
 
         marks = ["mark_NA", "mark_SA", "mark_CA", "mark_CA_SA"]
 
-        for element in self.res_vars:
+        
+        mark_list = []
 
-            mark_list = []
-
-            for mark in marks:
-                if element in list(res["group_res"][mark]):
-                    mark_list.append(res["group_res"][mark][element])
+        for mark in marks:
             
-            if mark_list != []:
-                model_mark = sum(mark_list)/len(mark_list)
-                res["model_res"][element] = model_mark
-                self.log.info("model_mark {} = {}".format(element, model_mark))
+            mark_list.append(res["class_res"][mark])
+        
+        if mark_list != []:
+            model_mark = sum(mark_list)/len(mark_list)
+            res["model_res"] = model_mark
+            self.log.info("model_mark = {}".format(model_mark))
 
                 
         return res
@@ -450,6 +456,7 @@ class Comparison:
                 res[BAC]['sys_res'][sys]["mark_h_mix"] = mark_h_mix
 
             elif key == "Heat capacity of mixing":
+
                 vals = [["cp_mix"],[]]
                 mod_res, exp_res = self.get_param_data(mod_sets, exp_sets, 'Heat capacity of mixing', vals)
                 
@@ -473,7 +480,8 @@ class Comparison:
                     sum += err
 
                 mark_cp_mix = 20 - 0.1 * 1/len(mod_res["cp_mix"]) * sum
-                
+                if abs(mark_cp_mix) < 1.0e-4:
+                    mark_cp_mix = 0.0
 
                 # write results
                 res[BAC]['sys_res'][sys]["mark_cp_mix"] = mark_cp_mix

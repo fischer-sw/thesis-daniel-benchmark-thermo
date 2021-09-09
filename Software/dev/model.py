@@ -46,7 +46,7 @@ class Model:
 
         vars = ['Enthalpy of mixing', 'Heat capacity of mixing', 'Isothermal phase equilibrium data', 'Isobaric phase equilibrium data']
 
-        self.calc_vars = vars[2:4]
+        self.calc_vars = vars[0:2]
 
         self.fluid_mappings = self.read_mappings("mappings")
 
@@ -396,7 +396,7 @@ class Model:
 
 
                     # calculate results
-                    values, phase_error = self.calc_phase_eq(system, var, var_val)
+                    values, value_lis, phase_error = self.calc_phase_eq(system, var, var_val)
 
                     if phase_error != 0:
                         self.log.info("error in {} for {} | {}, error = {}".format(element,self.fluid_mappings[system[0]], self.fluid_mappings[system[1]], phase_error))
@@ -415,8 +415,9 @@ class Model:
                         min_idx = np.where(val_dist == np.amin(val_dist))[0][0]
                         
                         # check if distance from exp value is to large
-                        if (var == 'Tvap' and min_dist > 3) or (var == 'pvap' and min_dist > 10):
-                            continue 
+
+                        # if (var == 'Tvap' and min_dist > 3) or (var == 'pvap' and min_dist > 10):
+                        #     continue 
                         
                         min_x_val = values[model_keys[min_idx]]['x']
                         min_y_val = values[model_keys[min_idx]]['y']
@@ -558,6 +559,8 @@ class Model:
 
         values = {}
 
+        lis = []
+
         fld1_name = self.fluid_mappings[system[0]]
         fld2_name = self.fluid_mappings[system[1]]
         
@@ -575,17 +578,21 @@ class Model:
             return values, error.value
 
         if var == 'Tvap':
+            lis.append(['p', "x", "y"])
             for i in range(points.value):
                 element = p_points_array[i]
                 values[element] = {}
                 values[element]['x'] = x_points[2][i]
                 values[element]['y'] = x_points[0][i]
+                lis.append([p_points_array[i], x_points[2][i], x_points[0][i]])
 
         if var == 'pvap':
+            lis.append(['T', "x", "y"])
             for i in range(points.value):
                 element = T_points_array[i]
                 values[element] = {}
                 values[element]['x'] = x_points[2][i]
                 values[element]['y'] = x_points[0][i]
+                lis.append([T_points_array[i], x_points[2][i], x_points[0][i]])
 
-        return values, error.value
+        return values, lis, error.value
