@@ -36,8 +36,9 @@ class Comparison:
         self.setup_test_model()
         self.init_results()
 
+        marks = ['mark_h_mix', 'mark_cp_mix', 'mark_isoth_x' ,'mark_isoth_y', 'mark_isob_x', 'mark_isob_y', 'mark_paz', 'mark_xaz']
 
-        self.res_vars = ['mark_h_mix', 'mark_cp_mix']
+        self.res_vars = marks[2:6]
         self.bacs = list(range(1,10))
      
 

@@ -46,7 +46,7 @@ class Model:
 
         vars = ['Enthalpy of mixing', 'Heat capacity of mixing', 'Isothermal phase equilibrium data', 'Isobaric phase equilibrium data']
 
-        self.calc_vars = vars[0:2]
+        self.calc_vars = vars[2:4]
 
         self.fluid_mappings = self.read_mappings("mappings")
 
@@ -326,10 +326,14 @@ class Model:
                     
                     # check for existing data
                     if model_data != {}:
-                        if exp_data[element][i]["params"] == model_data[element][i]["params"]:
-                            results[element][i] = model_data[element][i]
-                            self.log.info("Already calculated {} data for {} | {}".format(element,self.fluid_mappings[system[0]], self.fluid_mappings[system[1]] ))
-                            continue
+
+                         # check for key in dict
+                        if element in list(model_data.keys()):
+
+                            if exp_data[element][i]["params"] == model_data[element][i]["params"]:
+                                results[element][i] = model_data[element][i]
+                                self.log.info("Already calculated {} data for {} | {}".format(element,self.fluid_mappings[system[0]], self.fluid_mappings[system[1]] ))
+                                continue
                     
                     
                     Press = data_set["params"]["P / bar "]
@@ -376,10 +380,14 @@ class Model:
                     
                     # check for existing data
                     if model_data != {}:
-                        if exp_data[element][i]["params"] == model_data[element][i]["params"]:
-                            results[element][i] = model_data[element][i]
-                            self.log.info("Already calculated {} data for {} | {}".format(element,self.fluid_mappings[system[0]], self.fluid_mappings[system[1]] ))
-                            continue
+
+                        # check for key in dict
+                        if element in list(model_data.keys()):
+
+                            if exp_data[element][i]["params"] == model_data[element][i]["params"]:
+                                results[element][i] = model_data[element][i]
+                                self.log.info("Already calculated {} data for {} | {}".format(element,self.fluid_mappings[system[0]], self.fluid_mappings[system[1]] ))
+                                continue
                     
                     if element == 'Isothermal phase equilibrium data':
                         var_val = data_set["params"]["T / K "]
@@ -403,34 +411,23 @@ class Model:
                         continue
 
 
-                    # process model data
-                    len_data = len(exp_data[element][i]['measurements'])
+                    # check if x and y are in correct order
 
-                    model_keys = np.array(list(values.keys()))
+                    exp_x_val = exp_data[element][i]['measurements'][5][1]
 
-                    for k in range(1,len_data):
-                        measure_ele = exp_data[element][i]['measurements'][k]
-                        val_dist = abs(model_keys - measure_ele[0])
-                        min_dist = min(val_dist)
-                        min_idx = np.where(val_dist == np.amin(val_dist))[0][0]
-                        
-                        # check if distance from exp value is to large
+                    position = [abs(value_lis[5][1] - exp_x_val), abs(value_lis[5][2] - exp_x_val)]
 
-                        # if (var == 'Tvap' and min_dist > 3) or (var == 'pvap' and min_dist > 10):
-                        #     continue 
-                        
-                        min_x_val = values[model_keys[min_idx]]['x']
-                        min_y_val = values[model_keys[min_idx]]['y']
+                    if position[0] < position[1]:
+                        for n in range(1,len(value_lis[1:])):
+                            results[element][i]['measurements'].append([value_lis[n][0], value_lis[n][1], value_lis[n][2]])
 
-                        positon = [min_x_val - measure_ele[1], min_y_val - measure_ele[1]]
+                    else:
 
-                        if positon[0] > positon[1]:
-                            tmp_set = [measure_ele[0], min_y_val, min_x_val]
-                        else:
-                            tmp_set = [measure_ele[0], min_x_val, min_y_val]
-                        
-                        results[element][i]['measurements'].append(tmp_set)
+                        for n in range(1,len(value_lis[1:])):
+                            results[element][i]['measurements'].append([value_lis[n][0], value_lis[n][2], value_lis[n][1]])
 
+
+                    self.log.info("Added new dataset in {} for {} | {}.".format(element,self.fluid_mappings[system[0]], self.fluid_mappings[system[1]]))
 
 
             if element == "blabla":
@@ -575,7 +572,7 @@ class Model:
         p_points_array, T_points_array, x_points, rhovap_points, rholiq_points, points, error = fldmix.PTXDIAG_FIT(var_val, self.COSMOparam, tmp_path)
 
         if error.value != 0:
-            return values, error.value
+            return values, lis, error.value
 
         if var == 'Tvap':
             lis.append(['p', "x", "y"])
