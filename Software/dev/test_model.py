@@ -24,7 +24,7 @@ def tearDownModule():
     global model
     return
 
-# @unittest.skip("Skipping Test01")
+@unittest.skip("Skipping Test01")
 class Test01(unittest.TestCase):
     
     def setUp(self):
@@ -45,7 +45,7 @@ class Test02(unittest.TestCase):
     def test_model_results(self):
        self.model.calc_model_results()
 
-# @unittest.skip("Skipping Test03")
+@unittest.skip("Skipping Test03")
 class Test03(unittest.TestCase):
     
     def setUp(self):

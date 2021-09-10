@@ -46,7 +46,7 @@ class Model:
 
         vars = ['Enthalpy of mixing', 'Heat capacity of mixing', 'Isothermal phase equilibrium data', 'Isobaric phase equilibrium data']
 
-        self.calc_vars = vars[2:4]
+        self.calc_vars = vars[3:]
 
         self.fluid_mappings = self.read_mappings("mappings")
 
@@ -395,7 +395,7 @@ class Model:
 
                     if element == 'Isobaric phase equilibrium data':
                         var_val = data_set["params"]["P / bar "]
-                        var = 'p_vap'
+                        var = 'pvap'
 
 
                      # create results
@@ -413,9 +413,14 @@ class Model:
 
                     # check if x and y are in correct order
 
-                    exp_x_val = exp_data[element][i]['measurements'][5][1]
 
-                    position = [abs(value_lis[5][1] - exp_x_val), abs(value_lis[5][2] - exp_x_val)]
+                    mid_pos_exp = int(round(len(exp_data[element][i]['measurements'])/2,0))
+
+                    mid_pos_model = int(round(len(value_lis)/2,0))
+
+                    exp_x_val = exp_data[element][i]['measurements'][mid_pos_exp][1]
+
+                    position = [abs(value_lis[mid_pos_model][1] - exp_x_val), abs(value_lis[mid_pos_model][2] - exp_x_val)]
 
                     if position[0] < position[1]:
                         for n in range(1,len(value_lis[1:])):

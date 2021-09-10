@@ -9,11 +9,12 @@
 *.fld
 *.toc
 *.pdf
-!figs/*.pdf
+*.pyc
+*.stats
+!Latex/figs/*.pdf
 !Literatur/*.pdf
 !Daten/mappings.json
 Daten/*.txt
-Software/dev/__pycache__/*
 Software/site/*
 TREND 4.0/*
 *.ps

@@ -165,7 +165,7 @@ class Test04(unittest.TestCase):
         print("heat_capacity (combined) = {} J/molK, error = {}".format(cpE, errmix))
         self.assertIsNotNone(cpE)
         
-# @unittest.skip("Skipping Test05")
+@unittest.skip("Skipping Test05")
 class Test05(unittest.TestCase):
     
     def setUp(self):
@@ -201,9 +201,58 @@ class Test05(unittest.TestCase):
         self.COSMOparam[19] = 76.89
         self.COSMOparam[20] = 85.37 
 
-    def test_ptxdiag(self):
+    def test_ptxdiag_isotherm(self):
          # prop = 'Tvap' or 'pvap'
         prop = 180.0
+        tmp_path = ''
+
+        p_points_array, T_points_array, x_points, rhovap_points, rholiq_points, points, error = self.fldmix.PTXDIAG_FIT(prop, self.COSMOparam, tmp_path)
+
+        print("p_points = {}, T_points = {}, x_points = {}, points = {}".format(p_points_array[0:10], T_points_array[0:10], x_points[0][0:10], points.value))
+        self.assertIsNotNone(x_points[0][0:-1])
+        self.assertIsNotNone(T_points_array[0:-1])
+        self.assertIsNotNone(p_points_array[0:-1])
+
+
+# @unittest.skip("Skipping Test06")
+class Test06(unittest.TestCase):
+    
+    def setUp(self):
+        global fld
+        path = os.path.join(sys.path[0],'..','..','TREND 4.0')
+        dll_path = os.path.join(sys.path[0],'TREND_FIT_DLL.dll')
+        self.data_dir = os.path.join(sys.path[0], '..','..', 'Datenbank', 'Experimente')
+        #self.fldmix1 = Fluid('TP','HE',['methane','ethane'],[0.6,0.4],[1,1],1,path,'molar',dll_path)
+        self.fldmix = Fluid('pvap','CP',['methane','ethane'],[0.6,0.4],[2,2],22,path,'molar',dll_path)
+        # self.fld1 = Fluid('TP','CP',['methane','ethane'],[0.99999999,0.00000001],[1,1],1,path,'molar',dll_path)
+        # self.fld2 = Fluid('TP','CP',['ethane','methane'],[0.99999999,0.00000001],[1,1],1,path,'molar',dll_path)
+
+        self.COSMOparam = (ct.c_double * COSMO_length)()
+        self.COSMOparam[0] = 6525.69 * 4184.0
+        self.COSMOparam[1] = 1.4859 * 10**8 * 4184.0
+        self.COSMOparam[2] = 4013.78 * 4184.0
+        self.COSMOparam[3] = 932.31 * 4184.0 
+        self.COSMOparam[4] = 3016.43 * 4184.0
+        self.COSMOparam[5] = 115.7023
+        self.COSMOparam[6] = 117.4650
+        self.COSMOparam[7] = 66.0691
+        self.COSMOparam[8] = 95.6184
+        self.COSMOparam[9] = -11.0549
+        self.COSMOparam[10] = 15.4901
+        self.COSMOparam[11] = 84.6268
+        self.COSMOparam[12] = 109.6621
+        self.COSMOparam[13] = 52.9318
+        self.COSMOparam[14] = 104.2534
+        self.COSMOparam[15] = 19.3477
+        self.COSMOparam[16] = 141.1709
+        self.COSMOparam[17] = 58.3301
+        self.COSMOparam[18] = 115.70
+        self.COSMOparam[19] = 76.89
+        self.COSMOparam[20] = 85.37 
+
+    def test_ptxdiag_isobar(self):
+
+        prop = 0.1
         tmp_path = ''
 
         p_points_array, T_points_array, x_points, rhovap_points, rholiq_points, points, error = self.fldmix.PTXDIAG_FIT(prop, self.COSMOparam, tmp_path)
