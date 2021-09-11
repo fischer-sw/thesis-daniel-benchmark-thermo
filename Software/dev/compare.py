@@ -373,7 +373,13 @@ class Comparison:
                 if exp_res["x1"] == [] or exp_res["x2"] == [] or exp_res["y1"] == [] or exp_res["y2"] == []:
                     continue
                 
-                for i in range(len(mod_res)):
+
+
+                mod_res_tmp = mod_res
+                exp_res_tmp = exp_res
+                i = 0
+
+                while i < len(mod_res_tmp['x1']):
 
                     x1_exp_val = exp_res["x1"][i]
                     x2_exp_val = exp_res["x2"][i]
@@ -391,24 +397,28 @@ class Comparison:
                     pct_err_y2 = abs(y2_exp_val - y2_mod_val)/ y2_exp_val * 100
 
 
-                    # check x
-                    if (x1_exp_val < 0.01 or x1_exp_val > 0.99) and 0.5 * (pct_err_x1+ pct_err_x2)/2 > 45.0: 
-                        mod_res["x1"].remove(mod_res["x1"][i])
-                        mod_res["x2"].remove(mod_res["x2"][i])
+                    # check x and y
+                    if ((x1_exp_val < 0.01 or x1_exp_val > 0.99) and 0.5 * (pct_err_x1+ pct_err_x2)/2 > 45.0) or ((y1_exp_val < 0.01 or y1_exp_val > 0.99) and 0.5 * (pct_err_y1+ pct_err_y2)/2 > 45.0): 
+                        
+                        # delte model datapoint
+                        mod_res_tmp["x1"].remove(mod_res["x1"][i])
+                        mod_res_tmp["x2"].remove(mod_res["x2"][i])
+                        mod_res_tmp["y1"].remove(mod_res["y1"][i])
+                        mod_res_tmp["y2"].remove(mod_res["y2"][i])
 
-                    # check y
-                    if (y1_exp_val < 0.01 or y1_exp_val > 0.99) and 0.5 * (pct_err_y1+ pct_err_y2)/2 > 45.0: 
-                        mod_res["y1"].remove(mod_res["y1"][i])
-                        mod_res["y2"].remove(mod_res["y2"][i])
+                        # delete exp datapoint
+                        exp_res_tmp["x1"].remove(exp_res["x1"][i])
+                        exp_res_tmp["x2"].remove(exp_res["x2"][i])
+                        exp_res_tmp["y1"].remove(exp_res["y1"][i])
+                        exp_res_tmp["y2"].remove(exp_res["y2"][i])
 
+                    i += 1
 
-
-
-                MPAE_x1 = self.MAPE(mod_res["x1"], exp_res["x1"])
-                MPAE_x2 = self.MAPE(mod_res["x2"], exp_res["x2"])
+                MPAE_x1 = self.MAPE(mod_res_tmp["x1"], exp_res_tmp["x1"])
+                MPAE_x2 = self.MAPE(mod_res_tmp["x2"], exp_res_tmp["x2"])
                 
-                MPAE_y1 = self.MAPE(mod_res["y1"], exp_res["y1"])
-                MPAE_y2 = self.MAPE(mod_res["y2"], exp_res["y2"])
+                MPAE_y1 = self.MAPE(mod_res_tmp["y1"], exp_res_tmp["y1"])
+                MPAE_y2 = self.MAPE(mod_res_tmp["y2"], exp_res_tmp["y2"])
 
                 mark_x = 20 - 0.5 * (MPAE_x1 + MPAE_x2)/2
                 mark_y = 20 - 0.5 * (MPAE_y1 + MPAE_y2)/2
@@ -574,22 +584,77 @@ class Comparison:
 
                 if v == 'NaN':
                     continue
-                # Experiment Data
-                exp_mes_data = exp_mes["measurements"]
-                if len(exp_mes_data) > 2:
-                    exp_vals = list(list(zip(*exp_mes["measurements"][1:-1]))[v])
-                else:
-                    exp_vals = [exp_mes["measurements"][-1][v]]
-                exp_res[k] += exp_vals
+                
 
-                # Modell Data
+                exp_mes_data = exp_mes["measurements"]
                 mod_mes_data = mod_mes["measurements"]
-                if len(mod_mes_data) > 2:
-                    mes_vals = list(list(zip(*mod_mes["measurements"][1:-1]))[v])
+
+                if param != 'phase equilibrium data':
+
+                    # add add data normaly (n model = n exp)
+                    
+                    # Experiment Data
+                    if len(exp_mes_data) > 2:
+                        exp_vals = list(list(zip(*exp_mes["measurements"][1:]))[v])
+                    else:
+                        exp_vals = [exp_mes["measurements"][-1][v]]
+                    exp_res[k] += exp_vals
+
+                    # Modell Data
+
+                    if len(mod_mes_data) > 2:
+                        mes_vals = list(list(zip(*mod_mes["measurements"][1:]))[v])
+                    else:
+                        mes_vals = [mod_mes["measurements"][-1][v]]
+                    model_res[k] += mes_vals
+
+
                 else:
-                    mes_vals = [mod_mes["measurements"][-1][v]]
-                model_res[k] += mes_vals
-            
+
+                    # merge data (n model > n exp)
+
+                    # get all p/T values
+
+
+                    mes_vals = []
+                    exp_vals = []
+
+                    mes_var_vals = list(list(zip(*mod_mes["measurements"][1:]))[0])
+
+                    # get max and min p/T values
+                    max_value = max(mes_var_vals)
+                    min_value = min(mes_var_vals)
+
+                    for datarow in exp_mes_data:
+                        if datarow == header:
+                            continue
+
+                        # serach for closest value
+                        search_val = datarow[0]
+
+                        dist = 10
+                        dist_abs = 10
+
+                        for row in mod_mes_data:
+                            if row == header:
+                                continue
+                            new_dist_abs = abs(search_val - row[0])
+                            new_dist = search_val - row[0]
+                            
+                            if new_dist_abs < dist_abs:
+                                dist = new_dist
+                                closest_row = row
+                                dist_abs = new_dist_abs
+
+                        if search_val < min_value or search_val > max_value:
+                            continue
+
+                        mes_vals.append(closest_row[v])
+                        exp_vals.append(datarow[v])
+                    
+                    model_res[k] += mes_vals
+                    exp_res[k] += exp_vals
+
                 # check if calculation is needed:
                 first_chrs = []
                 if values[1] != []:
