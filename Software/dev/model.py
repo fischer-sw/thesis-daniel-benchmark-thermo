@@ -46,7 +46,7 @@ class Model:
 
         vars = ['Enthalpy of mixing', 'Heat capacity of mixing', 'Isothermal phase equilibrium data', 'Isobaric phase equilibrium data']
 
-        self.calc_vars = vars[3:]
+        self.calc_vars = vars
 
         self.fluid_mappings = self.read_mappings("mappings")
 
@@ -397,44 +397,58 @@ class Model:
                         var_val = data_set["params"]["P / bar "]
                         var = 'pvap'
 
+                    # create results
+                    results[element][i]['measurements'] = [exp_data[element][i]['measurements'][0]]
+                    results[element][i]['params'] = exp_data[element][i]['params']
+
                     # calculate results
                     values, value_lis, phase_error = self.calc_phase_eq(system, var, var_val)
 
                     if phase_error != 0:
                         self.log.info("error in {} for {} | {}, error = {}".format(element,self.fluid_mappings[system[0]], self.fluid_mappings[system[1]], phase_error))
+                        results.pop(results[element][i])
                         continue
                     
-                    # create results
-                    results[element][i]['measurements'] = [exp_data[element][i]['measurements'][0]]
-                    results[element][i]['params'] = exp_data[element][i]['params']
+                    
 
 
                     for n in range(1,len(value_lis[1:])):
                         results[element][i]['measurements'].append([value_lis[n][0], value_lis[n][1], value_lis[n][2]])
 
-                    # check if x and y are in correct order
-
-
-                    # mid_pos_exp = int(round(len(exp_data[element][i]['measurements'])/2,0))
-
-                    # mid_pos_model = int(round(len(value_lis)/2,0))
-
-                    # exp_x_val = exp_data[element][i]['measurements'][mid_pos_exp][1]
-
-                    # position = [abs(value_lis[mid_pos_model][1] - exp_x_val), abs(value_lis[mid_pos_model][2] - exp_x_val)]
-
-                    # if position[0] < position[1]:
-                    #     for n in range(1,len(value_lis[1:])):
-                    #         results[element][i]['measurements'].append([value_lis[n][0], value_lis[n][1], value_lis[n][2]])
-
-                    # else:
-
-                    #     for n in range(1,len(value_lis[1:])):
-                    #         results[element][i]['measurements'].append([value_lis[n][0], value_lis[n][2], value_lis[n][1]])
-
 
                     self.log.info("Added new dataset in {} for {} | {}.".format(element,self.fluid_mappings[system[0]], self.fluid_mappings[system[1]]))
 
+
+
+            if element == "Azeotropic point":
+
+                search_elements = ['Isothermal phase equilibrium data']
+                
+                 # loop through all measurements
+                for i in range(len(exp_data[element])):
+                    
+                    data_set = exp_data[element][i]
+
+
+                    #add key to dict
+                    if not element in results.keys():
+                        results[element] = []
+
+                    results[element].append({})
+                        
+                    
+                    # check for existing data
+                    if model_data != {}:
+
+                        # check for key in dict
+                        if element in list(model_data.keys()):
+
+                            if exp_data[element][i]["params"] == model_data[element][i]["params"]:
+                                results[element][i] = model_data[element][i]
+                                self.log.info("Already calculated {} data for {} | {}".format(element,self.fluid_mappings[system[0]], self.fluid_mappings[system[1]] ))
+                                continue
+
+                    # search for correct measurement dataset
 
             if element == "blabla":
                 pass
