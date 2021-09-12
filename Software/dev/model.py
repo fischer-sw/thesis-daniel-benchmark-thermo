@@ -422,7 +422,6 @@ class Model:
 
             if element == "Azeotropic point":
 
-                search_elements = ['Isothermal phase equilibrium data']
                 
                  # loop through all measurements
                 for i in range(len(exp_data[element])):
@@ -443,12 +442,28 @@ class Model:
                         # check for key in dict
                         if element in list(model_data.keys()):
 
-                            if exp_data[element][i]["params"] == model_data[element][i]["params"]:
+                            if exp_data[element][i]["params"]['T / K '] == model_data[element][i]["params"]['T / K ']:
                                 results[element][i] = model_data[element][i]
                                 self.log.info("Already calculated {} data for {} | {}".format(element,self.fluid_mappings[system[0]], self.fluid_mappings[system[1]] ))
                                 continue
 
                     # search for correct measurement dataset
+
+                    T_search = exp_data[element][i]["params"]['T / K ']
+
+                    for i in range(len(model_data['Isothermal phase equilibrium data'])):
+                        
+                        if model_data['Isothermal phase equilibrium data'][i]["params"]['T / K '] == T_search:
+
+                            azeo_dataset = model_data['Isothermal phase equilibrium data'][i]
+
+                            azeo_point = self.get_azeo_point(azeo_dataset)
+
+                            if azeo_point != {}:
+                                results[element][i]['measurements'] = [azeo_point]
+                            else:
+                                break
+
 
             if element == "blabla":
                 pass
@@ -488,6 +503,10 @@ class Model:
 
         if os.path.isdir(path) == False:
             os.mkdir(path)
+
+
+    def get_azeo_point(self):
+        return {}
 
 
     def calc_h_mix(self, system, temp, press, x):
