@@ -337,33 +337,38 @@ class Comparison:
                 res[BAC]['sys_res'][sys]["mark_xc"] = mark_xc
 
             elif key == "Azeotropic point":
-                vals = [["x1"],["x2"]]
-                mod_res, exp_res = self.get_param_data(mod_sets, exp_sets, 'Azeotropic point', vals)
+                pass
+            #     vals = [["x1"],["x2"]]
+            #     mod_res, exp_res = self.get_param_data(mod_sets, exp_sets, 'Azeotropic point', vals)
                 
-                # add P mod_res
-                mod_res["P"] = []
-                for i in range(len(mod_res["x1"])):
-                    mod_res["P"].append(mod_sets[i]["params"]["P / bar "])
+            #     # add P mod_res
+            #     mod_res["P"] = []
+            #     for i in range(len(mod_res["x1"])):
+            #         mod_res["P"].append(mod_sets[i]["params"]["P / bar "])
 
-                # add P exp_res
-                exp_res["P"] = []
-                for i in range(len(exp_res["x1"])):
-                    exp_res["P"].append(exp_sets[i]["params"]["P / bar "])
+            #     # add P exp_res
+            #     exp_res["P"] = []
+            #     for i in range(len(exp_res["x1"])):
+            #         exp_res["P"].append(exp_sets[i]["params"]["P / bar "])
 
-                MPAE_p_az = self.MAPE(mod_res["P"], exp_res["P"])
-                MPAE_x1_az = self.MAPE(mod_res["x1"], exp_res["x1"])
-                MPAE_x2_az = self.MAPE(mod_res["x2"], exp_res["x2"])
+            #     MPAE_p_az = self.MAPE(mod_res["P"], exp_res["P"])
+            #     MPAE_x1_az = self.MAPE(mod_res["x1"], exp_res["x1"])
+            #     MPAE_x2_az = self.MAPE(mod_res["x2"], exp_res["x2"])
                 
-                mark_paz = 20 - 0.75 * MPAE_p_az
+            #     mark_paz = 20 - 0.75 * MPAE_p_az
 
-                mark_xaz = 20 - 0.5 * (MPAE_x1_az + MPAE_x2_az)/2  
+            #     mark_xaz = 20 - 0.5 * (MPAE_x1_az + MPAE_x2_az)/2  
                 
-                # write results
-                res[BAC]['sys_res'][sys]["mark_paz"] = mark_paz
-                res[BAC]['sys_res'][sys]["mark_xaz"] = mark_xaz
+            #     # write results
+            #     res[BAC]['sys_res'][sys]["mark_paz"] = mark_paz
+            #     res[BAC]['sys_res'][sys]["mark_xaz"] = mark_xaz
 
             elif key == "Isobaric phase equilibrium data" or key == "Isothermal phase equilibrium data":
                 vals = [["x1", "y1"],["x2", "y2"]]
+
+                if sys == 'METHANOL_ETHANE':
+                    print('')
+
                 mod_res, exp_res = self.get_param_data(mod_sets, exp_sets, 'phase equilibrium data', vals)
                 
                 # check if enough data is available
@@ -379,6 +384,8 @@ class Comparison:
                 exp_res_tmp = exp_res
                 i = 0
 
+                
+
                 while i < len(mod_res_tmp['x1']):
 
                     x1_exp_val = exp_res["x1"][i]
@@ -390,6 +397,10 @@ class Comparison:
                     x2_mod_val = mod_res["x2"][i]
                     y1_mod_val = mod_res["y1"][i]
                     y2_mod_val = mod_res["y2"][i]
+
+                    if x1_exp_val == 0 or x2_exp_val == 0 or y1_exp_val == 0 or y2_exp_val == 0:
+                        i += 1
+                        continue
 
                     pct_err_x1 = abs(x1_exp_val - x1_mod_val)/ x1_exp_val * 100
                     pct_err_x2 = abs(x2_exp_val - x2_mod_val)/ x2_exp_val * 100
@@ -626,14 +637,14 @@ class Comparison:
                     min_value = min(mes_var_vals)
 
                     for datarow in exp_mes_data:
-                        if datarow == header:
+                        if datarow == ['P / bar', 'x₁', 'y₁'] or datarow == header or len(datarow) < 3:
                             continue
 
                         # serach for closest value
                         search_val = datarow[0]
 
-                        dist = 10
-                        dist_abs = 10
+                        dist = 1000
+                        dist_abs = 1000
 
                         for row in mod_mes_data:
                             if row == header:
@@ -648,24 +659,51 @@ class Comparison:
 
                         if search_val < min_value or search_val > max_value:
                             continue
+                        
+                        if type(closest_row[v]) != type('') and type(datarow[v]) != type(''):
+                            mes_vals.append(closest_row[v])
+                            exp_vals.append(datarow[v])
 
-                        mes_vals.append(closest_row[v])
-                        exp_vals.append(datarow[v])
+                        
                     
+                    # if (type(mes_vals[1]) != type('') and type(mes_vals[2]) != type('')):
                     model_res[k] += mes_vals
+                    # if (type(exp_vals[1]) != type('') and type(exp_vals[2]) != type('')):
                     exp_res[k] += exp_vals
 
                 # check if calculation is needed:
-                first_chrs = []
-                if values[1] != []:
-                    first_chrs =  list(list(zip(*values[1]))[0])
 
-                if len(k) > 1 and k[0] in first_chrs:
-                    mod_calc_vals = [1-x for x in mes_vals]
-                    exp_calc_vals = [1-x for x in exp_vals]
+                    # clean mes_vals
+                    j = 0
+                    while j < len(mes_vals):
+                        mes_ele = mes_vals[j]
+                        if type(mes_ele) == type(''):
+                            mes_vals.remove(mes_ele)
+                        else:
+                            j += 1
 
-                    model_res[k[0]+ "2"] += mod_calc_vals
-                    exp_res[k[0]+ "2"] += exp_calc_vals
+                    j = 0
+                    while j < len(exp_vals):
+                        exp_ele = exp_vals[j]
+                        if type(exp_ele) == type(''):
+                            exp_vals.remove(exp_ele)
+                        else:
+                            j += 1
+
+
+
+                    if mes_vals != [] and exp_vals != []:
+                        first_chrs = []
+                        if values[1] != []:
+                            first_chrs =  list(list(zip(*values[1]))[0])
+
+                        if len(k) > 1 and k[0] in first_chrs:
+
+                            mod_calc_vals = [1-x for x in mes_vals]
+                            exp_calc_vals = [1-x for x in exp_vals]
+
+                            model_res[k[0]+ "2"] += mod_calc_vals
+                            exp_res[k[0]+ "2"] += exp_calc_vals
 
         return model_res , exp_res 
 

@@ -26,7 +26,7 @@ def tearDownModule():
     global comp
     return
 
-# @unittest.skip("Skipping Test01")
+@unittest.skip("Skipping Test01")
 class Test01(unittest.TestCase):
 
     def setUp(self):
@@ -38,7 +38,7 @@ class Test01(unittest.TestCase):
         self.assertIsNotNone(self.comp)
         self.assertIsNotNone(self.comp.model)
 
-# @unittest.skip("Skipping Test02")
+@unittest.skip("Skipping Test02")
 class Test02(unittest.TestCase):
 
     def setUp(self):
@@ -52,7 +52,7 @@ class Test02(unittest.TestCase):
 
         
 
-# @unittest.skip("Skipping Test03")
+@unittest.skip("Skipping Test03")
 class Test03(unittest.TestCase):
 
     def setUp(self):
@@ -64,7 +64,7 @@ class Test03(unittest.TestCase):
         self.assertIsNotNone(erg["BAC1"]["group_res"]["mark_h_mix"])
         self.comp.write_results_file(erg)
 
-# @unittest.skip("Skipping Test04")
+@unittest.skip("Skipping Test04")
 class Test04(unittest.TestCase):
 
     def setUp(self):

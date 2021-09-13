@@ -43,7 +43,9 @@ class Test02(unittest.TestCase):
         
 
     def test_model_results(self):
-       self.model.calc_model_results()
+        # self.model.clean_model_data()
+        self.model.calc_model_results()
+       
 
 @unittest.skip("Skipping Test03")
 class Test03(unittest.TestCase):

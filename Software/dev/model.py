@@ -46,7 +46,7 @@ class Model:
 
         vars = ['Enthalpy of mixing', 'Heat capacity of mixing', 'Isothermal phase equilibrium data', 'Isobaric phase equilibrium data']
 
-        self.calc_vars = vars
+        self.calc_vars = vars[0:2]
 
         self.fluid_mappings = self.read_mappings("mappings")
 
@@ -123,6 +123,26 @@ class Model:
             data = json.loads(f.read())
 
         return data
+
+
+    def clean_model_data(self):
+        
+        for system in self.systems:
+
+            data = self.get_system_data(system)
+
+            keys = list(data.keys())
+            for key in keys:
+                if key in ['BAC', 'sheet']:
+                    continue
+                n_mes = len(data[key])
+                for i in range(n_mes):
+
+                    test_element = data[key][i]['measurements']
+                    if len(test_element) == 1:
+                        data.pop(data[key[i]])
+
+            self.write_results(system[0] + '_' + system[1] + '.json', data)
 
     def check_possible_calculations(self):
         
@@ -366,7 +386,11 @@ class Model:
             if element in ["Isothermal phase equilibrium data", "Isobaric phase equilibrium data"]:
                 
                 # loop through all measurements
-                for i in range(len(exp_data[element])):
+
+                mes_number = len(exp_data[element])
+                deleted = 0
+
+                for i in range(mes_number):
                     
                     data_set = exp_data[element][i]
 
@@ -384,8 +408,12 @@ class Model:
                         # check for key in dict
                         if element in list(model_data.keys()):
 
-                            if exp_data[element][i]["params"] == model_data[element][i]["params"]:
-                                results[element][i] = model_data[element][i]
+                            for k in range(len(model_data[element])):
+                                if exp_data[element][i]["params"] == model_data[element][k]["params"]:
+                                    break 
+
+                            if exp_data[element][i]["params"] == model_data[element][k]["params"]:
+                                results[element][i-deleted] = model_data[element][k]
                                 self.log.info("Already calculated {} data for {} | {}".format(element,self.fluid_mappings[system[0]], self.fluid_mappings[system[1]] ))
                                 continue
                     
@@ -398,26 +426,26 @@ class Model:
                         var = 'pvap'
 
                     # create results
-                    results[element][i]['measurements'] = [exp_data[element][i]['measurements'][0]]
-                    results[element][i]['params'] = exp_data[element][i]['params']
+                    results[element][i-deleted]['measurements'] = [exp_data[element][i]['measurements'][0]]
+                    results[element][i-deleted]['params'] = exp_data[element][i]['params']
 
                     # calculate results
                     values, value_lis, phase_error = self.calc_phase_eq(system, var, var_val)
 
                     if phase_error != 0:
                         self.log.info("error in {} for {} | {}, error = {}".format(element,self.fluid_mappings[system[0]], self.fluid_mappings[system[1]], phase_error))
-                        results.pop(results[element][i])
+                        results[element].remove(results[element][-1])
+                        deleted += 1
                         continue
                     
                     
 
 
                     for n in range(1,len(value_lis[1:])):
-                        results[element][i]['measurements'].append([value_lis[n][0], value_lis[n][1], value_lis[n][2]])
+                        results[element][i-deleted]['measurements'].append([value_lis[n][0], value_lis[n][1], value_lis[n][2]])
 
 
                     self.log.info("Added new dataset in {} for {} | {}.".format(element,self.fluid_mappings[system[0]], self.fluid_mappings[system[1]]))
-
 
 
             if element == "Azeotropic point":
