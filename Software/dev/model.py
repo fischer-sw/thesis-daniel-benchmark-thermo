@@ -7,6 +7,8 @@ import os
 import json
 import re
 import sys
+import matplotlib.pyplot as plt
+from matplotlib.ticker import (MultipleLocator, FormatStrFormatter, AutoMinorLocator)
 
 import pandas as pd
 import numpy as np
@@ -44,11 +46,15 @@ class Model:
         self.dll_path = os.path.join(sys.path[0],'TREND_FIT_DLL.dll')
 
 
-        vars = ['Enthalpy of mixing', 'Heat capacity of mixing', 'Isothermal phase equilibrium data', 'Isobaric phase equilibrium data']
+        vars = ['Enthalpy of mixing', 'Heat capacity of mixing', 'Isothermal phase equilibrium data', 'Isobaric phase equilibrium data', 'Azeotropic point']
 
-        self.calc_vars = vars[0:2]
+        self.calc_vars = vars[0:4]
+        # self.calc_vars = [vars[4]]
+
 
         self.fluid_mappings = self.read_mappings("mappings")
+
+        self.clean_model_data()
 
         
 
@@ -115,34 +121,169 @@ class Model:
         return systems
 
 
-    def get_system_data(self, system):
+    def get_system_data(self, system, type):
         
-        path = os.path.join(self.data_dir, system[0]+"_"+system[1] + ".json")
+        if type != "model":
+            path = os.path.join(self.data_dir, system[0]+"_"+system[1] + ".json")
+        
+        else:
+            path = os.path.join(self.model_dir, system[0]+"_"+system[1] + ".json")
 
-        with open(path) as f:
-            data = json.loads(f.read())
 
+        if os.path.exists(path):
+
+            with open(path) as f:
+                data = json.loads(f.read())
+        else:
+            data = {}
         return data
-
+    
 
     def clean_model_data(self):
-        
+
+
         for system in self.systems:
 
-            data = self.get_system_data(system)
+            data = self.get_system_data(system, 'model')
 
-            keys = list(data.keys())
-            for key in keys:
-                if key in ['BAC', 'sheet']:
+            if data != {}:
+
+                keys = list(data.keys())
+                for key in keys:
+                    if key in ['BAC', 'sheet']:
+                        continue
+                    n_mes = len(data[key])
+                    i = 0
+                    while i < n_mes:
+                        test_element = data[key][i]['measurements']
+                        if len(test_element) == 1:
+                            
+                            data[key].remove(data[key][i])
+                            n_mes -= 1
+                        else:
+                            i += 1
+
+                self.write_results(system[0] + '_' + system[1] + '.json', data)
+
+
+    def create_diags(self):
+
+        for system in self.systems:
+
+            model_data = self.get_system_data(system, 'model')
+            exp_data = self.get_system_data(system, 'exp')
+
+            for key in list(model_data.keys()):
+                if not key in ["Isothermal phase equilibrium data", "Isobaric phase equilibrium data"]:
                     continue
-                n_mes = len(data[key])
-                for i in range(n_mes):
 
-                    test_element = data[key][i]['measurements']
-                    if len(test_element) == 1:
-                        data.pop(data[key[i]])
+                
+    
+                if key == "Isothermal phase equilibrium data":
+                    mode = "isotherm"
+                    par = "T / K "
 
-            self.write_results(system[0] + '_' + system[1] + '.json', data)
+                else:
+                    mode = "isobar"
+                    par = "P / bar "
+
+                #
+                for mes in model_data[key]:
+                    # get exp dataset
+
+                    for k in range(len(exp_data[key])):
+                        if exp_data[key][k]["params"] == mes["params"]:
+                            param = mes["params"][par]
+                            self.create_phase_eq_diag(mes["measurements"], exp_data[key][k]["measurements"], system, mode, param)
+
+    def create_phase_eq_diag(self, model_data, exp_data, system, mode, param):
+         # check for existing diag
+        path = os.path.join(self.model_dir, '..', 'Diagramme',system[0]+ "_" + system[1] + mode + "_" + str(param) + "_" + ".pdf")
+
+        if os.path.exists(path):
+            self.log.info("{} Diag for {} | {} already exsits for parameter {}".format(mode, system[0], system[1], param))
+
+            return
+
+        # clean data
+        mod_len = len(model_data)
+        exp_len = len(exp_data)
+
+        if len(model_data[0]) != 3 or len(model_data[0]) != 3:
+            return
+
+        i = 1
+        while i < mod_len:
+
+            if len(model_data) == 1:
+                return
+
+            ele = model_data[i]
+            if type(ele[1]) == type("") or type(ele[2]) == type(""):
+                model_data.remove(model_data[i])
+            else:
+                i += 1
+
+        i = 1
+        while i < exp_len:
+
+            if len(exp_data) == 1:
+                return
+
+            ele = exp_data[i]
+            if type(ele[1]) == type("") or type(ele[2]) == type(""):
+                exp_data.remove(exp_data[i])
+            else:
+                i += 1
+
+        x_data_model = list(list(zip(*model_data[1:]))[1])
+        x_data_exp = list(list(zip(*exp_data[1:]))[1])
+
+        y_data_model = list(list(zip(*model_data[1:]))[2])
+        y_data_exp = list(list(zip(*exp_data[1:]))[2])
+        
+        var_data_model = list(list(zip(*model_data[1:]))[0])
+        var_data_exp = list(list(zip(*exp_data[1:]))[0])
+        
+
+        fig, ax = plt.subplots()
+        ax.plot(x_data_model, var_data_model,'g+',label="Modell-Daten")
+        ax.plot(y_data_model, var_data_model,'g+')
+        ax.plot(x_data_exp, var_data_exp,'r+',label="Exp-Daten")
+        ax.plot(y_data_exp, var_data_exp,'r+')
+
+
+        ax.legend()
+
+        # set labels
+        # plt.xlabel("$x_{hexane}$")
+        plt.xlabel("x")
+
+        if mode == "isotherm":
+            plt.ylabel("p [kPa]")
+        if mode == "isobar":
+            plt.ylabel("T [K]")
+
+        #set ticks
+        ax.tick_params(direction='in', top=True, right=True)
+        ax.tick_params(direction='in', top=True, right=True, which='minor', length=3)
+        ax.xaxis.set_minor_locator(AutoMinorLocator(2))
+        ax.yaxis.set_minor_locator(AutoMinorLocator(2))
+
+        #set limits
+        # plt.ylim(20, 70)
+        plt.xlim(0, 1)
+
+        # set size
+        fig.set_size_inches(9, 6)
+
+        
+        fig.savefig(path, dpi=100)
+
+        self.log.info("Created {} Diag for {} | {} for parameter {}".format(mode, system[0], system[1], param))
+
+        plt.close()
+
 
     def check_possible_calculations(self):
         
@@ -160,7 +301,7 @@ class Model:
 
         for system in self.systems:
 
-            data = self.get_system_data(system)
+            data = self.get_system_data(system, 'exp')
 
             bac = "BAC" + str(data["BAC"])
             
@@ -201,7 +342,7 @@ class Model:
          
         for system in self.systems:
             
-            data = self.get_system_data(system)
+            data = self.get_system_data(system, 'exp')
 
             for key in data.keys():
                 if key in ["BAC","sheet"]:
@@ -449,20 +590,21 @@ class Model:
 
 
             if element == "Azeotropic point":
-
+                
+                if not 'Isothermal phase equilibrium data' in model_data.keys():
+                    self.log.info("No isotherm phase eq data for {} | {} to calculate {}".format(self.fluid_mappings[system[0]], self.fluid_mappings[system[1]], element))
+                    break
                 
                  # loop through all measurements
                 for i in range(len(exp_data[element])):
                     
                     data_set = exp_data[element][i]
-
-
+                    
                     #add key to dict
                     if not element in results.keys():
                         results[element] = []
 
                     results[element].append({})
-                        
                     
                     # check for existing data
                     if model_data != {}:
@@ -533,7 +675,24 @@ class Model:
             os.mkdir(path)
 
 
-    def get_azeo_point(self):
+    def get_azeo_point(self, inputset):
+
+        dataset = {
+            "params" : {
+                "T / K " : 0,
+                "P / bar " : 0
+            },
+            "measurements": [
+                [
+                "x\u2081",
+                "y\u2081"
+                ],
+            ]
+        }
+
+        # Set T to inputset T value
+        dataset['params']['T / K '] = inputset['params']['T / K ']
+        
         return {}
 
 

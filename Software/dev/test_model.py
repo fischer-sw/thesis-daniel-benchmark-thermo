@@ -43,7 +43,6 @@ class Test02(unittest.TestCase):
         
 
     def test_model_results(self):
-        # self.model.clean_model_data()
         self.model.calc_model_results()
        
 
@@ -61,6 +60,16 @@ class Test03(unittest.TestCase):
         self.assertIsNotNone(model_res)
         self.assertIsNotNone(res)
 
+# @unittest.skip("Skipping Test04")
+class Test04(unittest.TestCase):
+    
+    def setUp(self):
+        global model
+        self.model = model
+        
+
+    def test_model_results(self):
+        self.model.create_diags()
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)

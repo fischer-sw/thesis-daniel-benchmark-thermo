@@ -5,7 +5,9 @@
 \chapter{Implementierung}
 \label{chp: implementierung}
 
-Die Implementierung lässt sich in drei verschiedene Bestandteile aufteilen, welche in den folgenden Abschnitten näher erläutert werden.
+Um die Bewertung eines Modells vornehmen zu können, sind einige Bedingungen notwendig. Die experimentellen Daten müssen in einem standardisierten Format zur Verfügung stehen. Die Daten des Modells müssen, sofern das möglich ist, berechnet und anschließend gespeichert werden. Um die Bewertung zu vereinfachen, sollte die Art und Weise, wie die experimentellen Daten und die Daten des Modells gespeichert werden identisch sein. Wenn die experimentellen Daten, sowie die des Modells vorliegen kann der Vergleich und die Bewertung durchgeführt werden. Die Ergebnisse dieses Vergleichs werden, analog zu den Daten, in einem standardisierten Format gespeichert. Als Datenformat bietet sich \texttt{.json} an.
+
+Die Implementierung lässt sich, anhand des beschriebenen Vorgehens, in drei verschiedene Bestandteile aufteilen, welche in den folgenden Abschnitten näher erläutert werden.
 
 \section{Datenbank}
 
@@ -16,11 +18,11 @@ Die Klasse \texttt{database} dient zur Bereitstellung und Speicherung aller ben�
 ]{./code/gemischbeispiel.json}
 \label{code: beispielgemisch}
 
-Der Schlüssel \texttt{BAC} dient der Klassifizierung des Gemisches, wie in \autoref{sec: gemischklassifikation} beschrieben. Das Tabellenblatt auf dem die Daten in der Originaldatei zu finden sind als Wert des Schlüssels \texttt{sheet} gespeichert. Analog zum Aufbau der Originaldatei werden unter den weiteren Schlüsseln die Daten der gemessenen Größen gespeichert. Alle Messreihen werden als Liste unter dem Variablennamen gespeichert.
+Der Schlüssel \texttt{BAC} dient der Klassifizierung des Gemisches, wie in \autoref{sec: gemischklassifikation} beschrieben. Das Tabellenblatt auf dem die Daten in der Originaldatei zu finden sind ist als Wert des Schlüssels \texttt{sheet} gespeichert. Analog zum Aufbau der Originaldatei werden unter den weiteren Schlüsseln die Daten der gemessenen Größen gespeichert. Alle Messreihen werden als Liste unter dem jeweiligen Variablennamen gespeichert.
 
 Eine Messreihe ist durch ihre Quelle unter dem Punkt \texttt{reference}, die Parameter der Messung unter dem Punkt \texttt{params}, und die Messdaten unter dem Punkt \texttt{measurements} charakterisiert.
 
-Somit stehen alle experimentellen Daten in computerlesbaren Format bereit.
+Somit stehen alle experimentellen Daten in computerlesbaren Format zur Verfügung.
 
 \section{Modell}
 
@@ -30,13 +32,13 @@ Der Ablauf der Berechnung für ein Gemisch ist in \autoref{fig: model_berechnung
 
 \begin{figure}[htb]
 	\centering
-	\includegraphics[scale=0.6]{berechnung_model}
+	\includegraphics[scale=0.7]{berechnung_model}
 	\caption{Ablauf Berechnung Model}
 	\label{fig: model_berechnung}
 \end{figure}
 
-Für jedes Gemisch werden die folgenden Schritte für jede zu berechnende Größe durchgeführt. Als erster Schritt wird das zu berechnende Gemisch festgelegt. Anschließend werden alle vorhandenen experimentellen Daten aus der entsprechenden \texttt{.json} Datei eingelesen. Die hier eingelesen Daten bestimmen was das Modell berechnen soll. Es werden alle Größen, die für das Gemisch gefunden wurden nacheinander berechnet. Bevor das Modell aufgerufen wird wird getestet, ob das Modell die Daten für das Gemisch überhaupt berechnen kann. Dieser Test basiert meistens auf den Parametern die für das Modell vorhanden sind. Ist ein Stoff an dem Gemisch beteiligt für das das Modell keine Parameter hat kann das Modell keine Ergebnisse berechnen. Dieses Gemisch wird übersprungen.
-Kann das Modell die geforderten Daten berechnen wird es aufgerufen und wenn kein Fehler bei der Berechnung auftritt werden die Daten gespeichert. Andernfalls wird der versucht den nächsten Datenpunkt zu berechnen. Die Datei mit den Berechnungsergebnissen des Modells hat den gleichen Aufbau, wie die der experimentellen Daten aus \autoref{code: beispielgemisch}
+Für jedes Gemisch werden die folgenden Schritte für jede zu berechnende Größe durchgeführt. Als erster Schritt wird das zu berechnende Gemisch festgelegt. Anschließend werden alle vorhandenen experimentellen Daten aus der entsprechenden \texttt{.json} Datei eingelesen. Die hier eingelesenen Daten bestimmen was das Modell berechnen soll. Es werden alle Größen, die für das Gemisch gefunden wurden nacheinander berechnet. Bevor das Modell aufgerufen wird, wird getestet ob das Modell die Daten für das Gemisch überhaupt berechnen kann. Dieser Test basiert auf den Parametern, die für das Modell vorhanden sind. Ist ein Stoff an dem Gemisch beteiligt für den das Modell keine Parameter, hat kann das Modell keine Ergebnisse berechnen. Dieses Gemisch wird übersprungen.
+Kann das Modell die geforderten Daten berechnen wird es aufgerufen und wenn kein Fehler bei der Berechnung auftritt werden die Daten gespeichert. Andernfalls wird versucht den nächsten Datenpunkt zu berechnen. Die Datei mit den Berechnungsergebnissen des Modells hat den gleichen Aufbau, wie die der experimentellen Daten aus Listing \autoref{code: beispielgemisch}
 
 \section{Bewertung}
 
@@ -44,15 +46,24 @@ Die Klasse Bewertung dient dazu den Vergleich der experimentellen und den aus de
 
 \subsection{Bewertung Mischungswärmekapazität und Mischungsenthalpie}
 
-Für die Wärmekapazität werden die berechneten Daten mit den experimentellen Daten wie in \autoref{} verglichen. Da für alle experimentellen Datensätze Werte berechnet werden können ist gewährleistet, dass die Anzahl der zur Verfügung stehenden experimentellen Daten mit der Anzahl der aus dem Modell erhaltenen übereinstimmt.
+Für die Wärmekapazität werden die berechneten Daten mit den experimentellen Daten wie in \autoref{glg: } verglichen. Da für alle experimentellen Datensätze Werte berechnet werden können ist gewährleistet, dass die Anzahl der zur Verfügung stehenden experimentellen Daten mit der Anzahl der aus dem Modell erhaltenen übereinstimmt.
 
 Dies stimmt auch für die Mischungswärmekapazität.
 
 \subsection{Bewertung Phasengleichgewichte}
 
+Für die Bewertung der Phasengleichgewichte müssen die Daten des Modells und die experimentellen Daten zusammengeführt werden. Das Modell berechnet typischerweise eine weit aus größere Anzahl an Datenpunkt als im experimentellen Datensatz vorliegen.  Um die experimentellen Datenpunkte in denen des Modells zu finden wird zuerst der korrekte Datensatz gesucht. Im Falle eines isobaren Phasengleichgewichts ist dies der Datensatz ,welcher als Parameter den gleichen Druck $p$ enthält. Für ein isothermes Phasengleichgewicht wird anstatt des Drucks $p$ nach der identischen Temperatur $T$ als Parameter gesucht. Kann der Datensatz nicht gefunden werden, wird mit dem nächsten fortgefahren.
+
+Ist der Datensatz vorhanden wird in Berechnungsergebnissen nach dem Punkt gesucht der die kleinste Abweichung vom zweiten Parameter hat. Für ein isothermes Phasengleichgewicht ist dies der Druck $p$ und für ein isobares die Temperatur $T$. Liegt der gefundene Datenpunkt außerhalb des Modells wird der Datenpunkt verworfen und mit dem nächsten fortgefahren. Ein experimenteller Datenpunkt liegt außerhalb des Modells, wenn die Größe des zweiten Parameters kleiner als der minimale oder größer als der maximale vom Modell berechnete Wert ist. Anschließend werden die entsprechenden Molenbrüche der Flüssigkeit $x$ und der Gasphase $y$ zwischengespeichert.
+
+Sind alle Datensätze durchsucht worden, werden die zwischengespeicherten Molenbrüche miteinander verglichen und bewertetet.
+
+\subsection{Bewertung azetroper Punkt} 
+
+
 \subsection{Bewertung weiterer Zustandsgrößen}
 
-Die weiteren Zustandsgrößen des kritischen Punkts $ p_{\mathrm{c}}$ und $ x_{\mathrm{c}}$, sowie die Zustandsgrößen der ... können vom Modell bisher nicht berechnet werden, da die nötigen Routinen bisher nicht stabil genug funktionieren.
+Die weiteren Zustandsgrößen des Gemisches wie die des kritischen Punkts $ p_{\mathrm{c}}$ und $ x_{\mathrm{c}}$, sowie die 3-Phasen Zustandsgrößen $p_{\mathrm{LLV}}$ und $z_{\mathrm{LLV}}$ können vom Modell bisher nicht berechnet werden, da die nötigen Routinen bisher nicht stabil genug funktionieren oder noch nicht implementiert wurden.
 
 Aufgrund der fehlen Daten des Modells können für diese Größen bisher keine Noten berechnet werden, sodass diese in der Bewertung des thermodynamischen Modells bisher nicht berücksichtigt werden.
 

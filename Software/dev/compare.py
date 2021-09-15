@@ -9,6 +9,8 @@ import logging
 
 
 
+
+
 class Comparison:
 
     
@@ -38,7 +40,7 @@ class Comparison:
 
         marks = ['mark_h_mix', 'mark_cp_mix', 'mark_isoth_x' ,'mark_isoth_y', 'mark_isob_x', 'mark_isob_y', 'mark_paz', 'mark_xaz']
 
-        self.res_vars = marks[2:6]
+        self.res_vars = marks[0:2]
         self.bacs = list(range(1,10))
      
 
@@ -181,8 +183,10 @@ class Comparison:
                     mark_sum += res[key]["sys_res"][system][element]
                     sys_count += 1
 
-                res[key]["group_res"][element] = mark_sum/sys_count
-                self.log.info("{} group results {} = {}".format(key, element, mark_sum/sys_count))
+                if sys_count != 0:
+
+                    res[key]["group_res"][element] = mark_sum/sys_count
+                    self.log.info("{} group results {} = {}".format(key, element, mark_sum/sys_count))
 
         return res
 
@@ -210,30 +214,34 @@ class Comparison:
             for element in list(res[bac]["group_res"].keys()):
                 tmp.append(res[bac]["group_res"][element])
 
-            res[bac]["res"] = sum(tmp)/len(tmp)
+            if len(tmp) != 0:
+                res[bac]["res"] = sum(tmp)/len(tmp)
 
             # append bac results to class list
             if i in range(1,5):
-        
-                mark_NA_list.append(res[bac]["res"])
-                continue
+                if 'res' in res[bac].keys():
+                    mark_NA_list.append(res[bac]["res"])
+                    continue
 
             if i == 5:
-                
-                mark_SA_list.append(res[bac]["res"])
-                continue
+                if 'res' in res[bac].keys():
+                    
+                    mark_SA_list.append(res[bac]["res"])
+                    continue
                 
 
             if i == 6:
-                
-                mark_CA_list.append(res[bac]["res"])
-                continue
+                if 'res' in res[bac].keys():
+                    
+                    mark_CA_list.append(res[bac]["res"])
+                    continue
 
 
             if i in range(7,10):
-                
-                mark_CA_SA_list.append(res[bac]["res"])
-                continue
+                if 'res' in res[bac].keys():
+                    
+                    mark_CA_SA_list.append(res[bac]["res"])
+                    continue
                 
             
         # calc class marks
@@ -282,6 +290,8 @@ class Comparison:
 
                 
         return res
+
+    
 
 
     def calc_sys_results(self, sys, res):
@@ -379,6 +389,7 @@ class Comparison:
                     continue
                 
 
+                
 
                 mod_res_tmp = mod_res
                 exp_res_tmp = exp_res
@@ -422,14 +433,25 @@ class Comparison:
                         exp_res_tmp["x2"].remove(exp_res["x2"][i])
                         exp_res_tmp["y1"].remove(exp_res["y1"][i])
                         exp_res_tmp["y2"].remove(exp_res["y2"][i])
+                        i -= 1 
 
                     i += 1
 
                 MPAE_x1 = self.MAPE(mod_res_tmp["x1"], exp_res_tmp["x1"])
-                MPAE_x2 = self.MAPE(mod_res_tmp["x2"], exp_res_tmp["x2"])
+                if MPAE_x1 > 40:
+                    MPAE_x1 = 40.0
                 
+                MPAE_x2 = self.MAPE(mod_res_tmp["x2"], exp_res_tmp["x2"])
+                if MPAE_x2 > 40:
+                    MPAE_x2 = 40.0
+
                 MPAE_y1 = self.MAPE(mod_res_tmp["y1"], exp_res_tmp["y1"])
+                if MPAE_y1 > 40:
+                    MPAE_y1 = 40.0
+
                 MPAE_y2 = self.MAPE(mod_res_tmp["y2"], exp_res_tmp["y2"])
+                if MPAE_y2 > 40:
+                    MPAE_y2 = 40.0
 
                 mark_x = 20 - 0.5 * (MPAE_x1 + MPAE_x2)/2
                 mark_y = 20 - 0.5 * (MPAE_y1 + MPAE_y2)/2
@@ -630,6 +652,9 @@ class Comparison:
                     mes_vals = []
                     exp_vals = []
 
+                    if k == 'y1' and i == 13:
+                        print('')
+
                     mes_var_vals = list(list(zip(*mod_mes["measurements"][1:]))[0])
 
                     # get max and min p/T values
@@ -637,7 +662,7 @@ class Comparison:
                     min_value = min(mes_var_vals)
 
                     for datarow in exp_mes_data:
-                        if datarow == ['P / bar', 'x₁', 'y₁'] or datarow == header or len(datarow) < 3:
+                        if datarow == ['P / bar', 'x₁', 'y₁'] or datarow == ['P / bar', 'x₁ᵅ', 'x₁ᵝ', 'y₁'] or datarow == header or len(datarow) != 3:
                             continue
 
                         # serach for closest value

@@ -230,16 +230,16 @@ Um zwei thermodynamische Modelle miteinander zu vergleichen werden beide mit exp
 
 Zum Vergleich eines thermodynamischen Modells mit experimentellen Daten werden folgende Größen verwendet:
 \begin{itemize}
-	\item kritischer Druck
-	\item kritische Zusammensetzung
-	\item azeotroper Druck
-	\item azeotrope Zusammensetzung
-	\item Zusammensetzung Flüssigphase
-	\item Zusammensetzung Dampfphase (oder zweite Flüssigphase)
-	\item 3 Phasen Druck
-	\item 3 Phasen Zusammensetzung
-	\item Mischungsenthalpie
-	\item Mischungswärmekapazität
+	\item kritischer Druck $ p_\mathrm{c} $
+	\item kritische Zusammensetzung $ x_\mathrm{c} $
+	\item azeotroper Druck $ p_\mathrm{az} $
+	\item azeotrope Zusammensetzung $ x_\mathrm{az} $
+	\item Zusammensetzung Flüssigphase $ x $
+	\item Zusammensetzung Dampfphase (oder zweite Flüssigphase) $ y $
+	\item 3-Phasen-Druck $p_{\mathrm{LLV}}$
+	\item 3-Phasen-Zusammensetzung $z_{\mathrm{LLV}}$
+	\item Mischungsenthalpie $h^{\mathrm{M}}$
+	\item Mischungswärmekapazität $c_{\mathrm{p}}^{\mathrm{M}}$
 \end{itemize}
 
 Aufgrund der Gibbs'schen Phasenregel ergibt sich für alle Größen ein Freiheitsgrad > 0 sodass hierfür mindestens eine Größe festgelegt werden muss um die unbekannten berechnen zu können. Beispielhaft ist die Berechnung der Freiheitsgrade für den kritischen Punkt eines binären Gemischs in \autoref{eq: gibb p_krit} beschrieben.
@@ -275,8 +275,8 @@ In \autoref{tab: DoF} sind die festgelegten und berechneten Größen analog zu T
 		azeotrope Zusammensetzung  & 1 &$T$ & $p,x_1$  \\
 		Zusammensetzung Flüssigphase & 2 & $T,p$ & $x_1,y_1$ \\
 		Zusammensetzung Dampfphase & 2 & $T,p$ & $x_1,y_1$ \\
-		3-Phasen-Druck & 1 & $T$ & $x_1^{\alpha},x_1^{\beta},y_1$ \\
-		3-Phasen-Zusammensetzung & 1 & $T$ & $x_1^{\alpha},x_1^{\beta},y_1$ \\
+		3-Phasen-Druck & 1 & $p_{\mathrm{LLV}}$ & $x_1^{\alpha},x_1^{\beta},y_1$ \\
+		3-Phasen-Zusammensetzung & 1 & $z_{\mathrm{LLV}}$ & $x_1^{\alpha},x_1^{\beta},y_1$ \\
 		Mischungsenthalpie & - & $T,p,z_1$ & $h^{\mathrm{M}}$ \\
 		Mischungswärmekapazität & - & $T,p,z_1$ & $c_{\mathrm{p}}^{\mathrm{M}}$ \\
 		[\dimexpr-\normalbaselineskip+18pt]
@@ -365,6 +365,11 @@ Die Noten für die Phasengleichgewichtsgrößen werden mit folgender Gleichung b
 	\mathrm{Mark}_{\mathrm{x,y}} = 20 - 0,5 \cdot \left[
 		\dfrac{\mathrm{MAPE_{x_1,y_1}(\%)} + \mathrm{MAPE_{x_2,y_2}}(\%)}{2}
 	\right]
+\end{equation}
+
+Um Noten kleiner null zu verhindern, wird der Wert des MPAE bei der folgenden Bedingung auf 40\% festgesetzt.
+\begin{equation}
+	\mathrm{MAPE_{x_1,y_1,x_2,y_2}}(\%) > 40
 \end{equation}
 
 $x_1$ ist die Zusammensetzung der ersten und $x_2$ die des zweiten Stoffs in der Flüssigphase. Die Größen $ y $ beschreiben die Zusammensetzung in der Gasphase.
