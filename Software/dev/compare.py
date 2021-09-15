@@ -318,7 +318,7 @@ class Comparison:
             exp_data = json.loads(file.read())
 
         # calculate MAPEs
-        for key, val in model_data.items():
+        for key in model_data.keys():
             if key in ["BAC","sheet"]:
                 continue
             
@@ -375,9 +375,6 @@ class Comparison:
 
             elif key == "Isobaric phase equilibrium data" or key == "Isothermal phase equilibrium data":
                 vals = [["x1", "y1"],["x2", "y2"]]
-
-                if sys == 'METHANOL_ETHANE':
-                    print('')
 
                 mod_res, exp_res = self.get_param_data(mod_sets, exp_sets, 'phase equilibrium data', vals)
                 
@@ -533,7 +530,8 @@ class Comparison:
             else:
                 self.log.info("{}, Key '{}' wird bisher nicht verwendet".format(sys,key))
         
-        self.log.info("{},{}".format(sys,res[BAC]['sys_res'][sys]))
+        if list(model_data.keys()) != ['BAC']:
+            self.log.info("{},{}".format(sys,res[BAC]['sys_res'][sys]))
         return res
 
 
@@ -550,6 +548,35 @@ class Comparison:
         """
         model , exp = np.array(model[0:]), np.array(exp[0:])
         return np.mean(np.abs((model[exp != 0] - exp[exp != 0])/exp[exp != 0])) * 100
+
+
+    def check_xy_swap(self, exp_data, model_data, mode):
+
+        swap = False
+
+        
+
+        if mode == "isobar":
+            threshhold = 10
+        else:
+            threshhold = 0.7
+
+        diff = [abs(model_data['measurements'][1][0] - exp_data['measurements'][1][0]), abs(exp_data['measurements'][-1][0]- model_data['measurements'][-1][0])]
+
+        if diff[0] > threshhold or diff[1] > threshhold:
+            swap = True
+        
+
+        tmp_model = {
+            "measurements" : [model_data["measurements"][0]],
+            "params" : model_data["params"]
+        }
+
+        if swap == True:
+            for i in range(1,len(model_data["measurements"])):
+                tmp_model['measurements'].append([model_data['measurements'][i][0], 1 - model_data['measurements'][i][1], 1 - model_data['measurements'][i][2]])       
+
+        return exp_data, tmp_model
 
 
 
@@ -645,6 +672,19 @@ class Comparison:
                 else:
 
                     # merge data (n model > n exp)
+
+                    # check if variables need to be switched
+
+                    if mod_mes_data[0][0] == 'T /K':
+                        mode = 'isobar'
+                    else:
+                        mode = 'isotherm'
+
+                    exp_mes, mod_mes = self.check_xy_swap(exp_mes, mod_mes, mode)
+
+                    exp_mes_data = exp_mes['measurements']
+
+                    mod_mes_data = mod_mes['measurements']
 
                     # get all p/T values
 

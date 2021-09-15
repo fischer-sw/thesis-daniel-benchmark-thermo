@@ -43,7 +43,7 @@ def unzip():
 
 if __name__ == "__main__":
     
-    directorys = ['Datenbank', 'Datenbank/Modelle', 'Datenbank/Experimente', 'Ergebnisse']
+    directorys = ['Datenbank', 'Datenbank/Modelle', 'Datenbank/Experimente', 'Ergebnisse', 'Diagramme']
     
     # install_packages()
     setup(directorys)

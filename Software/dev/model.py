@@ -7,9 +7,11 @@ import os
 import json
 import re
 import sys
+import shutil
 import matplotlib.pyplot as plt
 from matplotlib.ticker import (MultipleLocator, FormatStrFormatter, AutoMinorLocator)
 
+import zipfile
 import pandas as pd
 import numpy as np
 import openpyxl
@@ -50,6 +52,12 @@ class Model:
 
         self.calc_vars = vars[0:4]
         # self.calc_vars = [vars[4]]
+
+        # keys to delete from all model data dicts
+
+        # self.del_keys = ['Isothermal phase equilibrium data', 'Isobaric phase equilibrium data']
+        self.del_keys = []
+
 
 
         self.fluid_mappings = self.read_mappings("mappings")
@@ -111,6 +119,10 @@ class Model:
         systems = []
         
         data = os.listdir(self.data_dir)
+        
+        # remove backup from data
+        if "archive.zip" in data:
+            data.remove("archive.zip")
 
         for element in data:
             # split systems into components
@@ -139,16 +151,45 @@ class Model:
         return data
     
 
-    def clean_model_data(self):
+    def do_model_backup(self):
 
+        path = self.model_dir
+
+        name = "0_backup"
+
+        archive_path = os.path.join(self.model_dir, name + ".zip")
+
+        res = input("Do you want to make a backup? (yes|no)")
+
+        if res == "yes":
+
+            if os.path.exists(archive_path):
+                os.remove(archive_path)
+            shutil.make_archive(name, 'zip', path)
+            shutil.copyfile('./' + name + '.zip', archive_path)
+            os.remove('./' + name + '.zip')
+
+    
+    
+    def clean_model_data(self):
 
         for system in self.systems:
 
             data = self.get_system_data(system, 'model')
 
             if data != {}:
+                
+                # check keys de be deleted
+                keys = list(data.keys())
+
+                for key in self.del_keys:
+                    if key in keys:
+                        data.pop(key)
+                        self.log.info("Deleted {} data in {} | {}".format(key, system[0], system[1]))
+
 
                 keys = list(data.keys())
+                
                 for key in keys:
                     if key in ['BAC', 'sheet']:
                         continue
@@ -166,14 +207,11 @@ class Model:
                 self.write_results(system[0] + '_' + system[1] + '.json', data)
 
 
-    def create_diags(self):
+    def create_system_diags(self, system):
+        model_data = self.get_system_data(system, 'model')
+        exp_data = self.get_system_data(system, 'exp')
 
-        for system in self.systems:
-
-            model_data = self.get_system_data(system, 'model')
-            exp_data = self.get_system_data(system, 'exp')
-
-            for key in list(model_data.keys()):
+        for key in list(model_data.keys()):
                 if not key in ["Isothermal phase equilibrium data", "Isobaric phase equilibrium data"]:
                     continue
 
@@ -183,7 +221,7 @@ class Model:
                     mode = "isotherm"
                     par = "T / K "
 
-                else:
+                if key == "Isobaric phase equilibrium data":
                     mode = "isobar"
                     par = "P / bar "
 
@@ -196,14 +234,35 @@ class Model:
                             param = mes["params"][par]
                             self.create_phase_eq_diag(mes["measurements"], exp_data[key][k]["measurements"], system, mode, param)
 
+    def create_diags(self):
+
+        for system in self.systems:
+
+            self.create_system_diag(system)
+
     def create_phase_eq_diag(self, model_data, exp_data, system, mode, param):
          # check for existing diag
-        path = os.path.join(self.model_dir, '..', 'Diagramme',system[0]+ "_" + system[1] + mode + "_" + str(param) + "_" + ".pdf")
+        path = os.path.join(self.data_dir,'../../Diagramme', self.model_name, system[0]+ "_" + system[1] + "_" + mode + "_" + str(param) + "_" + ".pdf")
+        
+        swap = False
+
+        if mode == "isobar":
+            threshhold = 10
+        else:
+            threshhold = 0.7
 
         if os.path.exists(path):
             self.log.info("{} Diag for {} | {} already exsits for parameter {}".format(mode, system[0], system[1], param))
 
             return
+
+        if len(exp_data[0]) != 3:
+            return
+
+        diff = [abs(model_data[1][0] - exp_data[1][0]), abs(exp_data[-1][0]- model_data[-1][0])]
+
+        if diff[0] > threshhold or diff[1] > threshhold:
+            swap = True
 
         # clean data
         mod_len = len(model_data)
@@ -236,15 +295,21 @@ class Model:
             else:
                 i += 1
 
-        x_data_model = list(list(zip(*model_data[1:]))[1])
-        x_data_exp = list(list(zip(*exp_data[1:]))[1])
+        x_data_model = np.array(list(list(zip(*model_data[1:]))[1]))
+        x_data_exp = np.array(list(list(zip(*exp_data[1:]))[1]))
 
-        y_data_model = list(list(zip(*model_data[1:]))[2])
-        y_data_exp = list(list(zip(*exp_data[1:]))[2])
+        y_data_model = np.array(list(list(zip(*model_data[1:]))[2]))
+        y_data_exp = np.array(list(list(zip(*exp_data[1:]))[2]))
         
-        var_data_model = list(list(zip(*model_data[1:]))[0])
-        var_data_exp = list(list(zip(*exp_data[1:]))[0])
+        var_data_model = np.array(list(list(zip(*model_data[1:]))[0]))
+        var_data_exp = np.array(list(list(zip(*exp_data[1:]))[0]))
         
+        if swap == True:
+            x_data_model = 1 - x_data_model    
+            y_data_model = 1 - y_data_model
+
+        
+
 
         fig, ax = plt.subplots()
         ax.plot(x_data_model, var_data_model,'g+',label="Modell-Daten")
@@ -255,20 +320,27 @@ class Model:
 
         ax.legend()
 
-        # set labels
-        # plt.xlabel("$x_{hexane}$")
-        plt.xlabel("x")
-
-        if mode == "isotherm":
-            plt.ylabel("p [kPa]")
-        if mode == "isobar":
-            plt.ylabel("T [K]")
-
         #set ticks
         ax.tick_params(direction='in', top=True, right=True)
         ax.tick_params(direction='in', top=True, right=True, which='minor', length=3)
         ax.xaxis.set_minor_locator(AutoMinorLocator(2))
         ax.yaxis.set_minor_locator(AutoMinorLocator(2))
+
+        # set labels
+        # plt.xlabel("$x_{hexane}$")
+        x_label = "$x_{" + system[0] + "}$"
+        plt.xlabel(x_label)
+
+        if mode == "isotherm":
+            plt.ylabel("p [bar]")
+            
+            #for i in range(len(var_data_model)):
+            #    var_data_model[i] = var_data_model[i] * 10
+                
+
+
+        if mode == "isobar":
+            plt.ylabel("T [K]")
 
         #set limits
         # plt.ylim(20, 70)
@@ -669,10 +741,18 @@ class Model:
 
     def ceate_model_dir(self):
 
-        path = os.path.join(self.data_dir,'../Modelle', self.model_name)
+        dirs = []
 
-        if os.path.isdir(path) == False:
-            os.mkdir(path)
+        path = os.path.join(self.data_dir,'../Modelle', self.model_name)
+        dirs.append(path)
+
+        path = os.path.join(self.data_dir,'../../Diagramme', self.model_name)
+        dirs.append(path)
+
+        for element in dirs:
+
+            if os.path.isdir(element) == False:
+                os.mkdir(element)
 
 
     def get_azeo_point(self, inputset):
@@ -790,6 +870,9 @@ class Model:
         eqtype = 2 #Reinstoffgleichung: 1: Hochgenau, 2: SRK, 3: PR, 4: LKP, 6: PC-SAFT
         mixtype = 22 #Gemischmodell: 1: Multifluid-Gemischmodell, 2: SRK a quadratisch, b linear, 21: SRK a quadratisch, b quadratisch, 22: PSRK, 3: PR a quadratisch, b linear, 31: PR a quadratisch, b quadratisch, 32: VTPR
 
+        if var == 'pvap':
+            var_val = var_val / 10
+
         # self.fldmix1 = Fluid('TP','HE',['methane','ethane'],[0.6,0.4],[1,1],1,self.trend_path,'molar',self.dll_path)
         fldmix = Fluid(var, 'CP', [fld1_name, fld2_name],[0.6,0.4],[eqtype,eqtype],mixtype,self.trend_path,'molar',self.dll_path)
 
@@ -802,12 +885,13 @@ class Model:
 
         if var == 'Tvap':
             lis.append(['p', "x", "y"])
+            
             for i in range(points.value):
                 element = p_points_array[i]
                 values[element] = {}
                 values[element]['x'] = x_points[2][i]
                 values[element]['y'] = x_points[0][i]
-                lis.append([p_points_array[i], x_points[2][i], x_points[0][i]])
+                lis.append([p_points_array[i] * 10, x_points[2][i], x_points[0][i]])
 
         if var == 'pvap':
             lis.append(['T', "x", "y"])

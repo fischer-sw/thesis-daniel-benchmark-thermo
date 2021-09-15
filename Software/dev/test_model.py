@@ -24,7 +24,7 @@ def tearDownModule():
     global model
     return
 
-@unittest.skip("Skipping Test01")
+# @unittest.skip("Skipping Test01")
 class Test01(unittest.TestCase):
     
     def setUp(self):
@@ -34,7 +34,7 @@ class Test01(unittest.TestCase):
     def test_constructor(self):
         self.assertIsNotNone(self.model)
 
-# @unittest.skip("Skipping Test02")
+@unittest.skip("Skipping Test02")
 class Test02(unittest.TestCase):
     
     def setUp(self):
@@ -60,7 +60,7 @@ class Test03(unittest.TestCase):
         self.assertIsNotNone(model_res)
         self.assertIsNotNone(res)
 
-# @unittest.skip("Skipping Test04")
+@unittest.skip("Skipping Test04")
 class Test04(unittest.TestCase):
     
     def setUp(self):
@@ -68,8 +68,43 @@ class Test04(unittest.TestCase):
         self.model = model
         
 
-    def test_model_results(self):
+    def test_diag(self):
         self.model.create_diags()
+
+
+@unittest.skip("Skipping Test05")
+class Test05(unittest.TestCase):
+    
+    def setUp(self):
+        global model
+        self.model = model
+        
+
+    def test_system_results(self):
+
+        system = ['WATER', 'ACETONE']
+
+        sys_file_name = '_'.join(system) + '.json'
+
+
+        res = self.model.calc_system_results(system)
+        if res != {}:
+            self.model.write_results(sys_file_name, res)
+
+        self.model.create_system_diags(system)
+
+    
+# @unittest.skip("Skipping Test06")
+class Test06(unittest.TestCase):
+    
+    def setUp(self):
+        global model
+        self.model = model
+        
+
+    def test_model_backup(self):
+        self.model.do_model_backup()
+
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)
