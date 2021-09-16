@@ -9,6 +9,7 @@
 *.fld
 *.toc
 *.pdf
+*.png
 *.pyc
 *.stats
 !Latex/figs/*.pdf

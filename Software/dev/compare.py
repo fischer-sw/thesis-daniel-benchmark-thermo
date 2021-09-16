@@ -40,7 +40,7 @@ class Comparison:
 
         marks = ['mark_h_mix', 'mark_cp_mix', 'mark_isoth_x' ,'mark_isoth_y', 'mark_isob_x', 'mark_isob_y', 'mark_paz', 'mark_xaz']
 
-        self.res_vars = marks[0:2]
+        self.res_vars = marks[0:-2]
         self.bacs = list(range(1,10))
      
 
@@ -124,6 +124,10 @@ class Comparison:
             res = json.loads(file.read())
 
         systems = os.listdir(path)
+
+        # remove backup from data
+        if "0_backup.zip" in systems:
+            systems.remove("0_backup.zip")
 
         for element in systems:
             sys_name = element.split('.json')[0]
@@ -376,6 +380,8 @@ class Comparison:
             elif key == "Isobaric phase equilibrium data" or key == "Isothermal phase equilibrium data":
                 vals = [["x1", "y1"],["x2", "y2"]]
 
+                
+
                 mod_res, exp_res = self.get_param_data(mod_sets, exp_sets, 'phase equilibrium data', vals)
                 
                 # check if enough data is available
@@ -392,7 +398,21 @@ class Comparison:
                 exp_res_tmp = exp_res
                 i = 0
 
-                
+                # get minimal length
+
+                min_len = min([len(exp_res["x1"]), len(exp_res["y1"]), len(mod_res["x1"]), len(mod_res["x1"])])
+
+                exp_res["x1"] = exp_res["x1"][:min_len]
+                exp_res["x2"] = exp_res["x2"][:min_len]
+                exp_res["y1"] = exp_res["y1"][:min_len]
+                exp_res["y2"] = exp_res["y2"][:min_len]
+
+                mod_res["x1"] = mod_res["x1"][:min_len]
+                mod_res["x2"] = mod_res["x2"][:min_len]
+                mod_res["y1"] = mod_res["y1"][:min_len]
+                mod_res["y2"] = mod_res["y2"][:min_len]
+
+
 
                 while i < len(mod_res_tmp['x1']):
 
@@ -433,6 +453,13 @@ class Comparison:
                         i -= 1 
 
                     i += 1
+
+                # check if enough data is available
+                if mod_res["x1"] == [] or mod_res["x2"] == [] or mod_res["y1"] == [] or mod_res["y2"] == []:
+                    continue
+
+                if exp_res["x1"] == [] or exp_res["x2"] == [] or exp_res["y1"] == [] or exp_res["y2"] == []:
+                    continue
 
                 MPAE_x1 = self.MAPE(mod_res_tmp["x1"], exp_res_tmp["x1"])
                 if MPAE_x1 > 40:
@@ -547,14 +574,20 @@ class Comparison:
 
         """
         model , exp = np.array(model[0:]), np.array(exp[0:])
-        return np.mean(np.abs((model[exp != 0] - exp[exp != 0])/exp[exp != 0])) * 100
+
+        if len(model) > 1 and len(exp) > 1: 
+            return np.mean(np.abs((model[exp != 0] - exp[exp != 0])/exp[exp != 0])) * 100
+
+        else:
+            if float(exp[0]) != 0.0:
+                return np.mean(np.abs((float(model[0]) - float(exp[0]))/float(exp[0]))) * 100
+            else:
+                return 0.0
 
 
     def check_xy_swap(self, exp_data, model_data, mode):
 
         swap = False
-
-        
 
         if mode == "isobar":
             threshhold = 10
@@ -576,7 +609,7 @@ class Comparison:
             for i in range(1,len(model_data["measurements"])):
                 tmp_model['measurements'].append([model_data['measurements'][i][0], 1 - model_data['measurements'][i][1], 1 - model_data['measurements'][i][2]])       
 
-        return exp_data, tmp_model
+        return exp_data, tmp_model, swap
 
 
 
@@ -680,7 +713,7 @@ class Comparison:
                     else:
                         mode = 'isotherm'
 
-                    exp_mes, mod_mes = self.check_xy_swap(exp_mes, mod_mes, mode)
+                    exp_mes, mod_mes, changed = self.check_xy_swap(exp_mes, mod_mes, mode)
 
                     exp_mes_data = exp_mes['measurements']
 
@@ -692,8 +725,8 @@ class Comparison:
                     mes_vals = []
                     exp_vals = []
 
-                    if k == 'y1' and i == 13:
-                        print('')
+                    if len(mod_mes["measurements"]) == 1 or len(exp_mes["measurements"]) == 1:
+                        return model_res , exp_res 
 
                     mes_var_vals = list(list(zip(*mod_mes["measurements"][1:]))[0])
 
@@ -711,6 +744,8 @@ class Comparison:
                         dist = 1000
                         dist_abs = 1000
 
+                        closest_row = []
+
                         for row in mod_mes_data:
                             if row == header:
                                 continue
@@ -725,7 +760,7 @@ class Comparison:
                         if search_val < min_value or search_val > max_value:
                             continue
                         
-                        if type(closest_row[v]) != type('') and type(datarow[v]) != type(''):
+                        if v < len(closest_row) and v < len(datarow) and type(closest_row[v]) != type('') and type(datarow[v]) != type('') and closest_row != []:
                             mes_vals.append(closest_row[v])
                             exp_vals.append(datarow[v])
 

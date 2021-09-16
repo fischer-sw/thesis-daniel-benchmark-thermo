@@ -89,7 +89,31 @@ class Model:
         self.COSMOparam[19] = 76.89
         self.COSMOparam[20] = 85.37 
 
+    def check_xy_swap(self, exp_data, model_data, mode):
+    
+        swap = False
 
+        if mode == "isobar":
+            threshhold = 10
+        else:
+            threshhold = 0.7
+
+        diff = [abs(model_data['measurements'][1][0] - exp_data['measurements'][1][0]), abs(exp_data['measurements'][-1][0]- model_data['measurements'][-1][0])]
+
+        if diff[0] > threshhold or diff[1] > threshhold:
+            swap = True
+        
+
+        tmp_model = {
+            "measurements" : [model_data["measurements"][0]],
+            "params" : model_data["params"]
+        }
+
+        if swap == True:
+            for i in range(1,len(model_data["measurements"])):
+                tmp_model['measurements'].append([model_data['measurements'][i][0], 1 - model_data['measurements'][i][1], 1 - model_data['measurements'][i][2]])       
+
+        return exp_data, tmp_model, swap
 
 
     def read_mappings(self, filename):
@@ -121,8 +145,8 @@ class Model:
         data = os.listdir(self.data_dir)
         
         # remove backup from data
-        if "archive.zip" in data:
-            data.remove("archive.zip")
+        if "0_backup.zip" in data:
+            data.remove("0_backup.zip")
 
         for element in data:
             # split systems into components
@@ -232,84 +256,76 @@ class Model:
                     for k in range(len(exp_data[key])):
                         if exp_data[key][k]["params"] == mes["params"]:
                             param = mes["params"][par]
-                            self.create_phase_eq_diag(mes["measurements"], exp_data[key][k]["measurements"], system, mode, param)
+                            self.create_phase_eq_diag(mes, exp_data[key][k], system, mode, param)
 
     def create_diags(self):
 
         for system in self.systems:
 
-            self.create_system_diag(system)
+            self.create_system_diags(system)
 
     def create_phase_eq_diag(self, model_data, exp_data, system, mode, param):
          # check for existing diag
-        path = os.path.join(self.data_dir,'../../Diagramme', self.model_name, system[0]+ "_" + system[1] + "_" + mode + "_" + str(param) + "_" + ".pdf")
+        # path = os.path.join(self.data_dir,'../../Diagramme', self.model_name, system[0]+ "_" + system[1] + "_" + mode + "_" + str(param) + "_" + ".pdf")
+        path = os.path.join(self.data_dir,'../../Diagramme', self.model_name, system[0]+ "_" + system[1] + "_" + mode + "_" + str(param) + "_" + ".png")
         
-        swap = False
-
-        if mode == "isobar":
-            threshhold = 10
-        else:
-            threshhold = 0.7
-
         if os.path.exists(path):
-            self.log.info("{} Diag for {} | {} already exsits for parameter {}".format(mode, system[0], system[1], param))
-
+            self.log.info("{} Diag for {} | {} already exsists for parameter {}".format(mode, system[0], system[1], param))
             return
 
-        if len(exp_data[0]) != 3:
+        if model_data['measurements'][0][1:3] != ['x₁', 'y₁']:
             return
 
-        diff = [abs(model_data[1][0] - exp_data[1][0]), abs(exp_data[-1][0]- model_data[-1][0])]
+        exp_data , model_data, changed = self.check_xy_swap(exp_data, model_data , mode)
 
-        if diff[0] > threshhold or diff[1] > threshhold:
-            swap = True
+        model_data_mes = model_data["measurements"]
+        exp_data_mes = exp_data["measurements"]
+
+
+        if len(exp_data_mes[0]) != 3 or len(model_data_mes) == 1 or len(exp_data_mes) == 1:
+            return
 
         # clean data
-        mod_len = len(model_data)
-        exp_len = len(exp_data)
+        mod_len = len(model_data_mes)
+        exp_len = len(exp_data_mes)
 
-        if len(model_data[0]) != 3 or len(model_data[0]) != 3:
+        if len(model_data_mes[0]) != 3 or len(model_data_mes[0]) != 3:
             return
 
         i = 1
         while i < mod_len:
 
-            if len(model_data) == 1:
+            if len(model_data_mes) == 1:
                 return
 
-            ele = model_data[i]
+            ele = model_data_mes[i]
             if type(ele[1]) == type("") or type(ele[2]) == type(""):
-                model_data.remove(model_data[i])
+                model_data_mes.remove(model_data_mes[i])
             else:
                 i += 1
 
         i = 1
         while i < exp_len:
 
-            if len(exp_data) == 1:
+            if len(exp_data_mes) == 1:
                 return
 
-            ele = exp_data[i]
+            ele = exp_data_mes[i]
             if type(ele[1]) == type("") or type(ele[2]) == type(""):
-                exp_data.remove(exp_data[i])
+                exp_data_mes.remove(exp_data_mes[i])
             else:
                 i += 1
-
-        x_data_model = np.array(list(list(zip(*model_data[1:]))[1]))
-        x_data_exp = np.array(list(list(zip(*exp_data[1:]))[1]))
-
-        y_data_model = np.array(list(list(zip(*model_data[1:]))[2]))
-        y_data_exp = np.array(list(list(zip(*exp_data[1:]))[2]))
         
-        var_data_model = np.array(list(list(zip(*model_data[1:]))[0]))
-        var_data_exp = np.array(list(list(zip(*exp_data[1:]))[0]))
-        
-        if swap == True:
-            x_data_model = 1 - x_data_model    
-            y_data_model = 1 - y_data_model
-
         
 
+        x_data_model = np.array(list(list(zip(*model_data_mes[1:]))[1]))
+        x_data_exp = np.array(list(list(zip(*exp_data_mes[1:]))[1]))
+
+        y_data_model = np.array(list(list(zip(*model_data_mes[1:]))[2]))
+        y_data_exp = np.array(list(list(zip(*exp_data_mes[1:]))[2]))
+        
+        var_data_model = np.array(list(list(zip(*model_data_mes[1:]))[0]))
+        var_data_exp = np.array(list(list(zip(*exp_data_mes[1:]))[0]))
 
         fig, ax = plt.subplots()
         ax.plot(x_data_model, var_data_model,'g+',label="Modell-Daten")
@@ -327,8 +343,9 @@ class Model:
         ax.yaxis.set_minor_locator(AutoMinorLocator(2))
 
         # set labels
-        # plt.xlabel("$x_{hexane}$")
+        
         x_label = "$x_{" + system[0] + "}$"
+
         plt.xlabel(x_label)
 
         if mode == "isotherm":
