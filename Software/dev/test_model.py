@@ -34,7 +34,7 @@ class Test01(unittest.TestCase):
     def test_constructor(self):
         self.assertIsNotNone(self.model)
 
-@unittest.skip("Skipping Test02")
+# @unittest.skip("Skipping Test02")
 class Test02(unittest.TestCase):
     
     def setUp(self):
@@ -87,7 +87,7 @@ class Test05(unittest.TestCase):
         self.model.create_diags()
 
 
-# @unittest.skip("Skipping Test06")
+@unittest.skip("Skipping Test06")
 class Test06(unittest.TestCase):
     
     def setUp(self):

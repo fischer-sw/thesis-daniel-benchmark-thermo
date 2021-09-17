@@ -746,12 +746,17 @@ class Model:
 
                     T_search = exp_data[element][i]["params"]['T / K ']
 
+                    model_dataset = None
+
                     for n in range(len(model_data['Isothermal phase equilibrium data'])):
                         
                         if model_data['Isothermal phase equilibrium data'][n]["params"]['T / K '] == T_search:
 
                             model_dataset = model_data['Isothermal phase equilibrium data'][n]
                             break
+                        
+                    if model_dataset == None:
+                        continue
 
                     # get experimental isothermal data
                     for n in range(len(exp_data['Isothermal phase equilibrium data'])):
