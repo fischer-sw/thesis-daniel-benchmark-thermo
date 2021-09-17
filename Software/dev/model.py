@@ -50,13 +50,13 @@ class Model:
 
         vars = ['Enthalpy of mixing', 'Heat capacity of mixing', 'Isothermal phase equilibrium data', 'Isobaric phase equilibrium data', 'Azeotropic point']
 
-        self.calc_vars = vars[0:4]
+        self.calc_vars = vars[0:5]
         # self.calc_vars = [vars[4]]
 
         # keys to delete from all model data dicts
 
-        # self.del_keys = ['Isothermal phase equilibrium data', 'Isobaric phase equilibrium data']
-        self.del_keys = []
+        # self.del_keys = ['Isothermal phase equilibrium data', 'Isobaric phase equilibrium data', 'Azeotropic point']
+        self.del_keys = ['Azeotropic point']
 
 
 
@@ -93,14 +93,29 @@ class Model:
     
         swap = False
 
-        if mode == "isobar":
-            threshhold = 10
-        else:
-            threshhold = 0.7
+        # get first and last elements of data
 
-        diff = [abs(model_data['measurements'][1][0] - exp_data['measurements'][1][0]), abs(exp_data['measurements'][-1][0]- model_data['measurements'][-1][0])]
+        x1_exp = np.array(list(list(zip(*exp_data['measurements'][1:]))[1]))
+        x1_exp_1_idx = np.argmax(x1_exp) + 1
+        x1_exp_0_idx = np.argmin(x1_exp) + 1
+        x1_mod = np.array(list(list(zip(*model_data['measurements'][1:]))[1]))
+        x1_mod_1_idx = np.argmax(x1_mod) + 1
+        x1_mod_0_idx = np.argmin(x1_mod) + 1
 
-        if diff[0] > threshhold or diff[1] > threshhold:
+        model_check_data = {
+            'first' : model_data['measurements'][x1_mod_0_idx],
+            'last' : model_data['measurements'][x1_mod_1_idx],
+        }
+
+        exp_check_data = {
+            'first' : exp_data['measurements'][x1_exp_0_idx],
+            'last' : exp_data['measurements'][x1_exp_1_idx],
+        }
+
+
+        diff = [abs(model_check_data['first'][0] - exp_check_data['first'][0]), abs(model_check_data['first'][0] - exp_check_data['last'][0]), abs(model_check_data['last'][0] - exp_check_data['first'][0]), abs(model_check_data['last'][0] - exp_check_data['last'][0])]
+
+        if diff[0] > diff[1] and diff[3] > diff[2]: 
             swap = True
         
 
@@ -112,6 +127,11 @@ class Model:
         if swap == True:
             for i in range(1,len(model_data["measurements"])):
                 tmp_model['measurements'].append([model_data['measurements'][i][0], 1 - model_data['measurements'][i][1], 1 - model_data['measurements'][i][2]])       
+
+        else:
+            for i in range(1,len(model_data["measurements"])):
+                tmp_model['measurements'].append([model_data['measurements'][i][0], model_data['measurements'][i][1], model_data['measurements'][i][2]])       
+
 
         return exp_data, tmp_model, swap
 
@@ -683,9 +703,25 @@ class Model:
                 if not 'Isothermal phase equilibrium data' in model_data.keys():
                     self.log.info("No isotherm phase eq data for {} | {} to calculate {}".format(self.fluid_mappings[system[0]], self.fluid_mappings[system[1]], element))
                     break
+
+
+                
                 
                  # loop through all measurements
                 for i in range(len(exp_data[element])):
+
+                    dataset = {
+                        "params" : {
+                            "T / K " : 0,
+                            "P / bar " : 0
+                        },
+                        "measurements": [
+                            [
+                                "x\u2081",
+                                "y\u2081"
+                            ],
+                        ]
+                    }
                     
                     data_set = exp_data[element][i]
                     
@@ -693,7 +729,7 @@ class Model:
                     if not element in results.keys():
                         results[element] = []
 
-                    results[element].append({})
+                    results[element].append(dataset)
                     
                     # check for existing data
                     if model_data != {}:
@@ -710,18 +746,36 @@ class Model:
 
                     T_search = exp_data[element][i]["params"]['T / K ']
 
-                    for i in range(len(model_data['Isothermal phase equilibrium data'])):
+                    for n in range(len(model_data['Isothermal phase equilibrium data'])):
                         
-                        if model_data['Isothermal phase equilibrium data'][i]["params"]['T / K '] == T_search:
+                        if model_data['Isothermal phase equilibrium data'][n]["params"]['T / K '] == T_search:
 
-                            azeo_dataset = model_data['Isothermal phase equilibrium data'][i]
+                            model_dataset = model_data['Isothermal phase equilibrium data'][n]
+                            break
 
-                            azeo_point = self.get_azeo_point(azeo_dataset)
+                    # get experimental isothermal data
+                    for n in range(len(exp_data['Isothermal phase equilibrium data'])):
+                        
+                        if exp_data['Isothermal phase equilibrium data'][n]["params"] == model_dataset['params']:
+                            exp_dataset = exp_data['Isothermal phase equilibrium data'][n]
+                            break
 
-                            if azeo_point != {}:
-                                results[element][i]['measurements'] = [azeo_point]
-                            else:
-                                break
+                    exp_dataset, model_dataset, changed = self.check_xy_swap(exp_dataset, model_dataset, 'isotherm')
+
+                    p_vals = np.array(list(list(zip(*model_dataset['measurements'][1:]))[0]))
+
+
+                    if max(p_vals) - min(p_vals) < 0.1:
+                        continue
+
+                    azeo_point = self.get_azeo_point(dataset, model_dataset)
+
+                    if azeo_point != {}:
+                        results[element][i] = azeo_point
+                        self.log.info("Added new dataset in {} for {} | {}.".format(element,self.fluid_mappings[system[0]], self.fluid_mappings[system[1]]))
+
+
+                    
 
 
             if element == "blabla":
@@ -772,25 +826,29 @@ class Model:
                 os.mkdir(element)
 
 
-    def get_azeo_point(self, inputset):
+    def get_azeo_point(self, dataset, inputset):
 
-        dataset = {
-            "params" : {
-                "T / K " : 0,
-                "P / bar " : 0
-            },
-            "measurements": [
-                [
-                "x\u2081",
-                "y\u2081"
-                ],
-            ]
-        }
+        p_vals = np.array(list(list(zip(*inputset['measurements'][1:]))[0]))
+        x1_vals = np.array(list(list(zip(*inputset['measurements'][1:]))[1]))
+        y1_vals = np.array(list(list(zip(*inputset['measurements'][1:]))[2]))
+
+        p_max_idx = np.argmax(p_vals)
+        p_min_idx = np.argmin(p_vals)
+
+        if p_max_idx > 0 and p_max_idx < len(p_vals):
+            dataset['params']['P / bar '] = p_vals[p_max_idx]
+            dataset['measurements'].append([x1_vals[p_max_idx], y1_vals[p_max_idx]])
+
+        else:
+            dataset['params']['P / bar '] = p_vals[p_min_idx]
+            dataset['measurements'].append([x1_vals[p_min_idx], y1_vals[p_min_idx]])
+
+
 
         # Set T to inputset T value
         dataset['params']['T / K '] = inputset['params']['T / K ']
         
-        return {}
+        return dataset
 
 
     def calc_h_mix(self, system, temp, press, x):

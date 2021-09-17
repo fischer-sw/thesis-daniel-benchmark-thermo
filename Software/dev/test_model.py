@@ -75,7 +75,7 @@ class Test04(unittest.TestCase):
         self.model.create_system_diags(system)
 
 
-# @unittest.skip("Skipping Test05")
+@unittest.skip("Skipping Test05")
 class Test05(unittest.TestCase):
     
     def setUp(self):
@@ -87,7 +87,7 @@ class Test05(unittest.TestCase):
         self.model.create_diags()
 
 
-@unittest.skip("Skipping Test06")
+# @unittest.skip("Skipping Test06")
 class Test06(unittest.TestCase):
     
     def setUp(self):
@@ -99,7 +99,7 @@ class Test06(unittest.TestCase):
 
         res = {}
 
-        system = ['WATER', 'ACETONE']
+        system = ['ACETONE', 'N-PENTANE']
 
         sys_file_name = '_'.join(system) + '.json'
 

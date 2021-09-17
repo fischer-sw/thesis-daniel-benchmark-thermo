@@ -40,7 +40,7 @@ class Comparison:
 
         marks = ['mark_h_mix', 'mark_cp_mix', 'mark_isoth_x' ,'mark_isoth_y', 'mark_isob_x', 'mark_isob_y', 'mark_paz', 'mark_xaz']
 
-        self.res_vars = marks[0:-2]
+        self.res_vars = marks
         self.bacs = list(range(1,10))
      
 
@@ -191,6 +191,31 @@ class Comparison:
 
                     res[key]["group_res"][element] = mark_sum/sys_count
                     self.log.info("{} group results {} = {}".format(key, element, mark_sum/sys_count))
+
+                    # combine phase eq grades if they both exsist
+
+                    if 'mark_isob_x' in res[key]["group_res"].keys() and 'mark_isoth_x' in res[key]["group_res"].keys():
+                        mark_phase_eq_x = (res[key]["group_res"]['mark_isob_x'] + res[key]["group_res"]['mark_isoth_x']) / 2
+                        res[key]["group_res"]['mark_phase_eq_x'] = mark_phase_eq_x
+                        self.log.info("{} group results mark_phase_eq_x = {}".format(key, mark_phase_eq_x))
+                        res[key]["group_res"].pop('mark_isob_x')
+                        res[key]["group_res"].pop('mark_isoth_x')
+
+
+                    if 'mark_isob_y' in res[key]["group_res"].keys() and 'mark_isoth_y' in res[key]["group_res"].keys():
+                        mark_phase_eq_y = (res[key]["group_res"]['mark_isob_y'] + res[key]["group_res"]['mark_isoth_y']) / 2 
+                        res[key]["group_res"]['mark_phase_eq_y'] = mark_phase_eq_y
+                        self.log.info("{} group results mark_phase_eq_y = {}".format(key, mark_phase_eq_y))
+                        res[key]["group_res"].pop('mark_isob_y')
+                        res[key]["group_res"].pop('mark_isoth_y')
+
+
+                   
+        
+
+        
+
+        
 
         return res
 
@@ -351,31 +376,31 @@ class Comparison:
                 res[BAC]['sys_res'][sys]["mark_xc"] = mark_xc
 
             elif key == "Azeotropic point":
-                pass
-            #     vals = [["x1"],["x2"]]
-            #     mod_res, exp_res = self.get_param_data(mod_sets, exp_sets, 'Azeotropic point', vals)
                 
-            #     # add P mod_res
-            #     mod_res["P"] = []
-            #     for i in range(len(mod_res["x1"])):
-            #         mod_res["P"].append(mod_sets[i]["params"]["P / bar "])
-
-            #     # add P exp_res
-            #     exp_res["P"] = []
-            #     for i in range(len(exp_res["x1"])):
-            #         exp_res["P"].append(exp_sets[i]["params"]["P / bar "])
-
-            #     MPAE_p_az = self.MAPE(mod_res["P"], exp_res["P"])
-            #     MPAE_x1_az = self.MAPE(mod_res["x1"], exp_res["x1"])
-            #     MPAE_x2_az = self.MAPE(mod_res["x2"], exp_res["x2"])
+                vals = [["x1"],["x2"]]
+                mod_res, exp_res = self.get_param_data(mod_sets, exp_sets, 'Azeotropic point', vals)
                 
-            #     mark_paz = 20 - 0.75 * MPAE_p_az
+                # add P mod_res
+                mod_res["P"] = []
+                for i in range(len(mod_res['x1'])):
+                    mod_res["P"].append(mod_sets[i]["params"]["P / bar "])
 
-            #     mark_xaz = 20 - 0.5 * (MPAE_x1_az + MPAE_x2_az)/2  
+                # add P exp_res
+                exp_res["P"] = []
+                for i in range(len(exp_res['x1'])):
+                    exp_res["P"].append(exp_sets[i]["params"]["P / bar "])
+
+                MPAE_p_az = self.MAPE(mod_res["P"], exp_res["P"])
+                MPAE_x1_az = self.MAPE(mod_res["x1"], exp_res["x1"])
+                MPAE_x2_az = self.MAPE(mod_res["x2"], exp_res["x2"])
                 
-            #     # write results
-            #     res[BAC]['sys_res'][sys]["mark_paz"] = mark_paz
-            #     res[BAC]['sys_res'][sys]["mark_xaz"] = mark_xaz
+                mark_paz = 20 - 0.75 * MPAE_p_az
+
+                mark_xaz = 20 - 0.5 * (MPAE_x1_az + MPAE_x2_az)/2  
+                
+                # write results
+                res[BAC]['sys_res'][sys]["mark_paz"] = mark_paz
+                res[BAC]['sys_res'][sys]["mark_xaz"] = mark_xaz
 
             elif key == "Isobaric phase equilibrium data" or key == "Isothermal phase equilibrium data":
                 vals = [["x1", "y1"],["x2", "y2"]]
@@ -589,14 +614,29 @@ class Comparison:
 
         swap = False
 
-        if mode == "isobar":
-            threshhold = 10
-        else:
-            threshhold = 0.7
+        # get first and last elements of data
 
-        diff = [abs(model_data['measurements'][1][0] - exp_data['measurements'][1][0]), abs(exp_data['measurements'][-1][0]- model_data['measurements'][-1][0])]
+        x1_exp = np.array(list(list(zip(*exp_data['measurements'][1:]))[1]))
+        x1_exp_1_idx = np.argmax(x1_exp) + 1
+        x1_exp_0_idx = np.argmin(x1_exp) + 1
+        x1_mod = np.array(list(list(zip(*model_data['measurements'][1:]))[1]))
+        x1_mod_1_idx = np.argmax(x1_mod) + 1
+        x1_mod_0_idx = np.argmin(x1_mod) + 1
 
-        if diff[0] > threshhold or diff[1] > threshhold:
+        model_check_data = {
+            'first' : model_data['measurements'][x1_mod_0_idx],
+            'last' : model_data['measurements'][x1_mod_1_idx],
+        }
+
+        exp_check_data = {
+            'first' : exp_data['measurements'][x1_exp_0_idx],
+            'last' : exp_data['measurements'][x1_exp_1_idx],
+        }
+
+
+        diff = [abs(model_check_data['first'][0] - exp_check_data['first'][0]), abs(model_check_data['first'][0] - exp_check_data['last'][0]), abs(model_check_data['last'][0] - exp_check_data['first'][0]), abs(model_check_data['last'][0] - exp_check_data['last'][0])]
+
+        if diff[0] > diff[1] and diff[3] > diff[2]: 
             swap = True
         
 
@@ -609,8 +649,12 @@ class Comparison:
             for i in range(1,len(model_data["measurements"])):
                 tmp_model['measurements'].append([model_data['measurements'][i][0], 1 - model_data['measurements'][i][1], 1 - model_data['measurements'][i][2]])       
 
-        return exp_data, tmp_model, swap
+        else:
+            for i in range(1,len(model_data["measurements"])):
+                tmp_model['measurements'].append([model_data['measurements'][i][0], model_data['measurements'][i][1], model_data['measurements'][i][2]])       
 
+
+        return exp_data, tmp_model, swap
 
 
     def get_param_data(self, model_data, exp_data, param, values):
@@ -773,37 +817,37 @@ class Comparison:
 
                 # check if calculation is needed:
 
-                    # clean mes_vals
-                    j = 0
-                    while j < len(mes_vals):
-                        mes_ele = mes_vals[j]
-                        if type(mes_ele) == type(''):
-                            mes_vals.remove(mes_ele)
-                        else:
-                            j += 1
+                # clean mes_vals
+                j = 0
+                while j < len(mes_vals):
+                    mes_ele = mes_vals[j]
+                    if type(mes_ele) == type(''):
+                        mes_vals.remove(mes_ele)
+                    else:
+                        j += 1
 
-                    j = 0
-                    while j < len(exp_vals):
-                        exp_ele = exp_vals[j]
-                        if type(exp_ele) == type(''):
-                            exp_vals.remove(exp_ele)
-                        else:
-                            j += 1
+                j = 0
+                while j < len(exp_vals):
+                    exp_ele = exp_vals[j]
+                    if type(exp_ele) == type(''):
+                        exp_vals.remove(exp_ele)
+                    else:
+                        j += 1
 
 
 
-                    if mes_vals != [] and exp_vals != []:
-                        first_chrs = []
-                        if values[1] != []:
-                            first_chrs =  list(list(zip(*values[1]))[0])
+                if mes_vals != [] and exp_vals != []:
+                    first_chrs = []
+                    if values[1] != []:
+                        first_chrs =  list(list(zip(*values[1]))[0])
 
-                        if len(k) > 1 and k[0] in first_chrs:
+                    if len(k) > 1 and k[0] in first_chrs:
 
-                            mod_calc_vals = [1-x for x in mes_vals]
-                            exp_calc_vals = [1-x for x in exp_vals]
+                        mod_calc_vals = [1-x for x in mes_vals]
+                        exp_calc_vals = [1-x for x in exp_vals]
 
-                            model_res[k[0]+ "2"] += mod_calc_vals
-                            exp_res[k[0]+ "2"] += exp_calc_vals
+                        model_res[k[0]+ "2"] += mod_calc_vals
+                        exp_res[k[0]+ "2"] += exp_calc_vals
 
         return model_res , exp_res 
 
