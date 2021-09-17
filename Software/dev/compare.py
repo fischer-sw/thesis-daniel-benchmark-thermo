@@ -2,8 +2,8 @@
 import os
 import sys
 import json
+import math
 from shutil import copyfile
-#from typing_extensions import ParamSpec
 import numpy as np
 import logging
 
@@ -600,8 +600,12 @@ class Comparison:
         """
         model , exp = np.array(model[0:]), np.array(exp[0:])
 
-        if len(model) > 1 and len(exp) > 1: 
-            return np.mean(np.abs((model[exp != 0] - exp[exp != 0])/exp[exp != 0])) * 100
+        if len(model) > 1 and len(exp) > 1:
+            res = np.mean(np.abs((model[exp != 0] - exp[exp != 0])/exp[exp != 0])) * 100
+            if math.isnan(res) == False:
+                return res
+            else:
+                return 0.0
 
         else:
             if float(exp[0]) != 0.0:
@@ -757,6 +761,13 @@ class Comparison:
                     else:
                         mode = 'isotherm'
 
+                    # search for experimental data to match model data
+
+                    for l in range(len(exp_data)):
+                        test_set = exp_data[l]
+                        if test_set["params"] == mod_mes["params"]:
+                            exp_mes = test_set
+
                     exp_mes, mod_mes, changed = self.check_xy_swap(exp_mes, mod_mes, mode)
 
                     exp_mes_data = exp_mes['measurements']
@@ -779,7 +790,7 @@ class Comparison:
                     min_value = min(mes_var_vals)
 
                     for datarow in exp_mes_data:
-                        if datarow == ['P / bar', 'x₁', 'y₁'] or datarow == ['P / bar', 'x₁ᵅ', 'x₁ᵝ', 'y₁'] or datarow == header or len(datarow) != 3:
+                        if datarow == ['P / bar', 'x₁', 'y₁'] or datarow == ['T / K', 'x₁', 'y₁'] or datarow == ['P / bar', 'x₁ᵅ', 'x₁ᵝ', 'y₁'] or datarow == header or len(datarow) != 3:
                             continue
 
                         # serach for closest value
@@ -791,7 +802,7 @@ class Comparison:
                         closest_row = []
 
                         for row in mod_mes_data:
-                            if row == header:
+                            if row == header or type(row[0]) == type(''):
                                 continue
                             new_dist_abs = abs(search_val - row[0])
                             new_dist = search_val - row[0]

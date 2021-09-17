@@ -88,6 +88,27 @@ class Test05(unittest.TestCase):
         self.assertIsNotNone(erg["model_res"])
         self.comp.write_results_file(erg)
 
+@unittest.skip("Skipping Test06")
+class Test06(unittest.TestCase):
+
+    def setUp(self):
+        global comp
+        self.comp = comp
+
+    def test_system_results(self):
+
+        res_path = os.path.join(self.comp.result_dir, self.comp.model, self.comp.test_name +'.json')
+        path = os.path.join(sys.path[0],'..', '..', 'Datenbank', 'Modelle', self.comp.model)
+
+        with open(res_path, 'r') as file:
+            res = json.loads(file.read())
+
+        system = 'WATER_n-BUTANE'
+
+        erg = self.comp.calc_sys_results(system, res)
+        self.assertIsNotNone(erg)
+        
+
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)
