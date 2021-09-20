@@ -336,8 +336,8 @@ class Comparison:
         # get model data
         
         system = []
-        system[0] = sys.split('_')[0]
-        system[1] = sys.split('_')[1]
+        system.append(sys.split('_')[0])
+        system.append(sys.split('_')[1])  
         
         mod_path = os.path.join(self.data_dir, 'Modelle', self.model ,sys +'.json')
         exp_path = os.path.join(self.data_dir, 'Experimente' ,sys + '.json')
@@ -712,7 +712,7 @@ class Comparison:
 
                     # check if variables need to be switched
 
-                    if mod_mes_data[0][0] == 'T /K':
+                    if mod_mes_data[0][0].replace(" ", "") == 'T/K':
                         mode = 'isobar'
                     else:
                         mode = 'isotherm'

@@ -7,11 +7,11 @@
 
 Um die Bewertung eines Modells vornehmen zu können, sind einige Bedingungen notwendig. Die experimentellen Daten müssen in einem standardisierten Format zur Verfügung stehen. Die Daten des Modells müssen, sofern das möglich ist, berechnet und anschließend gespeichert werden. Um die Bewertung zu vereinfachen, sollte die Art und Weise, wie die experimentellen Daten und die Daten des Modells gespeichert werden identisch sein. Wenn die experimentellen Daten, sowie die des Modells vorliegen kann der Vergleich und die Bewertung durchgeführt werden. Die Ergebnisse dieses Vergleichs werden, analog zu den Daten, in einem standardisierten Format gespeichert. Als Datenformat bietet sich \texttt{.json} an.
 
-Die Implementierung lässt sich, anhand des beschriebenen Vorgehens, in drei verschiedene Bestandteile aufteilen, welche in den folgenden Abschnitten näher erläutert werden.
+Die Implementierung lässt sich, anhand des beschriebenen Vorgehens, in drei verschiedene Bestandteile aufteilen, welche in den folgenden Abschnitten näher erläutert werden. Der gesamte Quellcode, welcher zur Durchführung des Benchmarks benötigt wird, liegt im Ordner \texttt{Software/dev}.
 
 \section{Datenbank}
 
-Die Klasse \texttt{database} dient zur Bereitstellung und Speicherung aller benötigten Daten. Diese Daten beinhalten sowohl die der Experimente, als auch die des Modells. Die Klasse Datenbank erzeugt im gleichnamigen Ordner für jedes Gemisch eine eigene Datei, in der alle Daten im \textit{.json} Format abgelegt sind. Der beispielhafte Aufbau einer Gemischdatei ist in \autoref{code: beispielgemisch} dargestellt.
+Die Klasse \texttt{database} dient zur Bereitstellung und Speicherung aller benötigten Daten. Diese Daten beinhalten sowohl die der Experimente, als auch die des Modells. Die Klasse Datenbank erzeugt für jedes Gemisch eine eigene Datei, in der alle Daten im \textit{.json} Format abgelegt sind. Die Dateien werden im Ordner \texttt{Datenbank/Experimente} abgelegt. Der beispielhafte Aufbau einer Gemischdatei ist in \autoref{code: beispielgemisch} dargestellt.
 
 \definecolor{codehighlight}{rgb}{0.95,0.8,0.8}
 \lstinputlisting[language=Python, caption=Gemischdatei Beispiel, basicstyle=\fontsize{7}{8}\selectfont\ttfamily
@@ -22,7 +22,7 @@ Der Schlüssel \texttt{BAC} dient der Klassifizierung des Gemisches, wie in \aut
 
 Eine Messreihe ist durch ihre Quelle unter dem Punkt \texttt{reference}, die Parameter der Messung unter dem Punkt \texttt{params}, und die Messdaten unter dem Punkt \texttt{measurements} charakterisiert.
 
-Somit stehen alle experimentellen Daten in computerlesbaren Format zur Verfügung.
+Somit stehen alle experimentellen Daten in computerlesbaren Format zur Verfügung. Die Datenbank muss einmalig erzeugt werden, was mit nach dem erfolgreichen ausführen der Testdatei \texttt{test\_database.py} geschehen sein sollte.
 
 \section{Modell}
 
@@ -38,11 +38,13 @@ Der Ablauf der Berechnung für ein Gemisch ist in \autoref{fig: model_berechnung
 \end{figure}
 
 Für jedes Gemisch werden die folgenden Schritte für jede zu berechnende Größe durchgeführt. Als erster Schritt wird das zu berechnende Gemisch festgelegt. Anschließend werden alle vorhandenen experimentellen Daten aus der entsprechenden \texttt{.json} Datei eingelesen. Die hier eingelesenen Daten bestimmen was das Modell berechnen soll. Es werden alle Größen, die für das Gemisch gefunden wurden nacheinander berechnet. Bevor das Modell aufgerufen wird, wird getestet ob das Modell die Daten für das Gemisch überhaupt berechnen kann. Dieser Test basiert auf den Parametern, die für das Modell vorhanden sind. Ist ein Stoff an dem Gemisch beteiligt für den das Modell keine Parameter, hat kann das Modell keine Ergebnisse berechnen. Dieses Gemisch wird übersprungen.
-Kann das Modell die geforderten Daten berechnen wird es aufgerufen und wenn kein Fehler bei der Berechnung auftritt werden die Daten gespeichert. Andernfalls wird versucht den nächsten Datenpunkt zu berechnen. Die Datei mit den Berechnungsergebnissen des Modells hat den gleichen Aufbau, wie die der experimentellen Daten aus Listing \autoref{code: beispielgemisch}
+Kann das Modell die geforderten Daten berechnen wird es aufgerufen und wenn kein Fehler bei der Berechnung auftritt werden die Daten gespeichert. Andernfalls wird versucht den nächsten Datenpunkt zu berechnen. Die Datei mit den Berechnungsergebnissen des Modells hat den gleichen Aufbau, wie die der experimentellen Daten aus Listing \autoref{code: beispielgemisch}. Alle Modellergebnisse werden unter dem Ordner \texttt{Datenbank/Modelle/<Modellname>} gespeichert.
+
+Im Falle der Berechnung von Phasengleichgewichten ist die Klasse \texttt{model} zusätzlich in Lage die berechneten Ergebnisse und die des zugehörigen Experiments in einem Phasendiagramm darzustellen. Alle Phasendiagramme sind im Ordner \texttt{Diagramme/<Modellname>} zu finden. Die das Phasendiagramm charakterisierenden Parameter sowie die beteiligten Stoffe, können dem Dateinamen des Diagramms entnommen werden.
 
 \section{Bewertung}
 
-Die Klasse Bewertung dient dazu den Vergleich der experimentellen und den aus dem Modell berechneten Daten durchzuführen. Als Ergebnis werden die Teilnoten der betrachteten Systeme und Klassen, sowie die Gesamtnote des Modells berechnet.
+Die Klasse Bewertung dient dazu den Vergleich der experimentellen und den aus dem Modell berechneten Daten durchzuführen. Als Ergebnis werden die Teilnoten der betrachteten Systeme und Klassen, sowie die Gesamtnote des Modells berechnet. Die Modellergebnisse sind im Ordner \texttt{Ergebnisse/<Modellname>} zu finden. In der zu dem Text gehördenden \texttt{.json} Datei sind sowohl die Gesamtergebnisse der Klassen und des Modells, sowie die Einzelergebnisse der beteiligten Systeme hierarchisch aufgeführt.
 
 \subsection{Bewertung Mischungswärmekapazität und Mischungsenthalpie}
 
@@ -52,14 +54,49 @@ Dies stimmt auch für die Mischungswärmekapazität.
 
 \subsection{Bewertung Phasengleichgewichte}
 
-Für die Bewertung der Phasengleichgewichte müssen die Daten des Modells und die experimentellen Daten zusammengeführt werden. Das Modell berechnet typischerweise eine weit aus größere Anzahl an Datenpunkt als im experimentellen Datensatz vorliegen.  Um die experimentellen Datenpunkte in denen des Modells zu finden wird zuerst der korrekte Datensatz gesucht. Im Falle eines isobaren Phasengleichgewichts ist dies der Datensatz ,welcher als Parameter den gleichen Druck $p$ enthält. Für ein isothermes Phasengleichgewicht wird anstatt des Drucks $p$ nach der identischen Temperatur $T$ als Parameter gesucht. Kann der Datensatz nicht gefunden werden, wird mit dem nächsten fortgefahren.
+Für die Bewertung der Phasengleichgewichte müssen die Daten des Modells und die experimentellen Daten zusammengeführt werden. Das Modell berechnet typischerweise eine weit aus größere Anzahl an Datenpunkten als im experimentellen Datensatz vorliegen.  Um die experimentellen Datenpunkte in denen des Modells zu finden wird zuerst der korrekte Datensatz gesucht. Im Falle eines isobaren Phasengleichgewichts ist dies der Datensatz, welcher als Parameter den gleichen Druck $p$ enthält. Für ein isothermes Phasengleichgewicht wird anstatt des Drucks $p$ nach der identischen Temperatur $T$ als Parameter gesucht. Kann der Datensatz nicht gefunden werden, wird mit dem nächsten fortgefahren.
 
-Ist der Datensatz vorhanden wird in Berechnungsergebnissen nach dem Punkt gesucht der die kleinste Abweichung vom zweiten Parameter hat. Für ein isothermes Phasengleichgewicht ist dies der Druck $p$ und für ein isobares die Temperatur $T$. Liegt der gefundene Datenpunkt außerhalb des Modells wird der Datenpunkt verworfen und mit dem nächsten fortgefahren. Ein experimenteller Datenpunkt liegt außerhalb des Modells, wenn die Größe des zweiten Parameters kleiner als der minimale oder größer als der maximale vom Modell berechnete Wert ist. Anschließend werden die entsprechenden Molenbrüche der Flüssigkeit $x$ und der Gasphase $y$ zwischengespeichert.
+Ein Punkt, welcher bei der korrekten Bewertung des Phasengleichgewichts eine entscheidende Rolle spielt, ist die Lage des Phasengleichgewichts. Das heißt für welche der beteiligten Komponenten der Molenbruch auf der x-Achse aufgetragen wurde. Da dies in den experimentellen Daten nicht immer auf die gleiche Art und Weise vorgenommen wurde, ist die Lagebestimmung notwendig. Das Vorgehen zu Lagebestimmung ist in \autoref{fig: phasediagrammlage} dargestellt.
 
-Sind alle Datensätze durchsucht worden, werden die zwischengespeicherten Molenbrüche miteinander verglichen und bewertetet.
+\begin{figure}[htb]
+	\centering
+	\includegraphics[scale=0.6]{phasendiagrammlage}
+	\caption{Vorgehen bei der Lagebestimmung der Modelldaten im Phasendiagramm}
+	\label{fig: phasediagrammlage}
+\end{figure}
 
-\subsection{Bewertung azetroper Punkt} 
+Als erstes werden die experimentellen und vom Modell berechneten Daten an die Methode übergeben und von dieser eingelesen. Als nächstes werden die Endpunkte bestimmt. Als Endpunkte werden hier die Punkte mit dem größten und kleinsten Molenbruch definiert. Im Idealfall liegen in den experimentellen Daten Datenpunkte bei $x = 0$ und $ x = 1$ vor oder es gibt Punkte, welche nicht weit von diesen Punkten entfernt liegen. Diese Punkte können mit den Reinstoffgrößen der beteiligten Komponenten verglichen werden um die Lage im Diagramm eindeutig zu definieren. Die Reinstoffgrößen werden ebenfalls mit \texttt{TREND} berechnet. Sofern die Berechnung erfolgreich verläuft, wird der Abstand der Endpunkte von den Reinstoffgrößen berechnet und basierend darauf entschieden, ob die Lage der  Modelldaten zu den experimentellen Daten passt oder nicht. Wenn die Berechnung einen Fehler erzeugt, werden anstatt der Reinstoffdaten die Endpunkte des Modells im Vergleich verwendet. Wenn die Lage der Modelldaten zu der Lage der experimentellen Daten passt werden diese, so wie sie der Methode übergeben worden sind, wieder zurückgegeben. Sollten die Lagen nicht zueinander passen, werden die Molenbrüche der Modelldaten invertiert und die neuen Modelldaten mit den experimentellen Daten zurückgegeben.
 
+Im nun korrekt orientierten Datensatz wird nach dem Punkt im Modelldatensatz gesucht, welcher die kleinste Abweichung vom zweiten Parameter des experimentellen Datensatzes hat. Für ein isothermes Phasengleichgewicht ist dies der Druck $p$ und für ein isobares die Temperatur $T$. Liegt der gefundene Datenpunkt außerhalb des Modells wird der Datenpunkt verworfen und mit dem nächsten fortgefahren. Ein experimenteller Datenpunkt liegt außerhalb des Modells, wenn die Größe des zweiten Parameters kleiner als der minimale oder größer als der maximale vom Modell berechnete Wert ist. Das in \autoref{fig: phase_eq_datenausschluss} isotherme Phasengleichgewicht ist ein Beispiel für den Fall, dass alle experimentellen Punkte außerhalb des Modells liegen. 
+
+\begin{figure}[htb]
+	\centering
+	\includegraphics[scale=0.6]{DICHLOROMETHANE_CARBON DISULFIDE_isotherm_298.15_}
+	\caption{Isothermes Phasengleichgewicht bei $ 298.15 K$ für das Stoffgemisch Dichlormethan|Kohlenstoffdisulfid}
+	\label{fig: phase_eq_datenausschluss}
+\end{figure}
+
+Anschließend werden die entsprechenden Molenbrüche der Flüssigkeit $x$ und der Gasphase $y$ für diesen Punkt zwischengespeichert.
+
+Sind alle Datensätze und Datenpunkte durchsucht worden, werden die zwischengespeicherten Molenbrüche miteinander verglichen und bewertetet.
+
+\subsection{Bewertung azetroper Punkt}
+
+Für die Bewertung des azeotropen Punkts werden die Modelldaten dieses Punktes benötigt. Da es keine direkte Berechnungsmethode in \texttt{TREND} für diese Größe gibt wird dieser aus den berechneten Phasengleichgewichtsdaten extrahiert. Die Methode durchsucht nur diejenigen Stoffgemische, bei denen in den experimentellen Phasengleichgewichten azeotrope Punkte vermerkt wurden. Da der azeotrope Druck als Bewertungsgröße definiert ist, werden nur isotherme Phasengleichgewichte betrachtet, da nur hier der Druck berechnet und verändert wird. Um den azeotropen Punkt zu finden wird nach dem Maximum bzw. Minimum des Drucks in den Daten gesucht und die zugehörigen Molenbrüche gespeichert. Azeotrope Gemische können als Druckmaximumazetrope wie in \autoref{fig: durckmaximumazeotrop} dargestellt oder als Druckminimumazeotrope wie in \autoref{fig: druckminimumazeotrop} zu sehen auftreten. In beiden Fällen wird die Abweichung des vom Modell berechneten Drucks und die Abweichung der vom Modell berechneten Zusammensetzung $x$ von den experimentellen Werten bewertet. Eine separate Bewertung der Zusammensetzung der Dampfphase $y$ ist nicht notwendig, da diese am azeotropen Punkt gleich der der Flüssigphase ist. 
+
+\begin{figure}[htb]
+	\centering
+	\includegraphics[scale=0.6]{ACETONE_N-PENTANE_isotherm_422.6_}
+	\caption{Isothermes Phasengleichgewicht bei $ 422.6 K$ für das Stoffgemisch Azeton|n-Pentan}
+	\label{fig: durckmaximumazeotrop}
+\end{figure}
+
+\begin{figure}[hbt]
+	\centering
+	\includegraphics[scale=0.6]{CHLOROFORM_ACETONE_isotherm_308.15_}
+	\caption{Isothermes Phasengleichgewicht bei $ 308.15 K$ für das Stoffgemisch Chloroform|Azeton}
+	\label{fig: druckminimumazeotrop}
+\end{figure}
 
 \subsection{Bewertung weiterer Zustandsgrößen}
 

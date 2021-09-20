@@ -39,6 +39,8 @@ class Model:
         self.systems = self.get_systems()
         self.model_name = model_name
 
+        self.delete_diags = False
+
         self.model = "SRK"
         
         self.ceate_model_dir()
@@ -248,8 +250,15 @@ class Model:
         path = os.path.join(self.data_dir,'../../Diagramme', self.model_name, system[0]+ "_" + system[1] + "_" + mode + "_" + str(param) + "_" + ".png")
         
         if os.path.exists(path):
-            self.log.info("{} Diag for {} | {} already exsists for parameter {}".format(mode, system[0], system[1], param))
-            return
+
+            if self.delete_diags == True:
+                os.remove(path)
+                self.log.info("Deleted {} Diag for {} | {} for parameter {}".format(mode, system[0], system[1], param))
+            
+            else:
+                
+                self.log.info("{} Diag for {} | {} already exsists for parameter {}".format(mode, system[0], system[1], param))
+                return
 
         if model_data['measurements'][0][1:3] != ['x₁', 'y₁']:
             return
