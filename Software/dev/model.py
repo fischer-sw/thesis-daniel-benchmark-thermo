@@ -27,6 +27,7 @@ class Model:
         Constructor of database class
 
         """
+
         if logger == None:
             self.log = logging.getLogger(__file__)
         else:
@@ -56,7 +57,7 @@ class Model:
         # keys to delete from all model data dicts
 
         # self.del_keys = ['Isothermal phase equilibrium data', 'Isobaric phase equilibrium data', 'Azeotropic point']
-        self.del_keys = ['Azeotropic point']
+        self.del_keys = []
 
 
 
@@ -89,9 +90,11 @@ class Model:
         self.COSMOparam[19] = 76.89
         self.COSMOparam[20] = 85.37 
 
-    def check_xy_swap(self, exp_data, model_data, mode):
+    def check_xy_swap(self, system, exp_data, model_data, mode):
     
         swap = False
+        exp_x_system = system[0]
+
 
         # get first and last elements of data
 
@@ -113,10 +116,70 @@ class Model:
         }
 
 
-        diff = [abs(model_check_data['first'][0] - exp_check_data['first'][0]), abs(model_check_data['first'][0] - exp_check_data['last'][0]), abs(model_check_data['last'][0] - exp_check_data['first'][0]), abs(model_check_data['last'][0] - exp_check_data['last'][0])]
 
-        if diff[0] > diff[1] and diff[3] > diff[2]: 
+        if mode == 'isotherm':
+
+            var = 'Tvap'
+            par = "T / K "
+
+            par_val = model_data['params'][par]
+
+            value_comp1, error_comp1 = self.calc_vap_pres(system[0], var, par_val) #MPa
+            value_comp2, error_comp2 = self.calc_vap_pres(system[1], var, par_val) #MPa
+
+            if error_comp1.value == 0 and error_comp2.value == 0:
+
+                value_comp1 = value_comp1 * 10
+                value_comp2 = value_comp2 * 10
+            
+            else:
+
+                diff = [abs(model_check_data['first'][0] - exp_check_data['first'][0]), abs(model_check_data['first'][0] - exp_check_data['last'][0]), abs(model_check_data['last'][0] - exp_check_data['first'][0]), abs(model_check_data['last'][0] - exp_check_data['last'][0])]
+
+                if diff[0] > diff[1] and diff[3] > diff[2]: 
+                    swap = True
+
+        else:
+
+            var = 'pvap'
+            par = "P / bar "
+
+            par_val = model_data['params'][par]
+
+            value_comp1, error_comp1 = self.calc_vap_pres(system[0], var, par_val)
+            value_comp2, error_comp2 = self.calc_vap_pres(system[1], var, par_val)
+
+            
+            if error_comp1.value != 0 and error_comp2.value != 0:
+
+                diff = [abs(model_check_data['first'][0] - exp_check_data['first'][0]), abs(model_check_data['first'][0] - exp_check_data['last'][0]), abs(model_check_data['last'][0] - exp_check_data['first'][0]), abs(model_check_data['last'][0] - exp_check_data['last'][0])]
+
+                if diff[0] > diff[1] and diff[3] > diff[2]: 
+                    swap = True
+
+
+        diff_model = [abs(value_comp1 - model_check_data['first'][0]), abs(value_comp2 - model_check_data['first'][0]), abs(value_comp1 - model_check_data['last'][0]), abs(value_comp2 - model_check_data['last'][0])]
+
+        if diff_model[0] < diff_model[1] or diff_model[2] > diff_model[3]:
+            model_x_system = system[1]
+        else:
+            model_x_system = system[0]
+
+
+
+        diff_exp = [abs(value_comp1 - exp_check_data['first'][0]), abs(value_comp2 - exp_check_data['first'][0]), abs(value_comp1 - exp_check_data['last'][0]), abs(value_comp2 - exp_check_data['last'][0])]
+
+        if diff_exp[0] < diff_exp[1] or diff_exp[2] > diff_exp[3]:
+            exp_x_system = system[1]
+        else:
+            exp_x_system = system[0]
+
+        
+        if model_x_system != exp_x_system:
             swap = True
+
+
+        
         
 
         tmp_model = {
@@ -133,7 +196,7 @@ class Model:
                 tmp_model['measurements'].append([model_data['measurements'][i][0], model_data['measurements'][i][1], model_data['measurements'][i][2]])       
 
 
-        return exp_data, tmp_model, swap
+        return exp_data, tmp_model, exp_x_system
 
 
     def read_mappings(self, filename):
@@ -296,7 +359,8 @@ class Model:
         if model_data['measurements'][0][1:3] != ['x₁', 'y₁']:
             return
 
-        exp_data , model_data, changed = self.check_xy_swap(exp_data, model_data , mode)
+        exp_data , model_data, exp_x_system = self.check_xy_swap(system, exp_data, model_data , mode)
+
 
         model_data_mes = model_data["measurements"]
         exp_data_mes = exp_data["measurements"]
@@ -364,7 +428,7 @@ class Model:
 
         # set labels
         
-        x_label = "$x_{" + system[0] + "}$"
+        x_label = "$x_{" + exp_x_system + "}$"
 
         plt.xlabel(x_label)
 
@@ -765,7 +829,7 @@ class Model:
                             exp_dataset = exp_data['Isothermal phase equilibrium data'][n]
                             break
 
-                    exp_dataset, model_dataset, changed = self.check_xy_swap(exp_dataset, model_dataset, 'isotherm')
+                    exp_dataset, model_dataset, exp_x_system = self.check_xy_swap(system, exp_dataset, model_dataset, 'isotherm')
 
                     p_vals = np.array(list(list(zip(*model_dataset['measurements'][1:]))[0]))
 
@@ -896,6 +960,36 @@ class Model:
 
         return hE, errmix
 
+    def calc_vap_pres(self, component, var , var_val):
+        
+
+        
+        fld_name = self.fluid_mappings[component]
+
+        if var == 'Tvap':
+            calc_var = 'p'
+        else:
+            calc_var = 'T'
+            var_val = var_val / 10
+
+        eqtype = 2 #Reinstoffgleichung: 1: Hochgenau, 2: SRK, 3: PR, 4: LKP, 6: PC-SAFT
+        mixtype = 22 
+
+        fld1 = Fluid(var, calc_var,[fld_name],[1.0],[eqtype],mixtype,self.trend_path,'molar',self.dll_path)
+
+        var_res, errmix = fld1.TREND_EOS_FIT(var_val, var_val, self.COSMOparam)
+
+        if errmix.value == 0:
+            self.log.info("{}, {} = {}".format(component, calc_var, var_res))
+
+        else:
+            self.log.info("{} {} calculation not possible. error = {}".format(component, var, errmix.value))
+            
+            
+        return var_res, errmix
+
+        
+
     def calc_heat_capa(self, system, temp, press, x):
         
         fldmix = None
@@ -958,6 +1052,7 @@ class Model:
 
         tmp_path = ''
         
+
         p_points_array, T_points_array, x_points, rhovap_points, rholiq_points, points, error = fldmix.PTXDIAG_FIT(var_val, self.COSMOparam, tmp_path)
 
         if error.value != 0:

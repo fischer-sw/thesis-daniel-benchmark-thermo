@@ -34,7 +34,7 @@ class Test01(unittest.TestCase):
     def test_constructor(self):
         self.assertIsNotNone(self.model)
 
-# @unittest.skip("Skipping Test02")
+@unittest.skip("Skipping Test02")
 class Test02(unittest.TestCase):
     
     def setUp(self):
@@ -70,12 +70,12 @@ class Test04(unittest.TestCase):
 
     def test_sys_diag(self):
 
-        system = ['ETHANOL', 'WATER']
+        system = ['ARGON', 'METHANE']
 
         self.model.create_system_diags(system)
 
 
-@unittest.skip("Skipping Test05")
+# @unittest.skip("Skipping Test05")
 class Test05(unittest.TestCase):
     
     def setUp(self):
