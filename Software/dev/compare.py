@@ -8,6 +8,7 @@ import numpy as np
 import logging
 
 
+from check_phase_eq_direction import *
 
 
 
@@ -334,7 +335,9 @@ class Comparison:
         """
         # get model data
         
-
+        system = []
+        system[0] = sys.split('_')[0]
+        system[1] = sys.split('_')[1]
         
         mod_path = os.path.join(self.data_dir, 'Modelle', self.model ,sys +'.json')
         exp_path = os.path.join(self.data_dir, 'Experimente' ,sys + '.json')
@@ -361,7 +364,7 @@ class Comparison:
 
             if key == "Critical point":
                 vals = [["P", "x1"],["x2"]]
-                mod_res, exp_res = self.get_param_data(mod_sets, exp_sets, 'Critical point', vals)
+                mod_res, exp_res = self.get_param_data(mod_sets, exp_sets, 'Critical point', vals, system)
 
                 MPAE_p = self.MAPE(mod_res["P"], exp_res["P"])
                 MPAE_x1 = self.MAPE(mod_res["x1"], exp_res["x1"])
@@ -378,7 +381,7 @@ class Comparison:
             elif key == "Azeotropic point":
                 
                 vals = [["x1"],["x2"]]
-                mod_res, exp_res = self.get_param_data(mod_sets, exp_sets, 'Azeotropic point', vals)
+                mod_res, exp_res = self.get_param_data(mod_sets, exp_sets, 'Azeotropic point', vals, system)
                 
                 # add P mod_res
                 mod_res["P"] = []
@@ -407,7 +410,7 @@ class Comparison:
 
                 
 
-                mod_res, exp_res = self.get_param_data(mod_sets, exp_sets, 'phase equilibrium data', vals)
+                mod_res, exp_res = self.get_param_data(mod_sets, exp_sets, 'phase equilibrium data', vals, system)
                 
                 # check if enough data is available
                 if mod_res["x1"] == [] or mod_res["x2"] == [] or mod_res["y1"] == [] or mod_res["y2"] == []:
@@ -519,7 +522,7 @@ class Comparison:
             elif key == "Enthalpy of mixing":
                 
                 vals = [["h_mix"],[]]
-                mod_res, exp_res = self.get_param_data(mod_sets, exp_sets, 'Enthalpy of mixing', vals)
+                mod_res, exp_res = self.get_param_data(mod_sets, exp_sets, 'Enthalpy of mixing', vals, system)
                 
                 name = vals[0][0]
 
@@ -551,7 +554,7 @@ class Comparison:
             elif key == "Heat capacity of mixing":
 
                 vals = [["cp_mix"],[]]
-                mod_res, exp_res = self.get_param_data(mod_sets, exp_sets, 'Heat capacity of mixing', vals)
+                mod_res, exp_res = self.get_param_data(mod_sets, exp_sets, 'Heat capacity of mixing', vals, system)
                 
                 name = vals[0][0]
 
@@ -614,54 +617,7 @@ class Comparison:
                 return 0.0
 
 
-    def check_xy_swap(self, exp_data, model_data, mode):
-
-        swap = False
-
-        # get first and last elements of data
-
-        x1_exp = np.array(list(list(zip(*exp_data['measurements'][1:]))[1]))
-        x1_exp_1_idx = np.argmax(x1_exp) + 1
-        x1_exp_0_idx = np.argmin(x1_exp) + 1
-        x1_mod = np.array(list(list(zip(*model_data['measurements'][1:]))[1]))
-        x1_mod_1_idx = np.argmax(x1_mod) + 1
-        x1_mod_0_idx = np.argmin(x1_mod) + 1
-
-        model_check_data = {
-            'first' : model_data['measurements'][x1_mod_0_idx],
-            'last' : model_data['measurements'][x1_mod_1_idx],
-        }
-
-        exp_check_data = {
-            'first' : exp_data['measurements'][x1_exp_0_idx],
-            'last' : exp_data['measurements'][x1_exp_1_idx],
-        }
-
-
-        diff = [abs(model_check_data['first'][0] - exp_check_data['first'][0]), abs(model_check_data['first'][0] - exp_check_data['last'][0]), abs(model_check_data['last'][0] - exp_check_data['first'][0]), abs(model_check_data['last'][0] - exp_check_data['last'][0])]
-
-        if diff[0] > diff[1] and diff[3] > diff[2]: 
-            swap = True
-        
-
-        tmp_model = {
-            "measurements" : [model_data["measurements"][0]],
-            "params" : model_data["params"]
-        }
-
-        if swap == True:
-            for i in range(1,len(model_data["measurements"])):
-                tmp_model['measurements'].append([model_data['measurements'][i][0], 1 - model_data['measurements'][i][1], 1 - model_data['measurements'][i][2]])       
-
-        else:
-            for i in range(1,len(model_data["measurements"])):
-                tmp_model['measurements'].append([model_data['measurements'][i][0], model_data['measurements'][i][1], model_data['measurements'][i][2]])       
-
-
-        return exp_data, tmp_model, swap
-
-
-    def get_param_data(self, model_data, exp_data, param, values):
+    def get_param_data(self, model_data, exp_data, param, values, system):
         """ Function to get parameter data
 
         Arguments:
@@ -768,7 +724,7 @@ class Comparison:
                         if test_set["params"] == mod_mes["params"]:
                             exp_mes = test_set
 
-                    exp_mes, mod_mes, changed = self.check_xy_swap(exp_mes, mod_mes, mode)
+                    exp_mes, mod_mes, changed = check_xy_swap(self.log, system, exp_mes, mod_mes, mode)
 
                     exp_mes_data = exp_mes['measurements']
 
