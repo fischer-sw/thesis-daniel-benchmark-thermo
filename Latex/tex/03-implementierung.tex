@@ -65,7 +65,7 @@ Ein Punkt, welcher bei der korrekten Bewertung des Phasengleichgewichts eine ent
 	\label{fig: phasediagrammlage}
 \end{figure}
 
-Als erstes werden die experimentellen und vom Modell berechneten Daten an die Methode übergeben und von dieser eingelesen. Als nächstes werden die Endpunkte bestimmt. Als Endpunkte werden hier die Punkte mit dem größten und kleinsten Molenbruch definiert. Im Idealfall liegen in den experimentellen Daten Datenpunkte bei $x = 0$ und $ x = 1$ vor oder es gibt Punkte, welche nicht weit von diesen Punkten entfernt liegen. Diese Punkte können mit den Reinstoffgrößen der beteiligten Komponenten verglichen werden um die Lage im Diagramm eindeutig zu definieren. Die Reinstoffgrößen werden ebenfalls mit \texttt{TREND} berechnet. Sofern die Berechnung erfolgreich verläuft, wird der Abstand der Endpunkte von den Reinstoffgrößen berechnet und basierend darauf entschieden, ob die Lage der  Modelldaten zu den experimentellen Daten passt oder nicht. Wenn die Berechnung einen Fehler erzeugt, werden anstatt der Reinstoffdaten die Endpunkte des Modells im Vergleich verwendet. Wenn die Lage der Modelldaten zu der Lage der experimentellen Daten passt werden diese, so wie sie der Methode übergeben worden sind, wieder zurückgegeben. Sollten die Lagen nicht zueinander passen, werden die Molenbrüche der Modelldaten invertiert und die neuen Modelldaten mit den experimentellen Daten zurückgegeben.
+Als erstes werden die experimentellen und vom Modell berechneten Daten an die Methode übergeben und von dieser eingelesen. Als nächstes werden die Endpunkte bestimmt. Als Endpunkte werden hier die Punkte mit dem größten und kleinsten Molenbruch definiert. Im Idealfall liegen in den experimentellen Daten Datenpunkte bei $x = 0$ und $ x = 1$ vor oder es gibt Punkte, welche nicht weit von diesen Punkten entfernt liegen. Diese Punkte können mit den Reinstoffgrößen der beteiligten Komponenten verglichen werden um die Lage im Diagramm eindeutig zu definieren. Die Reinstoffgrößen werden ebenfalls mit \texttt{TREND} berechnet. Sofern die Berechnung erfolgreich verläuft, wird der Abstand der Endpunkte von den Reinstoffgrößen berechnet und basierend darauf entschieden, ob die Lage der  Modelldaten zu den experimentellen Daten passt oder nicht. Wenn die Berechnung einen Fehler erzeugt, werden anstatt der Reinstoffdaten die Endpunkte des Modells im Vergleich verwendet. Wenn die Lage der Modelldaten zu der Lage der experimentellen Daten passt werden diese, so wie sie der Methode übergeben worden sind, wieder zurückgegeben. Sollten die Lagen nicht zueinander passen, werden die Molenbrüche der Modelldaten invertiert und die neuen Modelldaten mit den experimentellen Daten zurückgegeben. Die Methode, welche für die Lageerkennung zuständig ist befindet sich in der Datei \texttt{check\_phase\_eq\_direction.py}, da diese sowohl in der Klasse \texttt{model} als auch in der Klasse \texttt{compare} benötigt wird.
 
 Im nun korrekt orientierten Datensatz wird nach dem Punkt im Modelldatensatz gesucht, welcher die kleinste Abweichung vom zweiten Parameter des experimentellen Datensatzes hat. Für ein isothermes Phasengleichgewicht ist dies der Druck $p$ und für ein isobares die Temperatur $T$. Liegt der gefundene Datenpunkt außerhalb des Modells wird der Datenpunkt verworfen und mit dem nächsten fortgefahren. Ein experimenteller Datenpunkt liegt außerhalb des Modells, wenn die Größe des zweiten Parameters kleiner als der minimale oder größer als der maximale vom Modell berechnete Wert ist. Das in \autoref{fig: phase_eq_datenausschluss} isotherme Phasengleichgewicht ist ein Beispiel für den Fall, dass alle experimentellen Punkte außerhalb des Modells liegen. 
 
@@ -80,21 +80,21 @@ Anschließend werden die entsprechenden Molenbrüche der Flüssigkeit $x$ und de
 
 Sind alle Datensätze und Datenpunkte durchsucht worden, werden die zwischengespeicherten Molenbrüche miteinander verglichen und bewertetet.
 
-\subsection{Bewertung azetroper Punkt}
+\subsection{Bewertung azeotroper Punkt}
 
 Für die Bewertung des azeotropen Punkts werden die Modelldaten dieses Punktes benötigt. Da es keine direkte Berechnungsmethode in \texttt{TREND} für diese Größe gibt wird dieser aus den berechneten Phasengleichgewichtsdaten extrahiert. Die Methode durchsucht nur diejenigen Stoffgemische, bei denen in den experimentellen Phasengleichgewichten azeotrope Punkte vermerkt wurden. Da der azeotrope Druck als Bewertungsgröße definiert ist, werden nur isotherme Phasengleichgewichte betrachtet, da nur hier der Druck berechnet und verändert wird. Um den azeotropen Punkt zu finden wird nach dem Maximum bzw. Minimum des Drucks in den Daten gesucht und die zugehörigen Molenbrüche gespeichert. Azeotrope Gemische können als Druckmaximumazetrope wie in \autoref{fig: durckmaximumazeotrop} dargestellt oder als Druckminimumazeotrope wie in \autoref{fig: druckminimumazeotrop} zu sehen auftreten. In beiden Fällen wird die Abweichung des vom Modell berechneten Drucks und die Abweichung der vom Modell berechneten Zusammensetzung $x$ von den experimentellen Werten bewertet. Eine separate Bewertung der Zusammensetzung der Dampfphase $y$ ist nicht notwendig, da diese am azeotropen Punkt gleich der der Flüssigphase ist. 
 
 \begin{figure}[htb]
 	\centering
-	\includegraphics[scale=0.6]{ACETONE_N-PENTANE_isotherm_422.6_}
-	\caption{Isothermes Phasengleichgewicht bei $ 422.6 K$ für das Stoffgemisch Azeton|n-Pentan}
+	\includegraphics[scale=0.57]{ACETONE_N-PENTANE_isotherm_422.6_}
+	\caption{Isothermes Phasengleichgewicht bei $ 422$.$6 K$ für das Stoffgemisch Azeton|n-Pentan}
 	\label{fig: durckmaximumazeotrop}
 \end{figure}
 
 \begin{figure}[hbt]
 	\centering
-	\includegraphics[scale=0.6]{CHLOROFORM_ACETONE_isotherm_308.15_}
-	\caption{Isothermes Phasengleichgewicht bei $ 308.15 K$ für das Stoffgemisch Chloroform|Azeton}
+	\includegraphics[scale=0.57]{CHLOROFORM_ACETONE_isotherm_308.15_}
+	\caption{Isothermes Phasengleichgewicht bei $ 308$.$15 K$ für das Stoffgemisch Chloroform|Azeton}
 	\label{fig: druckminimumazeotrop}
 \end{figure}
 

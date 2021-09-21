@@ -394,8 +394,18 @@ class Comparison:
                     exp_res["P"].append(exp_sets[i]["params"]["P / bar "])
 
                 MPAE_p_az = self.MAPE(mod_res["P"], exp_res["P"])
+
+                if MPAE_p_az > 80/3:
+                    MPAE_p_az = 80/3
+
                 MPAE_x1_az = self.MAPE(mod_res["x1"], exp_res["x1"])
                 MPAE_x2_az = self.MAPE(mod_res["x2"], exp_res["x2"])
+
+                if MPAE_x1_az > 40:
+                    MPAE_x1_az = 40
+
+                if MPAE_x2_az > 40:
+                    MPAE_x2_az = 40
                 
                 mark_paz = 20 - 0.75 * MPAE_p_az
 

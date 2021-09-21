@@ -159,10 +159,10 @@ def calc_vap_pres(logger, component, var , var_val):
         var_res, errmix = fld1.TREND_EOS_FIT(var_val, var_val, COSMOparam)
 
         if errmix.value == 0:
-            logger.info("{}, {} = {}".format(component, calc_var, var_res))
+            logger.debug("{}, {} = {}".format(component, calc_var, var_res))
 
         else:
-            logger.info("{} {} calculation not possible. error = {}".format(component, var, errmix.value))
+            logger.debug("{} {} calculation not possible. error = {}".format(component, var, errmix.value))
             
             
         return var_res, errmix
