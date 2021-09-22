@@ -7,6 +7,7 @@ def check_xy_swap(logger, system, exp_data, model_data, mode):
     
         swap = False
         exp_x_system = system[0]
+        error = False
 
 
         # get first and last elements of data
@@ -44,10 +45,11 @@ def check_xy_swap(logger, system, exp_data, model_data, mode):
                 value_comp2 = value_comp2 * 10
             
             else:
-
+                error = True
                 diff = [abs(model_check_data['first'][0] - exp_check_data['first'][0]), abs(model_check_data['first'][0] - exp_check_data['last'][0]), abs(model_check_data['last'][0] - exp_check_data['first'][0]), abs(model_check_data['last'][0] - exp_check_data['last'][0])]
 
-                if diff[0] > diff[1] and diff[3] > diff[2]: 
+                if diff[3] > diff[2]:
+                # if diff[0] > diff[1] and diff[3] > diff[2]:  
                     swap = True
 
         else:
@@ -63,31 +65,33 @@ def check_xy_swap(logger, system, exp_data, model_data, mode):
             
             if error_comp1.value != 0 and error_comp2.value != 0:
 
+                error = True
                 diff = [abs(model_check_data['first'][0] - exp_check_data['first'][0]), abs(model_check_data['first'][0] - exp_check_data['last'][0]), abs(model_check_data['last'][0] - exp_check_data['first'][0]), abs(model_check_data['last'][0] - exp_check_data['last'][0])]
 
-                if diff[0] > diff[1] and diff[3] > diff[2]: 
+                if diff[3] > diff[2]:
+                # if diff[0] > diff[1] and diff[3] > diff[2]: 
                     swap = True
 
+        if error == False:
+            diff_model = [abs(value_comp1 - model_check_data['first'][0]), abs(value_comp2 - model_check_data['first'][0]), abs(value_comp1 - model_check_data['last'][0]), abs(value_comp2 - model_check_data['last'][0])]
 
-        diff_model = [abs(value_comp1 - model_check_data['first'][0]), abs(value_comp2 - model_check_data['first'][0]), abs(value_comp1 - model_check_data['last'][0]), abs(value_comp2 - model_check_data['last'][0])]
-
-        if diff_model[0] < diff_model[1] or diff_model[2] > diff_model[3]:
-            model_x_system = system[1]
-        else:
-            model_x_system = system[0]
+            if diff_model[0] < diff_model[1]:
+                model_x_system = system[0]
+            else:
+                model_x_system = system[1]
 
 
 
-        diff_exp = [abs(value_comp1 - exp_check_data['first'][0]), abs(value_comp2 - exp_check_data['first'][0]), abs(value_comp1 - exp_check_data['last'][0]), abs(value_comp2 - exp_check_data['last'][0])]
+            diff_exp = [abs(value_comp1 - exp_check_data['first'][0]), abs(value_comp2 - exp_check_data['first'][0]), abs(value_comp1 - exp_check_data['last'][0]), abs(value_comp2 - exp_check_data['last'][0])]
 
-        if diff_exp[0] < diff_exp[1] or diff_exp[2] > diff_exp[3]:
-            exp_x_system = system[1]
-        else:
-            exp_x_system = system[0]
+            if diff_exp[0] < diff_exp[1]:
+                exp_x_system = system[0]
+            else:
+                exp_x_system = system[1]
 
-        
-        if model_x_system != exp_x_system:
-            swap = True
+            
+            if model_x_system != exp_x_system:
+                swap = True
 
 
         
