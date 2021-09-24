@@ -407,7 +407,7 @@ class Comparison:
                 if MPAE_x2_az > 40:
                     MPAE_x2_az = 40
                 
-                mark_paz = 20 - 0.75 * MPAE_p_az
+                mark_paz = 20 - 0.5 * MPAE_p_az
 
                 mark_xaz = 20 - 0.5 * (MPAE_x1_az + MPAE_x2_az)/2  
                 

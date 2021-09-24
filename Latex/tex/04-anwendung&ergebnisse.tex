@@ -4,57 +4,7 @@
 
 \chapter{Anwendung}
 
-\section{Zustandsgleichung PSRK}
-
-Um die Methode zu testen und Ergebnisse berechnen zu können wird der Benchmark beispielhaft mit dem in \texttt{TREND} bereits vorhanden thermodynamischen Modell \texttt{PSRK} durchgeführt. Die Abkürzung \texttt{PSRK} steht für \textbf{p}rädiktive \textbf{S}oave-\textbf{R}edlich-\textbf{K}wong.
-
-Die Basisform der \texttt{PSRK} hat folgende Form \cite{HOLDERBAUM1991251}:
-\begin{equation}
-	p = \dfrac{R \cdot T}{v - b}- \dfrac{a(T)}{v \cdot (v + b)}
-\end{equation}
-
-Die Variable $ p $ beschreibt in dieser Gleichung den Druck, $ T $ die Temperatur und $ v $ das molare Volumen. $ R $ ist die universale Gaskonstante. Der Parameter $a$ ist der Kohäsionsparameter und $ b $ ist das Kovolumen. Das Kovolumen $ b $ wird über eine lineare Mischungsregel aus den Reinstoffgrößen wie in \autoref{eq: par_b} gezeigt berechnet.
-
-\begin{equation}
-	b = \sum \left( x_i \cdot b_i \right)
-	\label{eq: par_b}
-\end{equation}
-
-Die Reinstoffgrößen $ b_i $ werden nach \autoref{eq: par_bi} aus den kritischen Stoffgrößen für jede Komponente im Gemisch berechnet.
-
-\begin{equation}
-	b_i = 0\text{.}08664 \cdot \dfrac{R \cdot T_{\mathrm{c},i}}{p_{\mathrm{c},i}}
-	\label{eq: par_bi}
-\end{equation}
-
-$ T_{\mathrm{c},i} $ ist die kritische Temperatur und $ p_{\mathrm{c},i} $ der kritische Druck der Komponente $ i$.
-
-Der Kohäsionsparameter $a$ kann mit folgender Gleichung berechnet werden.
-
-\begin{equation}
-	a = b \cdot \left[ \dfrac{g^{\mathrm{E}}_0}{A_1} + \sum \left( x_i \cdot \dfrac{a_i(T)}{b_i} \right) + \dfrac{R \cdot T}{A_1} \cdot \sum \left( x_i \cdot \mathrm{ln}\dfrac{b}{b_i} \right) \right]
-\end{equation} 
-
-$ A_1$ ist in diesem Fall eine Konstante und auf den Wert von $-0$.$64663$ festgelegt. $ g^{\mathrm{E}}_0 $ beschreibt die Gibbs-Energie und wird mit dem Gruppenbeitragsmodell UNIFAC berechnet. Die temperaturabhängige Variable $a_i$ kann mit folgenden Zusammenhängen beschrieben werden.
-
-\begin{equation}
-	a_i = 0\text{.}42748 \dfrac{R^2 \cdot T_{\mathrm{c},i}^2}{p_{\mathrm{c},i}} \cdot f(T) \\
-\end{equation}
-
-\begin{equation}
-	f(T) = \left[1 + c_1 * X + c_2 * X + c_3 *X \right]^2 \text{ wenn } T_\mathrm{r} < 1
-\end{equation} 
-
-\begin{equation}
-	f(T) = \left[1 + c_1 * X \right]^2 \text{ wenn } T_\mathrm{r} > 1
-\end{equation}
-
-Die Parameter $ c_1 $ bis $ c_3 $ sind stoffspezifisch und können Tabellen aus \cite{horstmann2005psrk} entnommen werden. Die Hilfsvariable $ X$ kann mit dem in \autoref{eq: a_i_sup} gezeigten Zusammenhang aus der reduzierten Temperatur $T_\mathrm{r}$ berechnet werden.
-
-\begin{equation}
-	X = \left( 1 - T_\mathrm{r}^{0\text{.}5} \right) \text{ mit } T_\mathrm{r} = \dfrac{T}{T_\mathrm{c}}
-	\label{eq: a_i_sup}
-\end{equation} 
+In diesem Kapitel werden die Ergebnisse des Benchmarks, welcher mit der in \texttt{TREND} vorhandenen Zustandsgleichung \texttt{PSRK} durchgeführt wurde gezeigt. Anschließend werden die Ergebnisse mit Literaturdaten verglichen und Gründe für die resultierenden Abweichungen genannt.
 
 \section{Berechnungsergebnisse}
 

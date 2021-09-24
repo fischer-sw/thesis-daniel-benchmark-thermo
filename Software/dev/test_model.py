@@ -60,7 +60,7 @@ class Test03(unittest.TestCase):
         self.assertIsNotNone(model_res)
         self.assertIsNotNone(res)
 
-@unittest.skip("Skipping Test04")
+# @unittest.skip("Skipping Test04")
 class Test04(unittest.TestCase):
     
     def setUp(self):
@@ -71,6 +71,9 @@ class Test04(unittest.TestCase):
     def test_sys_diag(self):
 
         self.model.delete_diags = True
+
+        system = ['CARBON DISULFIDE', 'ACETONE']
+        self.model.create_system_diags(system)
 
         system = ['WATER', 'ACETONE']
         self.model.create_system_diags(system)
@@ -85,7 +88,7 @@ class Test04(unittest.TestCase):
         # self.model.create_system_diags(system)
 
 
-# @unittest.skip("Skipping Test05")
+@unittest.skip("Skipping Test05")
 class Test05(unittest.TestCase):
     
     def setUp(self):
