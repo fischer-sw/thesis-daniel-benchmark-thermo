@@ -17,15 +17,15 @@ Die Anwendung des Benchmarks mit dem Modell der \texttt{PSRK} führt zu den in \
 		\hline
 		BAC & $ x $ & $ y $ & $ p_\mathrm{az}$ & $ x_\mathrm{az}$ & $ h^\mathrm{M} $ & $ c_p^\mathrm{M} $ & \textbf{Gesamtnote} \\
 		\hline
-		1 & 11.18 & 10.88 & -     & -     & 10.62 & 8.88  & \textbf{10.39}\\
-		2 & 8.63  & 10.39 & 16.77 & 12.68 & 9.42  & 9.54  & \textbf{11.24}\\
-		3 & 9.90  & 10.72 & 5.34  & 18.54 & 5.90  & 12.03 & \textbf{10.40}\\
-		4 & 10.51 & 13.80 & 0.0   & 0.0   & 4.62  & 12.0  & \textbf{6.82}\\
-		5 & 10.74 & 8.29  & 0.0   & 0.0   & 6.72  & 13.03 & \textbf{6.46}\\
-		6 & 8.88  & 7.10  & 0.0   & 2.37  & 5.47  & 6.61  & \textbf{5.07}\\
-		7 & 9.60  & 11.47 & 9.76  & 6.73  & 1.40  & 0.0   & \textbf{6.49}\\
-		8 & 7.53  & 9.77  & 8.06  & 8.65  & 5.24  & 8.47  & \textbf{8.65}\\
-		9 & 9.75  & 10.81 & 9.29  & 8.38  & 6.73  & 3.04  & \textbf{8.00}\\
+		1 & 11.2  & 10.9 & -     & -     & 10.6 & 8.8  & \textbf{10.4}\\
+		2 & 9.9   & 10.3 & 17.8  & 12.7 & 9.4  & 9.5  & \textbf{11.6}\\
+		3 & 10.2  & 10.9 & 19.0  & 5.34 & 5.9  & 12.0 & \textbf{10.6}\\
+		4 & 10.5  & 14.1 & 6.6   & 0.0   & 4.6  & 12.0  & \textbf{8.0}\\
+		5 & 11.2  & 9.2  & 0.0   & 0.0   & 6.7  & 13.0 & \textbf{7.8}\\
+		6 & 8.8   & 7.1  & 8.2   & 0.0  & 5.5  & 6.6  & \textbf{6.0}\\
+		7 & 9.6   & 11.6 & 13.2  & 6.7  & 1.4  & 0.0   & \textbf{7.0}\\
+		8 & 7.8  & 9.8  & 12.0  & 8.6  & 5.2  & 8.5  & \textbf{8.7}\\
+		9 & 10.0  & 10.7 & 12.8 & 8.3  & 6.7  & 3.0  & \textbf{8.6}\\
 		\hline
 		\label{tab: meine_bac_ergebnisse}
 	\end{tabular}
@@ -41,17 +41,17 @@ Aus den Gruppenergebnissen ergeben sich die in \autoref{tab: meine_gesamt_ergebn
 		\hline
 		Gruppe & BACs & Note  \\
 		\hline
-		NA & 1-4 & 9.71 \\
-		SA & 5   & 6.46 \\
-		CA & 6   & 5.07 \\
-		CA+SA & 7-9 & 7.48 \\ 
+		NA & 1-4 & 10.2 \\
+		SA & 5   & 7.8 \\
+		CA & 6   & 6.0 \\
+		CA+SA & 7-9 & 8.1 \\ 
 	
 		\hline
 		\label{tab: meine_gesamt_ergebnisse}
 	\end{tabular}
 \end{table}
 
-Die Gesamtnote des Modells kann nach \autoref{eq: mark_final} aus den Klassenergebnissen berechnet werden und hat in diesem Fall einen Wert von \textbf{7.18}.
+Die Gesamtnote des Modells kann nach \autoref{eq: mark_final} aus den Klassenergebnissen berechnet werden und hat in diesem Fall einen Wert von \textbf{8.0}.
 
 \section{Literaturvergleich}
 
@@ -98,34 +98,23 @@ Aus den Gruppenergebnissen ergeben sich die in \autoref{tab: meine_gesamt_ergebn
 
 Die Gesamtnote des in \cite{bibid} durchgeführten Benchmarks beträgt \textbf{10.4}.
 
-Beim Vergleich der Ergebnisse fällt auf, dass sich deutliche Unterschiede zeigen. Um die beiden Benchmarks miteinander vergleichen zu können, werden die berechneten Systeme im Idealfall inklusive deren berechnete Daten benötigt. Aus den in \cite{bibid} vorgestellten Ergebnisse geht leider nicht hervor welche Systeme berechnet wurden. Auch ein Anteil oder die Anzahl der Systeme pro Gruppe wäre zum einordnen der Ergebnisse hilfreich. Unter den genannten Rahmenbedingung zeigt der Vergleich der Ergebnisse, dass der Benchmark korrekt implementiert wurde, da beide Ergebnisse eine plausible Größenordnung zeigen. Unabhängig davon sind weitere Tests notwendig um in \autoref{chap: fehler} noch nicht genannte Fehler aufzudecken und zu beheben.
+Beim Vergleich der Ergebnisse fällt auf, dass sich deutliche Unterschiede zeigen. Um die beiden Benchmarks miteinander vergleichen zu können, werden die berechneten Systeme im Idealfall inklusive deren berechnete Daten benötigt. Aus den in [VORTRAG] \cite{bibid} vorgestellten Ergebnissen geht leider nicht hervor welche Systeme berechnet wurden. Auch ein Anteil oder die Anzahl der Systeme pro Gruppe wäre zum einordnen der Ergebnisse hilfreich. Unter den genannten Rahmenbedingung zeigt der Vergleich der Ergebnisse, dass der Benchmark vermutlich korrekt implementiert wurde, da beide Ergebnisse eine plausible Größenordnung zeigen. Unabhängig davon sind weitere Tests und Vergleich mit Literaturdaten notwendig um in \autoref{chap: fehler} noch nicht genannte Fehler aufzudecken und die Implementation zu validieren.
 
 
 \chapter{Fehlerquellen und Entwicklungspotential}
 \label{chap: fehler}
 
-In der bisherigen Implementation treten unter einigen Umständen Fehler bei der Bewertung einzelner Systeme auf. Dies betrifft insbesondere Größen, welche auf dem Phasengleichgewicht basieren. Dies sind damit die Größen des Phasengleichgewichts selbst $x$ und $y$, sowie die Größe des azeotropen Punkts $ x_\mathrm{az} $, da diese aus den Phasengleichgewichtsdaten bestimmt wird. Der konkrete Fehler welcher auftritt ist, dass die Lage des Phasengleichgewichts falsch eingeschätzt wird und somit die Molenbrüche der experimentellen und die der berechneten Daten nicht zueinander passen. Ein System bei dem dieser Fehler auftritt ist in \autoref{fig: phasenggw fehler1} zu sehen.
-
-\begin{figure}[htb]
-	\centering
-	\includegraphics[scale=0.6]{CARBON DIOXIDE_ETHANE_isotherm_207_}
-	\caption{Isothermes Phasengleichgewicht bei $ 207 K$ für das Stoffgemisch Kohlenstoffdioxid|Ethan}
-	\label{fig: phasenggw fehler1}
-\end{figure}
-
-Die Hauptursache für diesen Fehler ist, dass die Lage der experimentellen Messdaten falsch bestimmt wird. Gerade wenn, wie in dem gezeigten Fall, die experimentellen Messdaten nur in einem Teilbereich vorliegen kommt es häufig zur falschen Einschätzung der Lage. Verbesserungen bei der Lageerkennung haben direkten Einfluss auf den berechneten Molenbruch des azeotropen Punkts sowie die Bewertung der Phasengleichgewichtsdaten.
-
-Ein weiterer Fehler der auftritt ist, dass bei der Berechnung von isothermen Phasengleichgewichtsdaten falsche Werte für den Druck erhalten werden. Der Druck bleibt über den gesamten Wertebereich konstant, wie in \autoref{fig: phasenggw fehler2} zu sehen.
+Ein Fehler der auftritt ist, dass bei der Berechnung von isothermen Phasengleichgewichtsdaten falsche Werte für den Druck erhalten werden. Der Druck bleibt über den gesamten Wertebereich konstant, wie in \autoref{fig: phasenggw fehler2} zu sehen.
 
 \begin{figure}[htb]
 	\centering
 	\includegraphics[scale=0.6]{PENTAFLUOROETHANE_DIMETHYL ETHER_isotherm_313.15_}
-	\caption{Isothermes Phasengleichgewicht bei $ 315$.$15 K$ für das Stoffgemisch Pentaflourethan|Dimethylether}
+	\caption{Isothermes Phasengleichgewicht bei $ 315$.$15$ K für das Stoffgemisch Pentaflourethan|Dimethylether}
 	\label{fig: phasenggw fehler2}
 \end{figure}
-Der Grund für das Auftreten dieses Fehler liegt in \texttt{TREND} da bei sonstigen Fehlern ein Fehlercode generiert wird und die Berechnung fehlschlägt. 
+Der Grund für das Auftreten dieses Fehler liegt vermutlich in der \texttt{TREND} Methode da bei sonstigen Fehlern ein Fehlercode generiert wird und die Berechnung fehlschlägt. Dieses Phänomen tritt bei einer Vielzahl an Gemischen auf, wie den im Ordner \texttt{Diagramme/<Modellname>} erzeugten Phasendiagrammen  entnommen werden kann.
 
-Weitere Mögliche Ursachen für abweichende Noten können die für das Modell verwendeten Parameter sein. Alle in dieser Arbeit verwendeten Parameter sind im Ordner \texttt{TREND 4.0} an ihrer entsprechen Stelle zu finden und liegen dem Quellcode bei.
+Weitere mögliche Ursachen für abweichende Noten können die für das Modell verwendeten Parameter sein. Alle in dieser Arbeit verwendeten Parameter sind im Ordner \texttt{TREND 4.0} an ihrer entsprechen Stelle zu finden und liegen dem Quellcode bei.
 
 
 \end{document}

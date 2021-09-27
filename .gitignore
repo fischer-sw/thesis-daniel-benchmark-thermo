@@ -13,6 +13,7 @@
 *.pyc
 *.stats
 !Latex/figs/*.pdf
+!Latex/figs/*.png
 !Literatur/*.pdf
 !Daten/mappings.json
 *backup.zip

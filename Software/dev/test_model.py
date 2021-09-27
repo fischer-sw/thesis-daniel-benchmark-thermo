@@ -60,7 +60,7 @@ class Test03(unittest.TestCase):
         self.assertIsNotNone(model_res)
         self.assertIsNotNone(res)
 
-# @unittest.skip("Skipping Test04")
+@unittest.skip("Skipping Test04")
 class Test04(unittest.TestCase):
     
     def setUp(self):
@@ -78,17 +78,17 @@ class Test04(unittest.TestCase):
         system = ['WATER', 'ACETONE']
         self.model.create_system_diags(system)
 
-        # system = ['CARBON DIOXIDE', 'ETHANE']
-        # self.model.create_system_diags(system)
+        system = ['CARBON DIOXIDE', 'ETHANE']
+        self.model.create_system_diags(system)
         
-        # system = ['CHLORODIFLUOROMETHANE','CARBON DIOXIDE']
-        # self.model.create_system_diags(system)
+        system = ['CHLORODIFLUOROMETHANE','CARBON DIOXIDE']
+        self.model.create_system_diags(system)
         
-        # system = ['ETHANE','PROPANE']
-        # self.model.create_system_diags(system)
+        system = ['ETHANE','PROPANE']
+        self.model.create_system_diags(system)
 
 
-@unittest.skip("Skipping Test05")
+# @unittest.skip("Skipping Test05")
 class Test05(unittest.TestCase):
     
     def setUp(self):

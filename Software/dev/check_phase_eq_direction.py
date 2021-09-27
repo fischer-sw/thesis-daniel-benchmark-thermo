@@ -73,21 +73,35 @@ def check_xy_swap(logger, system, exp_data, model_data, mode):
                     swap = True
 
         if error == False:
+
             diff_model = [abs(value_comp1 - model_check_data['first'][0]), abs(value_comp2 - model_check_data['first'][0]), abs(value_comp1 - model_check_data['last'][0]), abs(value_comp2 - model_check_data['last'][0])]
 
-            if diff_model[0] < diff_model[1]:
-                model_x_system = system[0]
+            if abs(diff_model[0] - diff_model[1]) > abs(diff_model[3] - diff_model[2]):
+                
+                if diff_model[0] < diff_model[1]:
+                    model_x_system = system[1]
+                else:
+                    model_x_system = system[0]
             else:
-                model_x_system = system[1]
-
-
+                if diff_model[3] < diff_model[2]:
+                    model_x_system = system[1]
+                else:
+                    model_x_system = system[0]
+                
 
             diff_exp = [abs(value_comp1 - exp_check_data['first'][0]), abs(value_comp2 - exp_check_data['first'][0]), abs(value_comp1 - exp_check_data['last'][0]), abs(value_comp2 - exp_check_data['last'][0])]
 
-            if diff_exp[0] < diff_exp[1]:
-                exp_x_system = system[0]
+            if abs(diff_exp[0] - diff_exp[1]) > abs(diff_exp[3] - diff_exp[2]):
+
+                if diff_exp[0] < diff_exp[1]:
+                    exp_x_system = system[1]
+                else:
+                    exp_x_system = system[0]
             else:
-                exp_x_system = system[1]
+                if diff_exp[3] < diff_exp[2]:
+                    exp_x_system = system[1]
+                else:
+                    exp_x_system = system[0]
 
             
             if model_x_system != exp_x_system:
