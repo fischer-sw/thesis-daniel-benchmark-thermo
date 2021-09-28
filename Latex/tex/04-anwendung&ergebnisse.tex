@@ -4,7 +4,7 @@
 
 \chapter{Anwendung}
 
-In diesem Kapitel werden die Ergebnisse des Benchmarks, welcher mit der in \texttt{TREND} vorhandenen Zustandsgleichung \texttt{PSRK} durchgeführt wurde gezeigt. Anschließend werden die Ergebnisse mit Literaturdaten verglichen und Gründe für die resultierenden Abweichungen genannt.
+In diesem Kapitel werden die Ergebnisse des Benchmarks, welcher mit der in \texttt{TREND} vorhandenen Zustandsgleichung \texttt{PSRK} durchgeführt wurde, gezeigt. Anschließend werden die Ergebnisse mit Literaturdaten verglichen und Gründe für die resultierenden Abweichungen genannt.
 
 \section{Berechnungsergebnisse}
 
@@ -82,7 +82,7 @@ Aus den Gruppenergebnissen ergeben sich die in \autoref{tab: meine_gesamt_ergebn
 
 \begin{table} [htb]
 	\centering
-	\caption{\texttt{TREND} Berechnungsergebnisse pro Klasse mit dem Modell \texttt{PSRK}}
+	\caption{Literatur Berechnungsergebnisse pro Klasse mit dem Modell \texttt{PSRK}}
 	\begin{tabular}{ ccc }
 		\hline
 		Gruppe & BACs & Note  \\
@@ -98,7 +98,7 @@ Aus den Gruppenergebnissen ergeben sich die in \autoref{tab: meine_gesamt_ergebn
 
 Die Gesamtnote des in \cite{moine2021} durchgeführten Benchmarks beträgt \textbf{10.4}.
 
-Beim Vergleich der Ergebnisse fällt auf, dass sich deutliche Unterschiede zeigen. Um die beiden Benchmarks miteinander vergleichen zu können, werden die berechneten Systeme im Idealfall inklusive deren berechnete Daten benötigt. Aus den in \cite{moine2021} vorgestellten Ergebnissen geht leider nicht hervor welche Systeme berechnet wurden. Auch ein Anteil oder die Anzahl der Systeme pro Gruppe wäre zum einordnen der Ergebnisse hilfreich. Unter den genannten Rahmenbedingung zeigt der Vergleich der Ergebnisse, dass der Benchmark vermutlich korrekt implementiert wurde, da beide Ergebnisse eine plausible Größenordnung zeigen. Unabhängig davon sind weitere Tests und Vergleich mit Literaturdaten notwendig um in \autoref{chap: fehler} noch nicht genannte Fehler aufzudecken und die Implementation zu validieren.
+Beim Vergleich der Ergebnisse fällt auf, dass sich deutliche Unterschiede zeigen. Um die beiden Benchmarks miteinander vergleichen zu können, werden die berechneten Systeme im Idealfall inklusive deren berechnete Daten benötigt. Aus den in \cite{moine2021} vorgestellten Ergebnissen geht leider nicht hervor, welche Systeme berechnet wurden. Auch ein Anteil oder die Anzahl der Systeme pro Gruppe wäre zum Einordnen der Ergebnisse hilfreich. Unter den genannten Rahmenbedingung zeigt der Vergleich der Ergebnisse, dass der Benchmark vermutlich korrekt implementiert wurde, da beide Ergebnisse eine plausible Größenordnung zeigen. Unabhängig davon sind weitere Tests und Vergleich mit Literaturdaten notwendig um in \autoref{chap: fehler} noch nicht genannte Fehler aufzudecken und die Implementation zu validieren.
 
 
 \chapter{Fehlerquellen und Entwicklungspotential}
@@ -112,7 +112,7 @@ Ein Fehler der auftritt ist, dass bei der Berechnung von isothermen Phasengleich
 	\caption{Isothermes Phasengleichgewicht bei $ 315$.$15$ K für das Stoffgemisch Pentaflourethan|Dimethylether}
 	\label{fig: phasenggw fehler2}
 \end{figure}
-Der Grund für das Auftreten dieses Fehler liegt vermutlich in der \texttt{TREND} Methode da bei sonstigen Fehlern ein Fehlercode generiert wird und die Berechnung fehlschlägt. Dieses Phänomen tritt bei einer Vielzahl an Gemischen auf, wie den im Ordner \texttt{Diagramme/<Modellname>} erzeugten Phasendiagrammen  entnommen werden kann.
+Der Grund für das Auftreten dieses Fehlers liegt vermutlich in der \texttt{TREND} Methode, da bei sonstigen Fehlern ein Fehlercode generiert wird und die Berechnung fehlschlägt. Dieses Phänomen tritt bei einer Vielzahl an Gemischen auf, wie den im Ordner \texttt{Diagramme/<Modellname>} erzeugten Phasendiagrammen  entnommen werden kann.
 
 Weitere mögliche Ursachen für abweichende Noten können die für das Modell verwendeten Parameter sein. Alle in dieser Arbeit verwendeten Parameter sind im Ordner \texttt{TREND 4.0} an ihrer entsprechen Stelle zu finden und liegen dem Quellcode bei.
 
