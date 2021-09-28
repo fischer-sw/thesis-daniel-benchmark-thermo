@@ -31,9 +31,9 @@ Thermodynamische Modelle dienen dazu den Zustand eines Systems mit Hilfe von mat
 
 Beispiele für solche Zustandsgleichungen sind die Volume Translated Peng Robinson (\texttt{VTPR}) \cite{ahlers2002development} oder die prädiktive Soave-Redlich-Kwong (\texttt{PSRK}) \cite{HOLDERBAUM1991251} welche in dieser Arbeit verwendet wird.
 
-\section{Zustandsgleichung PSRK}
+\section{Zustandsgleichung prädiktive Soave-Redlich-Kwong}
 
-Der Benchmark wird in dieser Arbeit beispielhaft mit dem in \texttt{TREND} bereits vorhanden thermodynamischen Modell \texttt{PSRK} durchgeführt. Die Abkürzung \texttt{PSRK} steht für \textbf{p}rädiktive \textbf{S}oave-\textbf{R}edlich-\textbf{K}wong. In diesem Abschnitt werden die Berechnungsgrundlagen für diese Modell erläutert.
+Der Benchmark wird in dieser Arbeit beispielhaft mit dem in \texttt{TREND} bereits vorhanden thermodynamischen Modell \texttt{PSRK} durchgeführt. In diesem Abschnitt werden die Berechnungsgrundlagen für dieses Modell erläutert.
 
 Die \texttt{PSRK} hat folgende Basisform \cite{HOLDERBAUM1991251}:
 \begin{equation}
@@ -82,11 +82,11 @@ Die Parameter $ c_1 $ bis $ c_3 $ sind stoffspezifisch und können Tabellen aus 
 
 \section{Bewertung thermodynamischer Modelle}
 
-Um thermodynamische Modelle bewerten zu können wird das Modell anhand von experimentell ermittelten Daten getestet und validiert. Schwierigkeiten dabei sind die Erhebung von Daten über einen großen Temperatur- und Druckbereich sowie das Durchführen von Experimenten für möglichst viele verschiedene Stoffgemische. Um eine möglichst objektive Bewertung möglich zu machen, ist der Ansatz welcher in \cite{jaubert2020benchmark} gewählt wurde, die Stoffe und Gemische zunächst zu klassifizieren und dann für alle Klassen experimentelle Daten auszuwählen. Hierbei ist zu beachten, dass alle Klassen gleichmäßig in den Daten vertreten sein sollten um eine gleichmäßig gewichtete Bewertung vornehmen zu können.
+Um thermodynamische Modelle bewerten zu können wird das Modell anhand von experimentell ermittelten Daten getestet und die Bewertung nach dem in \cite{jaubert2020benchmark} beschriebenen Ansatz vorgenommen. In dem beschriebenen Ansatz wird die Bewertung des Modells anhand von Daten aus Experimenten, welche für einen großen Temperatur- und Druckbereich für verschiedenste binäre Stoffgemische vorliegen durchgeführt. Um eine möglichst objektive Bewertung möglich zu machen, wurden die Stoffe und Gemische nach dem in \cite{jaubert2020benchmark} beschriebenen Ansatz, zunächst klassifiziert und dann für alle Klassen experimentelle Daten ausgewählt. Hierbei ist zu beachten, dass alle Klassen gleichmäßig in den Daten vertreten sind um eine gleichmäßig gewichtete Bewertung vornehmen zu können.
 Die Bewertung des thermodynamischen Modells geschieht anhand der Abweichung der experimentellen von den errechneten Daten des Modells.
 In den folgenden Abschnitten werden das Vorgehen zur Datenauswahl und die Bewertung eines Modells näher erläutert.
 
-\subsection{Stoffklassifikation}
+\subsection{Stoffklassifikation nach Jaubert et al.}
 \label{sec: klassifikation}
 
 Die vorgenommene Stoffklassifikation unterteilt die Stoffe anhand ihres Assoziationscharakters. Diese Eigenschaft beschreibt die Fähigkeit der Wasserstoffbrückenbildung. Es wurden vier verschiedene Kategorien erstellt, welche nun genauer beschrieben werden.
@@ -109,7 +109,7 @@ Nicht assoziierende Stoffe besitzen keine Fähigkeit Wasserstoffbrückenbindunge
 
 \subsubsection{Wasserstoff akzeptierende Stoffe}
 
-Wasserstoff akzeptierende Stoffe weisen im Gegensatz zu den nicht assoziierenden Stoffen eine freies Elektronenpaar auf. Mit diesem freien Elektronenpaar kann ein Wasserstoffatom eines anderen Moleküls eine Wasserstoffbrückenbindung eingehen. Als Beispiel für einen solchen Stoff ist  $\mathrm{CO_2}$ in \autoref{fig: HA-bsp} dargestellt.
+Wasserstoff akzeptierende Stoffe weisen im Gegensatz zu den nicht assoziierenden Stoffen eine freies Elektronenpaar auf. Mit diesem freien Elektronenpaar kann das Molekül mit einem Wasserstoffatom eines anderen Moleküls eine Wasserstoffbrückenbindung eingehen. Als Beispiel für einen solchen Stoff ist  $\mathrm{CO_2}$ in \autoref{fig: HA-bsp} dargestellt.
 
 \begin{figure}[htbp]
 	\centering
@@ -126,7 +126,7 @@ Wasserstoff akzeptierende Stoffe weisen im Gegensatz zu den nicht assoziierenden
 
 Wasserstoff bereitstellende Stoffe haben mindestens ein partiell positiv geladenes Wasserstoffatom mit dem eine Wasserstoffbrückenbindung eingegangen werden kann. Das Molekül Trifluormethan in \autoref{fig: HD-bsp} ist ein Beispiel dieser Stoffklasse.
 
-\begin{figure}
+\begin{figure}[htbp]
 	\centering
 	\setchemfig{atom sep=9mm}
 	\schemestart
@@ -140,7 +140,7 @@ Wasserstoff bereitstellende Stoffe haben mindestens ein partiell positiv geladen
 
 Stoffe die mit sich selbst eine Wasserstoffbrückenbindung eingehen können werden selbstassoziierend genannt. Sie weisen sowohl ein freies Elektronenpaar als auch ein partiell positiv geladenes Wasserstoffatom auf. Als Beispiel ist das Molekül Wasser in \autoref{fig: SA-bsp} dargestellt.
 
-\begin{figure}
+\begin{figure}[htbp]
 	\centering
 	\setchemfig{atom sep=9mm}
 	\schemestart
@@ -153,7 +153,7 @@ Stoffe die mit sich selbst eine Wasserstoffbrückenbindung eingehen können werd
 \subsubsection{Gemischklassifikation}
 \label{sec: gemischklassifikation}
 
-Mit Klassifikation der Stoffe nach ihrer Assoziativität gegenüber Wasserstoff können Gemische aus 2 Stoffen in 9 verschiedene Gruppen unterteilt werden. Eine Darstellung der Zuordnungen für binäre Gemische ist in \autoref{tab: bin-bac} zu sehen.
+Mit der Klassifikation der Stoffe nach ihrer Assoziativität gegenüber Wasserstoff, können Gemische aus 2 Stoffen in 9 verschiedene Gruppen unterteilt werden. Eine Darstellung der Zuordnungen für binäre Gemische ist in \autoref{tab: bin-bac} zu sehen.
 
 \begin{table} [htb]
 	\centering
@@ -178,11 +178,11 @@ Mit Klassifikation der Stoffe nach ihrer Assoziativität gegenüber Wasserstoff 
 	\end{tabular}
 \end{table}
 
-Der BAC auch \textbf{B}inary \textbf{A}ssociation \textbf{C}ode genannt dient der Unterscheidung der Kombinationen. Diese Kombinationen können weiter zusammengefasst werden, sodass 4 Klassen entstehen.
+Der \textbf{B}inary \textbf{A}ssociation \textbf{C}ode (BAC) dient der Unterscheidung der verschiedenen Kombinationen. Diese Kombinationen können weiter zusammengefasst werden, sodass 4 Klassen entstehen.
 
-In der ersten Klasse befinden sich Gemische die keine Assoziation aufweisen. Sie haben entweder mindestens einen nicht assoziierenden Stoff oder bestehen nur aus Stoffen mit Wasserstoff bereitstellendem oder akzeptierenden Charakter. In dieser Klasse treten kaum Wechselwirkungen zwischen den Molekülen auf.
+In der ersten Klasse befinden sich Gemische die keine Assoziation aufweisen. Sie haben entweder mindestens einen nicht assoziierenden Stoff oder bestehen nur aus Stoffen mit Wasserstoff bereitstellendem oder akzeptierendem Charakter. In dieser Klasse treten kaum Wechselwirkungen zwischen den Molekülen auf.
 
-In der zweiten Klasse befinden sich Gemische, welche aus einem nicht assoziierenden Stoff und einem selbst assoziierenden Stoff bestehen. In diesen Gemischen tritt Selbstassoziation auf. Der nicht assoziierende Stoff stört die Wasserstoffbrückenbindungen und löst bestehende Bindungen teilweise wieder auf. Als Resultat dieses Phänomens sind oft partielle Mischungslücken zu beobachten \cite{jaubert2020benchmark}. Gemische aus Wasser und Alkanen oder Alkohol und Alkanen sind Beispiele für Gemische dieser Klasse.
+In der zweiten Klasse befinden sich Gemische, welche aus einem nicht assoziierenden Stoff und einem selbst assoziierenden Stoff bestehen. In diesen Gemischen tritt Selbstassoziation auf. Der nicht assoziierende Stoff stört die Wasserstoffbrückenbindungen und löst bestehende Bindungen teilweise wieder auf. Als Resultat dieses Phänomens entstehen oft partielle Mischungslücken \cite{jaubert2020benchmark}. Gemische aus Wasser und Alkanen oder Alkohol und Alkanen sind Beispiele für Gemische dieser Klasse.
 
 In der dritten Klasse befinden sich Gemische, die eine Wasserstoffbrückenbildung zwischen den beteiligten Komponenten ermöglichen. Dieses auch ''cross association'' genannte Phänomen tritt ein, wenn ein Stoff mit einem partiell positiv geladenen Wasserstoff Atom mit einem anderen Stoff, welcher ein freies Elektronenpaar hat gemischt wird. Da nur im Gemisch beider Stoffe Wasserstoffbrückenbindungen ausgebildet werden können, unterscheidet sich das Verhalten des Gemischs von dem der Reinstoffe.
 
@@ -190,7 +190,7 @@ In der vierten Klasse befinden sich Gemische, in denen sowohl selbst Assoziation
 
 \subsection{Stoffauswahl}
 
-Bei der Auswahl der Stoffe dient die Bewertung der Abweichung vom idealen Verhalten als Kriterium. Es ist sowohl eine quantitative als auch eine qualitative Bewertung vorgenommen worden.
+Bei der Auswahl der Stoffe dient die Bewertung der Abweichung vom idealen Verhalten als Kriterium. Es ist sowohl eine quantitative als auch eine qualitative Bewertung von der Forschergruppe vorgenommen worden.
 
 Für die qualitative Bewertung der Abweichung vom idealen Verhalten wurden folgende Kriterien verwendet:
 \begin{itemize}
@@ -198,7 +198,7 @@ Für die qualitative Bewertung der Abweichung vom idealen Verhalten wurden folge
 	\item Molekülform
 	\item energetische Interaktion (unabhängig von Temperatur, Druck und Zusammensetzung)
 \end{itemize}
-Ein Gemisch gilt qualitativ als ideal, wenn die Molekülgröße, -form und energetische Interaktion für beide der beteiligten Stoffe ähnliche Werte, unabhängig von Temperatur, Druck oder Zusammensetzung, aufweisen.
+Ein Gemisch gilt dem gewählt Ansatz nach als qualitativ ideal, wenn die Molekülgröße, -form und energetische Interaktion, für beide der beteiligten Stoffe, ähnliche Werte unabhängig von Temperatur, Druck oder Zusammensetzung aufweisen.
 Um eine möglichst gleichmäßige Verteilung zwischen sich ideal verhaltenden und vom Idealverhalten abweichende Stoffe in den Daten zu gewährleisten, beinhaltet jede BAC Gruppe etwa 20 binäre Systeme.
 Die Abweichung kann durch alle drei genannten Kriterien hervorgerufen werden. Ist die Abweichung vom Idealverhalten nur durch eine Differenz in der Molekülgröße hervorgerufen, ist die Exzess-Enthalpie $h^{\mathrm{E}}$ vernachlässigbar und das Gemisch wird als \textit{athermisch} bezeichnet. Aus der Tatsache, dass die Exzess-Enthalpie vernachlässigbar ist resultiert, dass die Gibbs-Energie $g^{\mathrm{E}}$ proportional zur Exzess-Entropie des Gemisches ist.
 
@@ -234,24 +234,73 @@ In dem hier gewählten Ansatz wird die Dampfphase als ideal angenommen, sodass d
 	y_i \cdot P = P_{i}^{\mathrm{sat}} \cdot x_i \cdot \gamma_i
 \end{equation}
 
-Der Faktor $\gamma_i$ beschreibt die Abweichung vom Idealverhalten in der Flüssigphase. Im Falle eines sich in der Flüssigkeit ideal verhaltenden Stoffgemisches gilt $\gamma_i = 1$.
+Der Faktor $\gamma_i$ beschreibt die Abweichung vom Idealverhalten in der Flüssigphase. Im Falle eines sich in der Flüssigkeit ideal verhaltenden Stoffgemisches gilt $\gamma_i = 1$. \autoref{eq: raoult_mod} kann nach dem Aktivitätskoeffizienten umgeformt werden. Für einen experimentell erhobenen Datenpunkt gilt dann:
 \begin{equation}
 	\gamma_i \left(T,x \right) = \dfrac{P_{\mathrm{exp}} \cdot y_{i,\mathrm{exp}}}{P_{i}^{\mathrm{sat}}(T_{\mathrm{exp}}) \cdot x_{i,\mathrm{exp}}}
 \end{equation}
-Die notwendigen temperaturabhängigen Dampfdrücke $P_{i}^{\mathrm{sat}}(T)$ sind der DIPPR Datenbank \cite{thomson1996dippr} entnommen.
-Um die Gibbs-Energie $g^{\mathrm{E}}$ berechnen zu können wird ein Ansatz des Margules Gibbs-Exzess-Energie Models verwendet. Der Ansatz fittet 4 Parameter anhand von isobaren Dampf-Flüssigkeit Phasengleichgewichtsdaten und ermöglicht so eine temperaturabhängige Berechnung der Gibbs-Energie. Der nötige Ansatz zum fitten ist in \autoref{eq: fit_par} beschrieben. Es gilt:
+Die notwendigen temperaturabhängigen Dampfdrücke $P_{i}^{\mathrm{sat}}(T)$ sind der Datenbank des Design Institute for Physical Properties (DIPPR) \cite{thomson1996dippr} entnommen worden.
+Um die Gibbs-Energie $g^{\mathrm{E}}$ berechnen zu können wird ein Ansatz des Margules Gibbs-Exzess-Energie Models verwendet. Der Ansatz fittet 4 Parameter anhand von isobaren Dampf-Flüssigkeit Phasengleichgewichtsdaten und ermöglicht so eine temperaturabhängige Berechnung der Gibbs-Energie. Der nötige Ansatz zum Fitten kann aus \autoref{eq: fit_par} hergeleitet werden. Es gilt:
 \begin{equation}
 	\label{eq: fit_par}
-	ln(\gamma_i) = A(T)
+	\mathrm{ln}(\gamma_1) =  \dfrac{\partial }{\partial n_1} \left( \dfrac{g^{\mathrm{E}}(T,x)}{RT} \cdot n \right)
 \end{equation}
-\begin{equation}
-	A(T) = p_1 - p_2 \cdot T-p_3 \cdot \ln(T)+p_4 \cdot \exp{ \left( \dfrac{1}{T} \right)}
-\end{equation}
+
+Die Gibbs-Energie $ g^{\mathrm{E}} $ kann durch folgenden Zusammenhang beschrieben werden:
 \begin{equation}
 	\dfrac{g^{\mathrm{E}}(T,x)}{RT} = x_1 \cdot x_2 \cdot A(T) 
 \end{equation}
 
-Für das fitten der Parameter hat die Forschergruppe in \cite{jaubert2020benchmark} die gemittelte durchschnittliche Abweichung minimiert. Sobald ein Ansatz für die Gibbs-Exzess-Energie vorliegt lässt sich damit mit \autoref{eq: he_ge} die Enthalpie $h^{\mathrm{E}}$ und \autoref{eq: se} die Entropie $s^{\mathrm{E}}$ berechnen.
+\begin{equation}
+	A(T) = p_1 - p_2 \cdot T-p_3 \cdot \ln(T)+p_4 \cdot \exp{ \left( \dfrac{1}{T} \right)}
+\end{equation}
+
+Die Parameter $ p_1 $ bis $ p_4 $ werden mittels des Fits berechnet.
+Die Molenbrüche $ x_1 $ und $ x_2 $ sowie der Gesamtstoffmenge $ n $ können wie folgt ersetzt werden:
+
+\begin{equation}
+	x_1 = \dfrac{n_1}{n_1 + n_2}
+\end{equation}  
+\begin{equation}
+	x_2 = \dfrac{n_2}{n_1 + n_2}
+\end{equation}  
+\begin{equation}
+	n = n_1 + n_2
+\end{equation}
+
+Die Größen $ n_1 $ und $ n_2 $ beschreiben die Stoffmenge der ersten bzw. zweiten Komponente.
+
+\begin{equation}
+	\dfrac{\partial }{\partial n_1} \left( \dfrac{g^{\mathrm{E}}(T,x)}{RT} \cdot n \right) = \dfrac{\partial }{\partial n_1} \left[ 
+	\dfrac{n_1}{n} \cdot \dfrac{n_2}{n} \cdot A(T) \cdot n
+	 \right]  
+\end{equation}
+
+\begin{equation}
+	\dfrac{\partial }{\partial n_1} \left[ 
+	\dfrac{n_1}{n} \cdot \dfrac{n_2}{n} \cdot A(T) \cdot n
+	\right]  = \dfrac{\partial }{\partial n_1} \left[ 
+	\dfrac{n_1}{n_1 + n_2} \cdot n_2 \cdot A(T)
+	\right] 
+\end{equation}
+
+Das Anwenden der Quotientenregel führt zu folgendem Zusammenhang:
+
+\begin{equation}
+	\dfrac{\partial }{\partial n_1} \left[ 
+	\dfrac{n_1}{n_1 + n_2} \cdot n_2 \cdot A(T) \right] = \dfrac{n_1 + n_2 - n_1}{(n_1 + n_2)^2} \cdot n_2 \cdot A(T) = A(T) \cdot \dfrac{n_2^2}{(n_1 + n_2)^2}
+\end{equation}
+
+Es ergibt sich der finale Zusammenhang:
+\begin{equation}
+	\mathrm{ln}(\gamma_1) = A(T) \cdot x_2^2
+\end{equation}
+
+Die Herleitung kann analog für die 2 Komponente durchgeführt werden.
+\begin{equation}
+	\mathrm{ln}(\gamma_2) = A(T) \cdot x_1^2
+\end{equation}
+
+Für das fitten wurde in \cite{jaubert2020benchmark} die gemittelte durchschnittliche Abweichung minimiert. Sobald ein Ansatz für die Gibbs-Exzess-Energie vorliegt lässt sich damit mit \autoref{eq: he_ge} die Enthalpie $h^{\mathrm{E}}$ und \autoref{eq: se} die Entropie $s^{\mathrm{E}}$ berechnen.
 
 \begin{equation}
 	\label{eq: he_ge}
@@ -271,7 +320,7 @@ Mit Hilfe der berechneten Größen kann ein Gemisch klassifiziert und falls es s
 
 \begin{figure}[htbp]
 	\centering
-	\includegraphics[scale=0.65]{Idealverhalten.pdf}
+	\includegraphics[scale=0.9]{Idealverhalten.pdf}
 	\caption{Routine zur Bestimmung des Verhalten eines Gemischs und des Ursprungs der Abweichung}
 	\label{fig: klassifikation}
 \end{figure}
@@ -296,15 +345,7 @@ Zum Vergleich eines thermodynamischen Modells mit experimentellen Daten werden f
 	\item Mischungswärmekapazität $c_p^{\mathrm{M}}$
 \end{itemize}
 
-Aufgrund der Gibbs'schen Phasenregel ergibt sich für alle Größen ein Freiheitsgrad > 0 sodass hierfür mindestens eine Größe festgelegt werden muss um die unbekannten berechnen zu können. Beispielhaft ist die Berechnung der Freiheitsgrade für die Zusammensetzung der Flüssigphase eines binären Gemischs in \autoref{eq: gibb x_phase} beschrieben.
-Der kritische Punkt wird durch drei Größen eindeutig definiert:
-\begin{itemize}
-	\item Druck $p$
-	\item Temperatur $T$
-	\item Zusammensetzung $x_1$
-\end{itemize}
-
-Mit der Gibb'schen Phasenregel lässt sich der Freiheitsgrad für ein Gemisch aus zwei Fluiden für die Flüssigphase wie folgt berechnen.
+Aufgrund der Gibbs'schen Phasenregel ergibt sich für alle Größen ein Freiheitsgrad > 0 sodass hierfür mindestens eine Größe festgelegt werden muss um die unbekannten berechnen zu können. Beispielhaft ist die Berechnung der Freiheitsgrade für das Phasengleichgewicht eines binären Gemischs in \autoref{eq: gibb x_phase} beschrieben. Im Falls des Phasengleichgewichts liegen für ein binäres Gemisch 2 Komponenten und 2 Phasen (Flüssig- und Dampfphase) vor.
 
 \begin{equation}
 	\label{eq: gibb x_phase}
@@ -313,7 +354,7 @@ Mit der Gibb'schen Phasenregel lässt sich der Freiheitsgrad für ein Gemisch au
 
 $ K $ beschreibt die Anzahl der Komponenten und $ P $ die Anzahl der Phasen im Gemisch.
 
-In \autoref{tab: DoF} sind die festgelegten und berechneten Größen analog zu Tabelle 13 \cite{jaubert2020benchmark} aufgeführt.
+In \autoref{tab: DoF} sind die festgelegten und berechneten Größen analog zu Tabelle 13 aus \cite{jaubert2020benchmark} aufgeführt.
 
 \begin{table} [htb]
 	\centering
@@ -329,8 +370,8 @@ In \autoref{tab: DoF} sind die festgelegten und berechneten Größen analog zu T
 		azeotrope Zusammensetzung  & 1 &$T$ & $p,x_1$  \\
 		Zusammensetzung Flüssigphase & 2 & $T,p$ & $x_1,y_1$ \\
 		Zusammensetzung Dampfphase & 2 & $T,p$ & $x_1,y_1$ \\
-		3-Phasen-Druck & 1 & $p_{\mathrm{LLV}}$ & $x_1^{\alpha},x_1^{\beta},y_1$ \\
-		3-Phasen-Zusammensetzung & 1 & $z_{\mathrm{LLV}}$ & $x_1^{\alpha},x_1^{\beta},y_1$ \\
+		3-Phasen-Druck & 1 & $ T $ &  $p_{\mathrm{LLV}}$ \\
+		3-Phasen-Zusammensetzung & 1 & $T$ & $x_1^{\alpha},x_1^{\beta},y_1$ \\
 		Mischungsenthalpie & - & $T,p,z_1$ & $h^{\mathrm{M}}$ \\
 		Mischungswärmekapazität & - & $T,p,z_1$ & $c_{p}^{\mathrm{M}}$ \\
 		[\dimexpr-\normalbaselineskip+18pt]
@@ -339,11 +380,14 @@ In \autoref{tab: DoF} sind die festgelegten und berechneten Größen analog zu T
 	\end{tabular}
 \end{table}
 
-Diese Größen werden für jedes Stoffgemisch falls möglich berechnet und mit den experimentellen Daten, falls sie erhoben worden sind, verglichen. Aus den Abweichung der Werte werden für jede BAC Gruppe Noten berechnet und schließlich die Gesamtnote aus den Teilnoten ermittelt.
+$ x_i$ , $ y_i$, $ z_i$ beschreiben Zusammensetzungen, wobei $x_i^{\alpha} $ und $ x_i^{\beta} $ die Zusammensetzungen der ersten und zweiten Flüssigphase im Falles eines 3-Phasengleichgewichts bezeichnen.  
+
+Diese Größen werden für jedes Stoffgemisch falls möglich berechnet und mit den experimentellen Daten, falls sie erhoben worden sind, verglichen. Aus den Abweichung der Werte werden für jeden BAC Gruppe Noten berechnet und schließlich die Gesamtnote aus den Teilnoten ermittelt. Wie die genaue Berechnung funktioniert ist in \autoref{chp: notenberechnung} beschrieben. 
 
 \section{Notenberechnung}
+\label{chp: notenberechnung}
 
-In diesem Kapitel wird die Berechnung der Gesamtnote eines thermodynamischen Modells und auf die Berechnung der einzelnen, dafür notwendigen, Teilnoten eingegangen.
+In diesem Kapitel wird auf die Berechnung der Gesamtnote eines thermodynamischen Modells und auf die Berechnung der einzelnen, dafür notwendigen, Teilnoten eingegangen.
 
 \subsection{Berechnung der Gesamtnote}
 Die maximale Punktzahl die ein Modell ereichen kann ist auf 20 festgelegt. Die Gesamtnote wird aus vier einzelnen Teilnoten berechnet. Diese vier Teilnoten werden für jede Klasse aus \autoref{tab: bin-bac} berechnet.
@@ -369,7 +413,7 @@ Die Berechnung der Noten der drei weiteren Klassen erfolgt analog mit der in \au
 In diesem Abschnitt wird die Berechnung des gemittelten durchschnittlichen Fehlers gezeigt, welcher auch als \textbf{M}ean \textbf{A}verage \textbf{P}ercantage \textbf{E}rror oder kurz MAPE bezeichnet wird. Der MAPE kann mit folgender Formel berechnet werden:
 
 \begin{equation}
-	MAPE_X(\%) = 100 \cdot \dfrac{1}{n} \cdot \sum_{i=1}^{n} \biggl| \dfrac{X_i^\mathrm{EXP} - X_i^\mathrm{MODEL}}{X_i^\mathrm{MODEL}} \biggr|
+	\mathrm{MAPE}_X(\%) = 100 \cdot \dfrac{1}{n} \cdot \sum_{i=1}^{n} \biggl| \dfrac{X_i^\mathrm{EXP} - X_i^\mathrm{MODEL}}{X_i^\mathrm{MODEL}} \biggr|
 	\label{MAPE Glg}
 \end{equation}
 

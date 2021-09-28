@@ -4,7 +4,7 @@
 
 \chapter{Implementierung}
 \label{chp: implementierung}
-In \autoref{chp: grundlagen} wurde die von Jaubert et al. entwickelte Methode zur Bewertung binärer Gemische dargestellt und um sinnvolle Randbedingungen bei der Notenberechnung ergänzt. In diesem Kapitel geht es um die softwaremäßige Umsetzung des vorgestellten Benchmarks.
+In \autoref{chp: grundlagen} wurde die in \cite{jaubert2020benchmark} entwickelte Methode zur Bewertung binärer Gemische dargestellt und um sinnvolle Randbedingungen bei der Notenberechnung ergänzt. In diesem Kapitel geht es um die softwaremäßige Umsetzung des vorgestellten Benchmarks.
 Um die Bewertung einer Zustandsgleichung vornehmen zu können, sind einige Voraussetzungen zu erfüllen. Die experimentellen Daten müssen zur Verfügung stehen. Die Daten des Modells müssen, sofern das möglich ist, berechnet und anschließend mit den der Experimente verglichen werden. Das Ergebnis der Bewertung ist eine Notenzusammenstellung.
 
 Da die im Zusatzmaterial von \cite{jaubert2020benchmark} zur Verfügung gestellte Excel Datei sich nur schwer nach den für den Vergleich notwendigen Daten und Parametern durchsuchen lässt, werden die Experimentellen Daten in ein anders Format überführt. Um den Vergleich zu vereinfachen wird für die gespeicherten Modelldaten das gleiche Format verwendet. Um mehrere durchgeführte Benchmarks miteinander vergleichen zu können, werden auch die Ergebnisse in einer Datei gespeichert. Aus dem vorgestellten Vorgehen ergeben sich drei voneinander unabhängige Problemstellungen die zur Durchführung des Benchmarks notwendig sind.
@@ -50,7 +50,7 @@ Für jedes Gemisch werden die folgenden Schritte für jede zu berechnende Größ
 Bevor das Modell aufgerufen wird, wird getestet ob das Modell die Daten für das Gemisch überhaupt berechnen kann. Dieser Test basiert auf den Parametern, die für das Modell vorhanden sind. Diese Parameter können beispielsweise kritische Stoffgrößen wie der kritische Druck $p_\mathrm{c}$, die kritische Temperatur $T_\mathrm{c}$ oder aber modellspezifische Parameter wie $c_1$, $c_2$ und $c_3$ im Fall der \texttt{PSRK} sein. Der Test der Berechenbarkeit ist nicht zwingend notwendig. Er erspart aber einigen Rechenaufwand, da ein Fehler bei der Berechnung vorhersehbar ist. Gerade bei iterativ rechnenden Methoden wie z.B. die Phasengleichgewichtsberechnung kann so unnötige Rechenzeit eingespart werden. Ist ein Stoff an dem Gemisch beteiligt, für den das Modell keine Parameter hat, wird das Gemisch übersprungen.
 Sind alle Voraussetzungen für die Berechnung mit dem Modell erfüllt, wird es aufgerufen und die Ergebnisse bei fehlerfreier Rechnung gespeichert. Der Speichervorgang ist hilfreich, um nicht bei jeder Durchführung des Benchmarks die Daten des Modells erneut berechnen zu müssen, da dies sehr zeitaufwendig ist. Falls ein Fehler auftritt, wird versucht den nächsten Datenpunkt der Messreihe zu berechnen. Die Datei mit den Berechnungsergebnissen des Modells hat den gleichen Aufbau, wie die der experimentellen Daten aus Listing \autoref{code: beispielgemisch}. Alle Modellergebnisse werden unter dem Ordner \texttt{Datenbank/Modelle/<Modellname>} gespeichert.
 
-Die Klasse \texttt{model} kann die Daten des Experiments mit den Berechnungsergebnissen des Modells in einem Phasendiagramm darzustellen. Alle erzeugten Phasendiagramme sind im Ordner \texttt{Diagramme/<Modellname>} zu finden. Die das Phasendiagramm charakterisierenden Parameter (Druck oder Temperatur) sowie die beteiligten Stoffe, können dem Dateinamen des Diagramms entnommen werden. Im Falle eines isothermen Phasendiagramms sind neben den beteiligten Komponenten die Temperatur in K und im Falle eines isobaren Phasendiagramms der Druck in bar im Dateinamen zu finden.
+Die Klasse \texttt{model} kann die Daten des Experiments mit den Berechnungsergebnissen des Modells in einem Phasendiagramm darstellen. Alle für die Gemische erzeugten Phasendiagramme sind im Ordner \texttt{Diagramme/<Modellname>} zu finden. Die das Phasendiagramm charakterisierenden Parameter (Druck oder Temperatur) sowie die beteiligten Stoffe, können dem Dateinamen des Diagramms entnommen werden. Im Falle eines isothermen Phasendiagramms sind neben den beteiligten Komponenten die Temperatur in K und im Falle eines isobaren Phasendiagramms der Druck in bar im Dateinamen zu finden.
 
 \section{Bewertung}
 
@@ -106,7 +106,7 @@ In den nun korrekt orientierten Datensätzen des Modells und Experiments wird de
 
 \begin{figure}[htb]
 	\centering
-	\includegraphics[scale=1.2]{phasendiagrammsuche}
+	\includegraphics[scale=1.1]{phasendiagrammsuche}
 	\caption{Schematische Darstellung der Zuordnung von Modelldatenpunkten zu experimentellen Datenpunkten für ein Phasendiagramm}
 	\label{fig: phasendiagrammsuche}
 \end{figure}
@@ -115,7 +115,7 @@ Da $\Delta p_1 < \Delta p_2$ wird der gekennzeichnete Modellpunkt dem experiment
 
 \begin{figure}[htb]
 	\centering
-	\includegraphics[scale=0.6]{DICHLOROMETHANE_CARBON DISULFIDE_isotherm_298.15_}
+	\includegraphics[scale=0.5]{DICHLOROMETHANE_CARBON DISULFIDE_isotherm_298.15_}
 	\caption{Isothermes Phasengleichgewicht bei $ 298$.$15$ K für das Stoffgemisch Dichlormethan|Kohlenstoffdisulfid}
 	\label{fig: phase_eq_datenausschluss}
 \end{figure}
