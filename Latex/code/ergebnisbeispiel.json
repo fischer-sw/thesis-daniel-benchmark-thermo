@@ -1,0 +1,51 @@
+{
+  "BAC1": {
+    "group_res": {
+      "mark_cp_mix": 8.886641258779735,
+      "mark_h_mix": 10.626844016368603,
+      "mark_phase_eq_x": 11.181368645012151,
+      "mark_phase_eq_y": 10.883600081966915
+    },
+    "res": 10.39461350053185,
+    "sys_res": {
+      "1,2-DICHLOROETHANE_CARBON TETRACHLORIDE": {
+        "mark_cp_mix": 1.3525702540608577,
+        "mark_h_mix": 9.84433399011303,
+        "mark_isob_x": 4.790066047191672,
+        "mark_isob_y": 6.535578610977936,
+        "mark_isoth_x": 8.48282509442517,
+        "mark_isoth_y": 11.118559759440775
+      },
+      ...
+    }
+  },
+  "BAC2": {
+    "group_res": {
+      "mark_cp_mix": 9.545454545454545,
+      "mark_h_mix": 9.427211893491538,
+      "mark_paz": 16.771494489577897,
+      "mark_phase_eq_x": 8.636855134782218,
+      "mark_phase_eq_y": 10.394506640841112,
+      "mark_xaz": 12.682559264148447
+    },
+    "res": 11.243013661382626,
+    "sys_res": {
+      "1,4-DIOXANE_CARBON TETRACHLORIDE": {
+        "mark_h_mix": 0.0,
+        "mark_isoth_x": 3.8950399192537724,
+        "mark_isoth_y": 6.429550577692279
+      },
+      ...
+    },
+  },
+  
+  ...
+
+  "class_res": {
+    "mark_CA": 5.073850682513256,
+    "mark_CA_SA": 7.48641010477229,
+    "mark_NA": 9.717512202622803,
+    "mark_SA": 6.465741331740243
+  },
+  "model_res": 7.185878580412148
+}

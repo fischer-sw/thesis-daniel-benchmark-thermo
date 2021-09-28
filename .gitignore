@@ -17,6 +17,7 @@
 !Latex/pdfs/*.pdf
 !Literatur/*.pdf
 !Daten/mappings.json
+!Latex/code/*.json
 *backup.zip
 Daten/*.txt
 Software/site/*
