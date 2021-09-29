@@ -40,7 +40,7 @@ Die \texttt{PSRK} hat folgende Basisform \cite{HOLDERBAUM1991251}:
 	p = \dfrac{R \cdot T}{v - b}- \dfrac{a(T)}{v \cdot (v + b)}
 \end{equation}
 
-Die Variable $ p $ beschreibt in dieser Gleichung den Druck, $ T $ die Temperatur und $ v $ das molare Volumen. $ R $ ist die universale Gaskonstante. Der Parameter $a$ ist der Kohäsionsparameter und $ b $ ist das Kovolumen. Das Kovolumen $ b $ wird über eine lineare Mischungsregel aus den Reinstoffgrößen wie in \autoref{eq: par_b} gezeigt berechnet.
+Die Variable $ p $ beschreibt in dieser Gleichung den Druck, $ T $ die Temperatur und $ v $ das molare Volumen. $ R $ ist die universale Gaskonstante. Der Parameter $a$ ist der Kohäsionsparameter und $ b $ das Kovolumen. Das Kovolumen $ b $ wird über eine lineare Mischungsregel aus den Reinstoffgrößen wie in \autoref{eq: par_b} gezeigt berechnet.
 
 \begin{equation}
 	b = \sum \left( x_i \cdot b_i \right)
@@ -63,7 +63,7 @@ Der Kohäsionsparameter $a$ kann mit folgender Gleichung aus \cite{horstmann2005
 	+ \sum \left( x_i \cdot \dfrac{a_i(T)}{b_i \cdot RT} \right) \text{ mit } u = \dfrac{v}{b}
 \end{equation}
 
-$ g^{\mathrm{E}}_0 $ beschreibt die Gibbs-Energie und wird mit dem Gruppenbeitragsmodell UNIFAC \cite{magnussen1981unifac} berechnet. Die temperaturabhängige Variable $a_i$ kann mit folgenden Zusammenhängen beschrieben werden:
+$ g^{\mathrm{E}}_0 $ beschreibt die Gibbs-Energie und wird mit dem Gruppenbeitragsmodell UNIFAC \cite{magnussen1981unifac} berechnet. Die temperaturabhängige Variable $a_i(T)$ kann mit folgenden Zusammenhängen beschrieben werden:
 
 \begin{equation}
 	a_i(T) = 0\text{.}42748 \dfrac{R^2 \cdot T_{\mathrm{c},i}^2}{p_{\mathrm{c},i}} \cdot f(T) \\
@@ -186,11 +186,11 @@ In der zweiten Klasse befinden sich Gemische, welche aus einem nicht assoziieren
 
 In der dritten Klasse befinden sich Gemische, die eine Wasserstoffbrückenbildung zwischen den beteiligten Komponenten ermöglichen. Dieses auch ''cross association'' genannte Phänomen tritt ein, wenn ein Stoff mit einem partiell positiv geladenen Wasserstoff Atom mit einem anderen Stoff, welcher ein freies Elektronenpaar besitzt, gemischt wird. Da nur im Gemisch beider Stoffe Wasserstoffbrückenbindungen ausgebildet werden können, unterscheidet sich das Verhalten des Gemischs von dem der Reinstoffe.
 
-In der vierten Klasse befinden sich Gemische, in denen sowohl selbst Assoziation als auch ''cross assoziation'' auftreten können. Das Verhalten dieser Stoffe ist schwer vorherzusagen, da sowohl eine Verstärkung als auch eine Abschwächung des Wasserstoffbrückennetzwerks erfolgen kann \cite{jaubert2020benchmark}.
+In der vierten Klasse befinden sich Gemische, in denen sowohl Selbstassoziation als auch ''cross assoziation'' auftreten können. Das Verhalten dieser Stoffe ist schwer vorherzusagen, da sowohl eine Verstärkung als auch eine Abschwächung des Wasserstoffbrückennetzwerks erfolgen kann \cite{jaubert2020benchmark}.
 
 \subsection{Stoffauswahl}
 
-Bei der Auswahl der Stoffe dient die Bewertung der Abweichung vom idealen Verhalten als Kriterium. Es ist sowohl eine quantitative als auch eine qualitative Bewertung von der Forschergruppe vorgenommen worden.
+Bei der Auswahl der Stoffe dient die Bewertung der Abweichung vom idealen Verhalten als Kriterium. Es ist sowohl eine quantitative als auch eine qualitative Bewertung in \cite{jaubert2020benchmark} vorgenommen worden.
 
 Für die qualitative Bewertung der Abweichung vom idealen Verhalten wurden folgende Kriterien verwendet:
 \begin{itemize}
@@ -228,7 +228,7 @@ Um die benötigten Größen berechnen zu können, werden die Aktivitätskoeffizi
 	y_i \cdot P = P_{i}^{\mathrm{sat}} \cdot x_i
 \end{equation}
 
-$ y_i $ beschriebt in dieser Gleichung die Zusammensetzung der Dampfphase. $ x_i $ ist die Zusammensetzung der Flüssigphase. $ P $ beschreibt den Gesamtdruck und $ P_{i}^{\mathrm{sat}} $ den Sättigungsdampfdruck.
+$ y_i $ beschriebt in dieser Gleichung die Zusammensetzung der Dampfphase. $ x_i $ ist die Zusammensetzung der Flüssigphase. $ P $ beschreibt den Gesamtdruck und $ P_{i}^{\mathrm{sat}} $ den Sättigungsdampfdruck der Komponente i im Gemisch.
 In dem hier gewählten Ansatz wird die Dampfphase als ideal angenommen, sodass die linke Seite von \autoref{eq: raoult_base} bestehen bleibt. Die Flüssigphase wird als nicht-ideal angenommen und es wird der Korrekturfaktor $\gamma_i$ eingeführt. Dieser Korrekturfaktor $\gamma_i$ wird auch Aktivitätskoeffizient genannt. 
 \begin{equation}
 	\label{eq: raoult_mod}
@@ -240,7 +240,7 @@ Der Faktor $\gamma_i$ beschreibt die Abweichung vom Idealverhalten in der Flüss
 	\gamma_i \left(T,x \right) = \dfrac{P_{\mathrm{exp}} \cdot y_{i,\mathrm{exp}}}{P_{i}^{\mathrm{sat}}(T_{\mathrm{exp}}) \cdot x_{i,\mathrm{exp}}}
 \end{equation}
 Die notwendigen temperaturabhängigen Dampfdrücke $P_{i}^{\mathrm{sat}}(T)$ sind der Datenbank des Design Institute for Physical Properties (DIPPR) \cite{thomson1996dippr} entnommen worden.
-Um die Gibbs-Energie $g^{\mathrm{E}}$ berechnen zu können, wird ein Ansatz des Margules Gibbs-Exzess-Energie Models verwendet. Der Ansatz fittet vier Parameter anhand von isobaren Dampf-Flüssigkeit Phasengleichgewichtsdaten und ermöglicht so eine temperaturabhängige Berechnung der Gibbs-Energie. Der benötigte Ansatz zum Fitten kann aus \autoref{eq: fit_par} hergeleitet werden. Es gilt:
+Um die Gibbs-Energie $g^{\mathrm{E}}$ berechnen zu können, wurde ein Ansatz des Margules Gibbs-Exzess-Energie Models in \cite{jaubert2020benchmark} verwendet. Der Ansatz fittet vier Parameter anhand von isobaren Dampf-Flüssigkeit Phasengleichgewichtsdaten und ermöglicht so eine temperaturabhängige Berechnung der Gibbs-Energie. Der benötigte Ansatz zum Fitten kann aus \autoref{eq: fit_par} hergeleitet werden. Es gilt:
 \begin{equation}
 	\label{eq: fit_par}
 	\mathrm{ln}(\gamma_1) =  \dfrac{\partial }{\partial n_1} \left( \dfrac{g^{\mathrm{E}}(T,x)}{RT} \cdot n \right)
@@ -317,7 +317,7 @@ Für das Fitten wurde in \cite{jaubert2020benchmark} die gemittelte durchschnitt
 	s^{\mathrm{E}} = - \left( \dfrac{\partial g^{\mathrm{E}}}{\partial T} \right)_x
 \end{equation}
 
-Mit den Berechnungsergebnissen der Größen kann ein Gemisch klassifiziert bestimmt werden. Dazu werden die Berechnungsgrößen bei einer Zusammensetzung von $x=\text{0.5}$ berechnet und anhand der resultierenden Werte die Einteilung vorgenommen. Wie die Einteilung genau erfolgt und wo mögliche Gründe für die Abweichung liegen, ist in \autoref{fig: klassifikation} dargestellt.
+Mit den Berechnungsergebnissen der Größen kann ein Gemisch klassifiziert werden. Dazu werden die Berechnungsgrößen bei einer Zusammensetzung von $x=\text{0.5}$ berechnet und anhand der resultierenden Werte die Einteilung vorgenommen. Wie die Einteilung genau erfolgt und wo mögliche Gründe für die Abweichung liegen, ist in \autoref{fig: klassifikation} dargestellt.
 
 \begin{figure}[htbp]
 	\centering
@@ -326,11 +326,11 @@ Mit den Berechnungsergebnissen der Größen kann ein Gemisch klassifiziert besti
 	\label{fig: klassifikation}
 \end{figure}
 
-Dieses Vorgehen zur Bewertung des Verhaltens kann zusätzlich zur Gemischauswahl, welche bereits durchgeführt wurde, zur Weiterentwicklung des bewerteten Modells dienen. Der Ursprung der Abweichung, falls dieser berechnet werden kann, zeigt an welcher Stelle noch Verbesserung notwendig sind.  
+Dieses Vorgehen zur Bewertung des Verhaltens kann zusätzlich zur Gemischauswahl, welche bereits durchgeführt wurde, zur Weiterentwicklung des bewerteten Modells dienen. Der Ursprung der Abweichung, falls dieser berechnet werden kann, zeigt an welcher Stelle noch Verbesserungen notwendig sind.  
 
 \subsection{Bewertungskriterien und Bewertungsgrößen}
 
-Um zwei Zustandsgleichungen miteinander zu vergleichen werden beide mit experimentellen Daten verglichen und die Abweichung von diesen als Bewertungskriterium benutzt. Der Vergleich mit experimentellen Daten wird im folgenden Abschnitt erläutert.
+Um zwei Zustandsgleichungen miteinander zu vergleichen werden beide mit experimentellen Daten verglichen und die Abweichung als Bewertungskriterium benutzt. Der Vergleich mit experimentellen Daten wird im folgenden Abschnitt erläutert.
 
 Zum Vergleich eines thermodynamischen Modells mit experimentellen Daten werden folgende Größen verwendet:
 \begin{itemize}
@@ -383,7 +383,7 @@ In \autoref{tab: DoF} sind die festgelegten und berechneten Größen analog zu T
 
 $ x_i$ , $ y_i$, $ z_i$ beschreiben Zusammensetzungen, wobei $x_i^{\alpha} $ und $ x_i^{\beta} $ die Zusammensetzungen der ersten und zweiten Flüssigphase im Falles eines 3-Phasengleichgewichts bezeichnen.  
 
-Diese Größen werden für jedes Stoffgemisch, falls möglich, berechnet und mit den experimentellen Daten, falls sie erhoben worden sind, verglichen. Aus den Abweichung der Werte werden für jeden BAC Gruppe Noten berechnet und schließlich die Gesamtnote aus den Teilnoten ermittelt. Wie die genaue Berechnung funktioniert ist in \autoref{chp: notenberechnung} beschrieben. 
+Diese Größen werden für jedes Stoffgemisch, falls möglich, berechnet und mit den experimentellen Daten, falls sie erhoben worden sind, verglichen. Aus den Abweichungen der Werte werden für jeden BAC Gruppe Noten berechnet und schließlich die Gesamtnote aus den Teilnoten ermittelt. Wie die genaue Berechnung funktioniert wird in \autoref{chp: notenberechnung} beschrieben. 
 
 \section{Notenberechnung}
 \label{chp: notenberechnung}
@@ -421,7 +421,7 @@ In diesem Abschnitt wird die Berechnung des gemittelten durchschnittlichen Fehle
 Die Variable $n$ beschreibt die Anzahl der Messpunkte. $X_i^\mathrm{MODEL}$ steht für den vom Modell berechneten Wert und $X_i^\mathrm{EXP}$ für den zugehörigen experimentellen Messwert.
 
 \subsection{Berechnung der Noten für die Bewertungsgrößen}
-Die einzelnen Teilnoten werden aus den Noten der jeweiligen Bewertungsgrößen bestimmt.
+Die einzelnen Teilnoten werden als Mittelwert aus den Noten der jeweiligen Berechnungsgrößen bestimmt.
 \\
 
 Die Note für den kritischen Druck errechnet sich mit folgendem Zusammenhang.
@@ -451,6 +451,7 @@ Die Größen $ x_{1,\mathrm{c}} $ und $ x_{2,\mathrm{c}} $ beschreiben die Molen
 
 Für den azeotropen Druck kann die Note wie folgt berechnet werden:
 \begin{equation}
+	\label{eq: mark_p_az}
 	\mathrm{mark}_{p_{\mathrm{az}}} = 20 - 0,5 \cdot \mathrm{MAPE}_{p_\mathrm{az}}(\%)
 \end{equation}
 Um hier ebenfalls keine Noten kleiner 0 zuzulassen, wird der MAPE auch hier limitiert.
@@ -470,7 +471,7 @@ Für die azeotrope Zusammensetzung gilt folgender Zusammenhang:
 	\dfrac{\mathrm{MAPE}_{x_{1,\mathrm{az}},y_{1,\mathrm{az}}}(\%) + \mathrm{MAPE}_{x_{2,\mathrm{az}},y_{2,\mathrm{az}}}(\%)}{2}
 \right]
 \end{equation}
-Für den $ \mathrm{MAPE}_{x_{1,\mathrm{az}},y_{1,\mathrm{az}}}(\%) $ sowie $ \mathrm{MAPE}_{x_{2,\mathrm{az}},y_{2,\mathrm{az}}}(\%) $ gelten die gleichen Rahmenbedingungen wie in \autoref{eq: pheq_x_lim} beschrieben. Auch diese sind dem Ansatz nach \cite{jaubert2020benchmark} hinzugefügt worden. Die Größen $ x_{1,\mathrm{az}} $ und $ y_{1,\mathrm{az}} $ beschreiben die Molenbrüche der ersten Komponente in der Flüssig- und der Gasphase am azeotropen Punkt. 
+Für den $ \mathrm{MAPE}_{x_{1,\mathrm{az}},y_{1,\mathrm{az}}}(\%) $ sowie $ \mathrm{MAPE}_{x_{2,\mathrm{az}},y_{2,\mathrm{az}}}(\%) $ gelten die gleichen Rahmenbedingungen wie die, die für den MAPE des azeotropen Druck aus \autoref{eq: mark_p_az} gelten. Auch diese sind dem Ansatz nach \cite{jaubert2020benchmark} hinzugefügt worden. Die Größen $ x_{1,\mathrm{az}} $ und $ y_{1,\mathrm{az}} $ beschreiben die Molenbrüche der ersten Komponente in der Flüssig- und der Gasphase am azeotropen Punkt. 
 \\
 
 Die Noten für die Phasengleichgewichtsgrößen werden mit folgender Gleichung bestimmt:
@@ -480,7 +481,7 @@ Die Noten für die Phasengleichgewichtsgrößen werden mit folgender Gleichung b
 	\right]
 \end{equation}
 
-Auch hier gelten die zusätzlich hinzugefügten Limitierungen aus \autoref{eq: pheq_x_lim}.
+Auch hier gelten die zusätzlich hinzugefügten Limitierungen, welche auch für die azeotrope Zusammensetzung aufgestellt wurden.
 $x_1$ ist die Zusammensetzung der ersten und $x_2$ die des zweiten Stoffs in der Flüssigphase. Die Größen $ y $ beschreiben die Zusammensetzung in der Gasphase.
 \\
 
