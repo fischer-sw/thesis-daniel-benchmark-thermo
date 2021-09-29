@@ -103,16 +103,18 @@ Wenn die Berechnung einen Fehler erzeugt, werden anstatt der Reinstoffwerte die 
 
 Wenn die Lage der Modelldaten zu der Lage der experimentellen Daten passt, werden diese, so wie sie der Methode übergeben worden sind, wieder zurückgegeben. Die Entscheidung ob die Lagen übereinstimmen wird anhand der Komponente der x-Achse getroffen. Sind Modell und Experiment dahingehend identisch stimmen die Lagen überein. Sollten die Lagen nicht zueinander passen, werden die Molenbrüche der Modelldaten invertiert und die neuen Modelldaten mit den experimentellen Daten zurückgegeben. Die Methode, welche für die Lageerkennung zuständig ist befindet sich in der Datei \texttt{check\_phase\_eq\_direction.py}, da diese sowohl in der Klasse \texttt{model} als auch in der Klasse \texttt{compare} benötigt wird.
 
-In den nun korrekt orientierten Datensätzen des Modells und Experiments wird der zu einem experimentellen Datenpunkt gehörende Punkt des Modells gesucht. Für diesen Punkt gilt, dass für diesen der variable Parameter, welcher auf der y-Achse des Phasengleichgewichtsdiagramms dargestellt ist, der Wert des Modells und des Experiments möglichst gleich sein soll. Im Falle eines isothermen Phasengleichgewichts wie in \autoref{fig: phasediagrammlage} zu sehen, ist dieser variable Parameter der Druck $ p $ in bar. Analog wird im Falle eines isobaren Phasengleichgewichts nach der gleichen Temperatur $ T $ in K gesucht. Da die Werte des Modells und die des Experiments nicht genau übereinstimmen, wird hier der Einfachheit halber der Punkt des Modells mit dem geringsten Abstand zum Punkt des Experiments verwendet. Eine schematische Darstellung des Verfahrens ist in \autoref{fig: phasendiagrammsuche} dargestellt. 
+In den nun korrekt orientierten Datensätzen des Modells und Experiments wird der zu einem experimentellen Datenpunkt gehörende Punkt des Modells gesucht. 
+Für diesen Punkt gilt, dass im Falle eines isothermen Phasengleichgewichts der Druck $ p $ in bar für das Modell und das Experiment möglichst gleich sein soll.
+Analog wird im Falle eines isobaren Phasengleichgewichts nach der gleichen Temperatur $ T $ in K gesucht. Da die Werte des Modells und die des Experiments nicht genau übereinstimmen, wird hier der Einfachheit halber der Punkt des Modells mit dem geringsten Abstand zum Punkt des Experiments verwendet. Eine schematische Darstellung des Verfahrens ist in \autoref{fig: phasendiagrammsuche} dargestellt. 
 
 \begin{figure}[htb]
 	\centering
-	\includegraphics[scale=1.1]{phasendiagrammsuche}
+	\includegraphics[scale=1.0]{phasendiagrammsuche}
 	\caption{Schematische Darstellung der Zuordnung von Modelldatenpunkten zu experimentellen Datenpunkten für ein Phasendiagramm}
 	\label{fig: phasendiagrammsuche}
 \end{figure}
 
-Da die Druckdifferenz $\Delta p_1$ kleiner $ \Delta p_2$ ist, wird der gekennzeichnete Modellpunkt dem experimentellen Datenpunkt zugeordnet. Da die Daten des Modells und die des Experiments meistens sehr eng beieinander liegen, wurde bisher auf eine Interpolation verzichtet. Liegen Punkte des Experiments oberhalb oder unterhalb der Modelldaten, wie beispielsweise in \autoref{fig: phase_eq_datenausschluss} zu sehen, werden diese aus der Bewertung ausgeschlossen. 
+Da die Druckdifferenz $\Delta p_1$ kleiner $ \Delta p_2$ ist, wird der gekennzeichnete Modellpunkt dem experimentellen Datenpunkt zugeordnet. Da die Daten des Modells und die des Experiments meistens sehr eng beieinander liegen, wurde bisher auf eine Interpolation verzichtet. Liegt ein Datenpunkt unterhalb des Minimums oder oberhalb des Maximums des Modells, werden diese von der Bewertung ausgeschlossen. In \autoref{fig: phase_eq_datenausschluss} ist zu sehen, dass alle experimentellen Datenpunkte bei einem größeren Druck liegen als der Maximaldruck der Modelldaten. In diesem Fall werden alle Daten von der Bewertung ausgeschlossen, da sie außerhalb des Modells liegen.
 
 \begin{figure}[htb]
 	\centering

@@ -225,21 +225,21 @@ Für die Bestimmung der quantitativen Abweichung vom idealen Verhalten werden fo
 Um die benötigten Größen berechnen zu können, werden die Aktivitätskoeffizienten aus experimentell erhobenen Dampf-Flüssigkeits-Gleichgewichts Daten berechnet. Dazu wird der $\gamma$-$\varphi$ Ansatz verwendet. Um diesen Ansatz herzuleiten wird das Raoult-sche Gesetz als Basis verwendet.
 \begin{equation}
 	\label{eq: raoult_base}
-	y_i \cdot P = P_{i}^{\mathrm{sat}} \cdot x_i
+	y_i \cdot p = p_{i}^{\mathrm{sat}} \cdot x_i
 \end{equation}
 
-$ y_i $ beschriebt in dieser Gleichung die Zusammensetzung der Dampfphase. $ x_i $ ist die Zusammensetzung der Flüssigphase. $ P $ beschreibt den Gesamtdruck und $ P_{i}^{\mathrm{sat}} $ den Sättigungsdampfdruck der Komponente i im Gemisch.
+$ y_i $ beschriebt in dieser Gleichung die Zusammensetzung der Dampfphase. $ x_i $ ist die Zusammensetzung der Flüssigphase. $ p $ beschreibt den Gesamtdruck und $ p_{i}^{\mathrm{sat}} $ den Sättigungsdampfdruck der Komponente i im Gemisch.
 In dem hier gewählten Ansatz wird die Dampfphase als ideal angenommen, sodass die linke Seite von \autoref{eq: raoult_base} bestehen bleibt. Die Flüssigphase wird als nicht-ideal angenommen und es wird der Korrekturfaktor $\gamma_i$ eingeführt. Dieser Korrekturfaktor $\gamma_i$ wird auch Aktivitätskoeffizient genannt. 
 \begin{equation}
 	\label{eq: raoult_mod}
-	y_i \cdot P = P_{i}^{\mathrm{sat}} \cdot x_i \cdot \gamma_i
+	y_i \cdot p = p_{i}^{\mathrm{sat}} \cdot x_i \cdot \gamma_i
 \end{equation}
 
 Der Faktor $\gamma_i$ beschreibt die Abweichung vom Idealverhalten in der Flüssigphase. Im Falle eines sich in der Flüssigkeit ideal verhaltenden Stoffgemisches gilt $\gamma_i = 1$. \autoref{eq: raoult_mod} kann nach dem Aktivitätskoeffizienten umgeformt werden. Für einen experimentell erhobenen Datenpunkt gilt dann:
 \begin{equation}
-	\gamma_i \left(T,x \right) = \dfrac{P_{\mathrm{exp}} \cdot y_{i,\mathrm{exp}}}{P_{i}^{\mathrm{sat}}(T_{\mathrm{exp}}) \cdot x_{i,\mathrm{exp}}}
+	\gamma_i \left(T,x \right) = \dfrac{p_{\mathrm{exp}} \cdot y_{i,\mathrm{exp}}}{p_{i}^{\mathrm{sat}}(T_{\mathrm{exp}}) \cdot x_{i,\mathrm{exp}}}
 \end{equation}
-Die notwendigen temperaturabhängigen Dampfdrücke $P_{i}^{\mathrm{sat}}(T)$ sind der Datenbank des Design Institute for Physical Properties (DIPPR) \cite{thomson1996dippr} entnommen worden.
+Die notwendigen temperaturabhängigen Dampfdrücke $p_{i}^{\mathrm{sat}}(T)$ sind der Datenbank des Design Institute for Physical Properties (DIPPR) \cite{thomson1996dippr} entnommen worden.
 Um die Gibbs-Energie $g^{\mathrm{E}}$ berechnen zu können, wurde ein Ansatz des Margules Gibbs-Exzess-Energie Models in \cite{jaubert2020benchmark} verwendet. Der Ansatz fittet vier Parameter anhand von isobaren Dampf-Flüssigkeit Phasengleichgewichtsdaten und ermöglicht so eine temperaturabhängige Berechnung der Gibbs-Energie. Der benötigte Ansatz zum Fitten kann aus \autoref{eq: fit_par} hergeleitet werden. Es gilt:
 \begin{equation}
 	\label{eq: fit_par}
