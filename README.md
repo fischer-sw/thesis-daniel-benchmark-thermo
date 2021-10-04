@@ -1,4 +1,4 @@
-# thesis-daniel-benchmark-thermo
+# benchmark-thermo
 
 Benchmark for thermodynamic models
 
