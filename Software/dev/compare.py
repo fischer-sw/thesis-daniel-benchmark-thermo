@@ -7,10 +7,7 @@ from shutil import copyfile
 import numpy as np
 import logging
 
-
 from check_phase_eq_direction import *
-
-
 
 class Comparison:
 
@@ -221,6 +218,10 @@ class Comparison:
         return res
 
     def calc_group_results(self):
+
+        """
+        Function that calcultes group results
+        """
         
         res = self.calc_bac_results()
 

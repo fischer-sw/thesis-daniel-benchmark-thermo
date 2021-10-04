@@ -22,7 +22,7 @@ from check_phase_eq_direction import *
 
 class Model:
 
-    def __init__(self, model_name, logger=None):
+    def __init__(self, model_name, mapings_filename, eqtype, mixtype, logger=None):
         
         """ 
         Constructor of database class
@@ -41,7 +41,11 @@ class Model:
 
         self.delete_diags = False
 
-        self.model = "SRK"
+        # self.eqtype = 2 #Reinstoffgleichung: 1: Hochgenau, 2: SRK, 3: PR, 4: LKP, 6: PC-SAFT
+        # self.mixtype = 22 #Gemischmodell: 1: Multifluid-Gemischmodell, 2: SRK a quadratisch, b linear, 21: SRK a quadratisch, b quadratisch, 22: PSRK, 3: PR a quadratisch, b linear, 31: PR a quadratisch, b quadratisch, 32: VTPR
+
+        self.eqtype = eqtype
+        self.mixtype = mixtype
         
         self.ceate_model_dir()
         # self.reset_model()
@@ -52,61 +56,49 @@ class Model:
         self.dll_path = os.path.join(sys.path[0],'TREND_FIT_DLL.dll')
 
 
+        # default calc vars
         vars = ['Enthalpy of mixing', 'Heat capacity of mixing', 'Isothermal phase equilibrium data', 'Isobaric phase equilibrium data', 'Azeotropic point']
-
         self.calc_vars = vars[0:5]
-        # self.calc_vars = [vars[4]]
 
-        # keys to delete from all model data dicts
-
-        # self.del_keys = ['Isothermal phase equilibrium data', 'Isobaric phase equilibrium data', 'Azeotropic point']
+        # default vars to calc again
         self.del_keys = []
 
-
-
-        self.fluid_mappings = self.read_mappings("mappings")
+        self.fluid_mappings = self.read_mappings(mapings_filename)
 
         self.clean_model_data()
 
-        
-
-        self.COSMOparam = (ct.c_double * COSMO_length)()
-        self.COSMOparam[0] = 6525.69 * 4184.0
-        self.COSMOparam[1] = 1.4859 * 10**8 * 4184.0
-        self.COSMOparam[2] = 4013.78 * 4184.0
-        self.COSMOparam[3] = 932.31 * 4184.0 
-        self.COSMOparam[4] = 3016.43 * 4184.0
-        self.COSMOparam[5] = 115.7023
-        self.COSMOparam[6] = 117.4650
-        self.COSMOparam[7] = 66.0691
-        self.COSMOparam[8] = 95.6184
-        self.COSMOparam[9] = -11.0549
-        self.COSMOparam[10] = 15.4901
-        self.COSMOparam[11] = 84.6268
-        self.COSMOparam[12] = 109.6621
-        self.COSMOparam[13] = 52.9318
-        self.COSMOparam[14] = 104.2534
-        self.COSMOparam[15] = 19.3477
-        self.COSMOparam[16] = 141.1709
-        self.COSMOparam[17] = 58.3301
-        self.COSMOparam[18] = 115.70
-        self.COSMOparam[19] = 76.89
-        self.COSMOparam[20] = 85.37 
-
-    
-
-
     def read_mappings(self, filename):
+
+        """
+        Function that reads mappings from file
+
+        Arguments:
+            filename (str): mappings filename
+
+        Returns:
+            dict: dict with all keys of database systems and values of model names
+
+        """
         
         mappings_path = os.path.join(sys.path[0], "..", "..","Daten", filename + ".json")
 
-        with open(mappings_path) as f:
-            mappings = json.loads(f.read())
+        if os.path.exists(mappings_path):
 
-        return mappings
+            with open(mappings_path) as f:
+                mappings = json.loads(f.read())
+
+            return mappings
+        else:
+            self.log.info("No mappings file {} found. Please create it.".format(filename+ ".json"))
+            exit()
 
 
     def reset_model(self):
+
+        """
+        Function that resets model and delets all calculated data
+        """
+
         files = os.listdir(self.model_dir)
         for file in files:
             os.remove(os.path.join(self.model_dir, file))
@@ -138,6 +130,17 @@ class Model:
 
 
     def get_system_data(self, system, type):
+
+        """
+        Function that returns all data for a system
+        
+        Arguments:
+            system (list): list of components in a system
+            type (str): if type == model look in model data else search for experimental data 
+
+        Returns:
+            dict: all system data
+        """
         
         if type != "model":
             path = os.path.join(self.data_dir, system[0]+"_"+system[1] + ".json")
@@ -156,6 +159,11 @@ class Model:
     
 
     def do_model_backup(self):
+
+        """
+        Function that creates a backup of all calculated model data
+
+        """
 
         path = self.model_dir
 
@@ -176,6 +184,11 @@ class Model:
     
     
     def clean_model_data(self):
+
+        """
+        Function that deletes all empty measurements in datasets for each system
+
+        """
 
         for system in self.systems:
 
@@ -212,6 +225,14 @@ class Model:
 
 
     def create_system_diags(self, system):
+
+        """
+        Function that gets all infos to create phase_eq diagram for a system
+
+        Arguments:
+            system (list): components of system
+        """
+
         model_data = self.get_system_data(system, 'model')
         exp_data = self.get_system_data(system, 'exp')
 
@@ -240,11 +261,27 @@ class Model:
 
     def create_diags(self):
 
+        """
+        Function that creats all phase eq diags
+        """
+
         for system in self.systems:
 
             self.create_system_diags(system)
 
     def create_phase_eq_diag(self, model_data, exp_data, system, mode, param):
+
+        """
+        Function that creates a phase eq diag for a system
+
+        Arguments:
+            model_data (dict): model data
+            exp_data (dict): experiment data
+            system (list): components of system
+            mode (str): mode (isotherm or isobar)
+            param (float): param of measurement (T in [K] or p in [bar])
+        """
+
          # check for existing diag
         # path = os.path.join(self.data_dir,'../../Diagramme', self.model_name, system[0]+ "_" + system[1] + "_" + mode + "_" + str(param) + "_" + ".pdf")
         path = os.path.join(self.data_dir,'../../Diagramme', self.model_name, system[0]+ "_" + system[1] + "_" + mode + "_" + str(param) + "_" + ".png")
@@ -363,6 +400,15 @@ class Model:
 
 
     def check_possible_calculations(self):
+
+        """
+        Function that checks all possible calculations for a model
+
+        Returns:
+            float: percentage of exp data that can be calculated
+            float: number of experiments datasets
+            float: number of model datasets
+        """
         
         exp_count = self.get_experimental_count()
 
@@ -408,6 +454,11 @@ class Model:
 
 
     def get_experimental_count(self):
+
+        """
+        Function that gets number of experiments
+
+        """
         res = {}
 
         exp_data_list = os.listdir(self.data_dir)
@@ -434,55 +485,22 @@ class Model:
         return res
 
 
-    def check_model_components(self, model, components):
+    def check_model_components(self, components):
+
+        """
+        Function that checks model components for possible calculation
+
+        """
         
-        res = {}
-
-        for ele in components:
-            res[ele] = False
-        
-        if model == "SRK":
-            
-            # get srk-fld data
-
-            path = os.path.join(sys.path[0], "..", "..","TREND 4.0", "srk", "fluids_srk", "srkfluids.fld")
-            reader = Filereader(path)
-            srk_data = reader.readdata()
-
-            for ele in components:
-                model_comp_name = self.fluid_mappings[ele]
-
-                if not model_comp_name in srk_data.keys() :
-                    continue
-
-                comp = srk_data[model_comp_name]
-
-                letters = ["A", "B", "C", "D", "E", "F", "G"]
-
-                for letter in letters:
-                    if comp[letter] != '0':
-                       res[ele] = True
-
-            test_res = 0
-
-            for ele in components:
-                if res[ele] == True:
-                    test_res += 1
-            
-            if test_res == 2:
-                return True
-
-            else:
-                return False
-
-        if model == "new model":
-            # do check here
-            pass
-
-        else:
-            return False
+        self.log.info("Running into default case. No implementation in child class found.")
+        return False
 
     def calc_model_results(self):
+
+        """
+        Function that calculates all model results
+
+        """
 
         for element in self.systems:
 
@@ -542,7 +560,7 @@ class Model:
 
             if element in ['Enthalpy of mixing', 'Heat capacity of mixing']:
                 
-                components_test = self.check_model_components(self.model, system)
+                components_test = self.check_model_components(system)
                 
 
                 if components_test == False:
@@ -778,12 +796,24 @@ class Model:
         return results
 
     def write_results(self, filename, results):
+
+        """
+        Function that writes results to file
+
+        Arguments:
+            filename (str): name of results file
+            results (dict): results data
+        """
         
         path = os.path.join(self.data_dir,'../Modelle', self.model_name, filename)
         with open(path, 'w') as outfile:
             json.dump(results, outfile, default=str, indent=2, sort_keys=True)
 
     def ceate_model_dir(self):
+
+        """
+        Function that creates all model directorys needed
+        """
 
         dirs = []
 
@@ -800,6 +830,17 @@ class Model:
 
 
     def get_azeo_point(self, dataset, inputset):
+
+        """
+        Function that searches for azetrop data
+
+        Arguments:
+            dataset (dict): datasets of experiment
+            inputset (dict): model dataset to look for azeotropic point
+
+        Returns:
+            dict: azeotropic point dataset
+        """
 
         p_vals = np.array(list(list(zip(*inputset['measurements'][1:]))[0]))
         x1_vals = np.array(list(list(zip(*inputset['measurements'][1:]))[1]))
@@ -825,6 +866,17 @@ class Model:
 
 
     def calc_h_mix(self, system, temp, press, x):
+
+        """
+        Function that calculates mixing_enthalpy
+
+        Arguments:
+            system (list): components of system
+            temp (float): temperature in [K]
+            press (float): pressure [bar]
+            x (float): molar composition
+
+        """
         
         fldmix = None
         fld1 = None
@@ -841,14 +893,11 @@ class Model:
 
             
         press = press/10  # MPa
-        eqtype = 2 #Reinstoffgleichung: 1: Hochgenau, 2: SRK, 3: PR, 4: LKP, 6: PC-SAFT
-        mixtype = 22 #Gemischmodell: 1: Multifluid-Gemischmodell, 2: SRK a quadratisch, b linear, 21: SRK a quadratisch, b quadratisch, 22: PSRK, 3: PR a quadratisch, b linear, 31: PR a quadratisch, b quadratisch, 32: VTPR
 
-        # self.fldmix1 = Fluid('TP','HE',['methane','ethane'],[0.6,0.4],[1,1],1,self.trend_path,'molar',self.dll_path)
-        fldmix = Fluid('TP','H',[fld1_name, fld2_name],[x, 1-x],[eqtype,eqtype],mixtype,self.trend_path,'molar',self.dll_path)
+        fldmix = Fluid('TP','H',[fld1_name, fld2_name],[x, 1-x],[self.eqtype, self.eqtype], self.mixtype,self.trend_path,'molar',self.dll_path)
         
-        fld1 = Fluid('TP','H',[fld1_name, fld2_name],[0.99999999,0.00000001],[eqtype,eqtype],mixtype,self.trend_path,'molar',self.dll_path)
-        fld2 = Fluid('TP','H',[fld2_name, fld1_name],[0.99999999,0.00000001],[eqtype,eqtype],mixtype,self.trend_path,'molar',self.dll_path)        
+        fld1 = Fluid('TP','H',[fld1_name, fld2_name],[0.99999999,0.00000001],[self.eqtype, self.eqtype], self.mixtype, self.trend_path, 'molar', self.dll_path)
+        fld2 = Fluid('TP','H',[fld2_name, fld1_name],[0.99999999,0.00000001],[self.eqtype, self.eqtype], self.mixtype, self.trend_path, 'molar', self.dll_path)        
         
         h_mix, errmix = fldmix.TREND_EOS_FIT(temp, press, self.COSMOparam)
         h_fld1, errmix = fld1.TREND_EOS_FIT(temp, press, self.COSMOparam)
@@ -869,6 +918,17 @@ class Model:
         
 
     def calc_heat_capa(self, system, temp, press, x):
+
+        """
+        Function that calculates mixing_heat_capacity
+
+        Arguments:
+            system (list): components of system
+            temp (float): temperature in [K]
+            press (float): pressure [bar]
+            x (float): molar composition
+
+        """
         
         fldmix = None
         fld1 = None
@@ -883,14 +943,11 @@ class Model:
         fld2_name = self.fluid_mappings[system[1]]
 
         press = press/10  # MPa
-        eqtype = 2 #Reinstoffgleichung: 1: Hochgenau, 2: SRK, 3: PR, 4: LKP, 6: PC-SAFT
-        mixtype = 22 #Gemischmodell: 1: Multifluid-Gemischmodell, 2: SRK a quadratisch, b linear, 21: SRK a quadratisch, b quadratisch, 22: PSRK, 3: PR a quadratisch, b linear, 31: PR a quadratisch, b quadratisch, 32: VTPR
-
-        # self.fldmix1 = Fluid('TP','HE',['methane','ethane'],[0.6,0.4],[1,1],1,self.trend_path,'molar',self.dll_path)
-        fldmix = Fluid('TP','CP',[fld1_name, fld2_name],[x, 1-x],[eqtype,eqtype],mixtype,self.trend_path,'molar',self.dll_path)
         
-        fld1 = Fluid('TP','CP',[fld1_name, fld2_name],[0.99999999,0.00000001],[eqtype,eqtype],mixtype,self.trend_path,'molar',self.dll_path)
-        fld2 = Fluid('TP','CP',[fld2_name, fld1_name],[0.99999999,0.00000001],[eqtype,eqtype],mixtype,self.trend_path,'molar',self.dll_path)        
+        fldmix = Fluid('TP','CP',[fld1_name, fld2_name],[x, 1-x],[self.eqtype, self.eqtype], self.mixtype, self.trend_path, 'molar', self.dll_path)
+        
+        fld1 = Fluid('TP','CP',[fld1_name, fld2_name],[0.99999999,0.00000001],[self.eqtype, self.eqtype], self.mixtype, self.trend_path,'molar',self.dll_path)
+        fld2 = Fluid('TP','CP',[fld2_name, fld1_name],[0.99999999,0.00000001],[self.eqtype, self.eqtype], self.mixtype, self.trend_path,'molar',self.dll_path)        
 
         cp_mix, errmix = fldmix.TREND_EOS_FIT(temp, press, self.COSMOparam)
         cp_fld1, errmix = fld1.TREND_EOS_FIT(temp, press, self.COSMOparam)
@@ -910,6 +967,20 @@ class Model:
 
     def calc_phase_eq(self, system, var, var_val):
 
+        """
+        Function that calcultes phase_eq diagram
+
+        Arguments:
+            system (list): list of components
+            var (str): var that is fixed
+            var_val (float): value of fixed variable
+
+        Returns:
+            list: p_points
+            list: T_points
+            ...
+        """
+
         fldmix = None
 
         values = {}
@@ -918,15 +989,11 @@ class Model:
 
         fld1_name = self.fluid_mappings[system[0]]
         fld2_name = self.fluid_mappings[system[1]]
-        
-        eqtype = 2 #Reinstoffgleichung: 1: Hochgenau, 2: SRK, 3: PR, 4: LKP, 6: PC-SAFT
-        mixtype = 22 #Gemischmodell: 1: Multifluid-Gemischmodell, 2: SRK a quadratisch, b linear, 21: SRK a quadratisch, b quadratisch, 22: PSRK, 3: PR a quadratisch, b linear, 31: PR a quadratisch, b quadratisch, 32: VTPR
 
         if var == 'pvap':
             var_val = var_val / 10
 
-        # self.fldmix1 = Fluid('TP','HE',['methane','ethane'],[0.6,0.4],[1,1],1,self.trend_path,'molar',self.dll_path)
-        fldmix = Fluid(var, 'CP', [fld1_name, fld2_name],[0.6,0.4],[eqtype,eqtype],mixtype,self.trend_path,'molar',self.dll_path)
+        fldmix = Fluid(var, 'CP', [fld1_name, fld2_name],[0.6,0.4],[self.eqtype, self.eqtype], self.mixtype, self.trend_path,'molar', self.dll_path)
 
         tmp_path = ''
         

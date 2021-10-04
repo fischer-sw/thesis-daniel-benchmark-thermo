@@ -2,11 +2,9 @@
 
 import logging
 import os
-import re
-import sys
 import unittest
 
-from model import Model
+from model_vtpr import VTPR
 
 # --- logging setup ---
 logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
@@ -17,7 +15,7 @@ model = None
 
 def setUpModule():
     global model
-    model = Model('Test_Modell', logger=log)
+    model = VTPR('VTPR_Test_Modell', 'mappings_vtpr', 3, 32, logger=log)
     return
 
 def tearDownModule():
@@ -34,7 +32,7 @@ class Test01(unittest.TestCase):
     def test_constructor(self):
         self.assertIsNotNone(self.model)
 
-@unittest.skip("Skipping Test02")
+# @unittest.skip("Skipping Test02")
 class Test02(unittest.TestCase):
     
     def setUp(self):
@@ -88,7 +86,7 @@ class Test04(unittest.TestCase):
         self.model.create_system_diags(system)
 
 
-# @unittest.skip("Skipping Test05")
+@unittest.skip("Skipping Test05")
 class Test05(unittest.TestCase):
     
     def setUp(self):
@@ -97,7 +95,7 @@ class Test05(unittest.TestCase):
         
 
     def test_diag(self):
-        self.model.delete_diags = True
+        self.model.delete_diags = False
 
         self.model.create_diags()
 

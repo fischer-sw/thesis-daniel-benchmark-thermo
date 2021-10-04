@@ -2,3 +2,6 @@ numpy
 openpyxl
 pandas>=1.2.0
 xlrd
+mkdocs
+mkdocstrings
+mkdocs-material

@@ -5,13 +5,14 @@ theme:
 nav:
   - Klassen:
     - Database: 
-      - Allgemeines: database.md
       - Methoden: database_methods.md
-    - Comparison:
-      - Methoden: compare_methods.md
+    - Modelle:
+      - Methoden: model_methods.md
+    # - Comparison:
+    #   - Methoden: compare_methods.md
 
 plugins:
   - search
   - mkdocstrings:
       watch:
-        - src/dev
+        - dev
